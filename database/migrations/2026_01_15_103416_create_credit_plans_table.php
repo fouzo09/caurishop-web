@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('credit_plans', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('order_id')->unique()->constrained('orders')->cascadeOnDelete();
+            $table->foreignUuid('order_id')->unique()->constrained('orders')->cascadeOnDelete();
 
             $table->unsignedInteger('duration_months');
             $table->unsignedInteger('installments_count');

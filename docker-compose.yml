@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  caurishop_app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=local
+      - DB_HOST=caurishop_db
+      - DB_DATABASE=caurishop
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+    depends_on:
+      - caurishop_db
+    networks:
+      - caurishop_network
+
+  caurishop_db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: caurishop
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - caurishop_postgres_data:/var/lib/postgresql/data
+    networks:
+      - caurishop_network
+
+volumes:
+  caurishop_postgres_data:
+
+networks:
+  caurishop_network:
+    driver: bridge
