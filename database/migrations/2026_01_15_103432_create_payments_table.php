@@ -8,10 +8,10 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('payments', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
 
             $table->foreignId('customer_id')->constrained('customers')->restrictOnDelete();
-            $table->foreignId('order_id')->nullable()->constrained('orders')->nullOnDelete();
+            $table->foreignUuid('order_id')->nullable()->constrained('orders')->nullOnDelete();
             $table->foreignId('credit_plan_id')->nullable()->constrained('credit_plans')->nullOnDelete();
 
             $table->decimal('amount', 14, 2);

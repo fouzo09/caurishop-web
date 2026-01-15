@@ -8,10 +8,10 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
 
             $table->string('order_number')->unique();
-            $table->foreignId('customer_id')->constrained('customers')->restrictOnDelete();
+            $table->foreignUuid('customer_id')->constrained('customers')->restrictOnDelete();
 
             $table->enum('order_type', ['cash', 'credit']);
             $table->enum('status', ['draft', 'confirmed', 'completed', 'cancelled'])->default('draft');

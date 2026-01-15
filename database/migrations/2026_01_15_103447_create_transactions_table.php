@@ -8,13 +8,13 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('transactions', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
 
             $table->enum('type', ['payment', 'adjustment']);
             $table->decimal('amount', 14, 2);
 
-            $table->foreignId('order_id')->nullable()->constrained('orders')->nullOnDelete();
-            $table->foreignId('payment_id')->nullable()->constrained('payments')->nullOnDelete();
+            $table->foreignUuid('order_id')->nullable()->constrained('orders')->nullOnDelete();
+            $table->foreignUuid('payment_id')->nullable()->constrained('payments')->nullOnDelete();
 
             // Permet de stocker des infos JSON (ex: reason adjustment)
             $table->jsonb('metadata')->nullable();

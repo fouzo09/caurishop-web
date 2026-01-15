@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('payment_allocations', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('payment_id')->constrained('payments')->cascadeOnDelete();
+            $table->foreignUuid('payment_id')->constrained('payments')->cascadeOnDelete();
             $table->foreignId('installment_id')->constrained('installments')->cascadeOnDelete();
 
             $table->decimal('amount_allocated', 14, 2);
