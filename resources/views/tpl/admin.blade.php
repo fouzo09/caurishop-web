@@ -6,9 +6,9 @@
     <title>CAURISHOP - Admin Dashboard</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="{{ asset('assets/admin/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/admin/components.css') }}" rel="stylesheet">
 </head>
 <body>
-<!-- Sidebar -->
 <aside class="sidebar">
     <div class="sidebar-header">
         <a href="#" class="logo">CAURISHOP</a>
@@ -66,6 +66,22 @@
         </div>
 
         <div class="menu-section">
+            <div class="menu-label">Utilisateurs</div>
+            <a href="{{ route('admin.users') }}" class="menu-item">
+                <i class="fas fa-user-cog"></i>
+                <span>Utilisateurs</span>
+            </a>
+            <a href="" class="menu-item">
+                <i class="fas fa-user-tag"></i>
+                <span>Rôles</span>
+            </a>
+            <a href="" class="menu-item">
+                <i class="fas fa-key"></i>
+                <span>Permissions</span>
+            </a>
+        </div>
+
+        <div class="menu-section">
             <div class="menu-label">Configuration</div>
             <a href="#" class="menu-item">
                 <i class="fas fa-cog"></i>
@@ -83,9 +99,7 @@
     </nav>
 </aside>
 
-<!-- Main Content -->
 <main class="main-content">
-    <!-- Header -->
     <header class="header">
         <div class="search-bar">
             <i class="fas fa-search"></i>
@@ -114,7 +128,6 @@
         </div>
     </header>
 
-    <!-- Content -->
     @yield('content')
 </main>
 </body>
