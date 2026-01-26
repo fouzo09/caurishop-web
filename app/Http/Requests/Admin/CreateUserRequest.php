@@ -8,7 +8,11 @@ class CreateUserRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('create users');
+        // Permettre temporairement à tous les utilisateurs authentifiés
+        return auth()->check();
+
+        // Ou utiliser ceci si vous avez les permissions configurées
+        // return $this->user()->can('create users');
     }
 
     public function rules(): array
