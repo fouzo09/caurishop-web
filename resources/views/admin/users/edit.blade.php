@@ -22,6 +22,13 @@
     </div>
     @endif
 
+    @if(session('error'))
+    <div class="alert danger">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>{{ session('error') }}</span>
+    </div>
+    @endif
+
     <form action="{{ route('admin.users.update', $user) }}" method="POST">
         @csrf
         @method('PUT')
