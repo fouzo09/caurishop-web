@@ -29,12 +29,16 @@
 
         <div class="menu-section">
             <div class="menu-label">Gestion</div>
-            <a href="{{ route('admin.companies') }}" class="menu-item">
+            <a href="{{ route('admin.customers.index') }}" class="menu-item">
+                <i class="fas fa-truck"></i>
+                <span>Fournisseurs</span>
+            </a>
+            <a href="{{ route('admin.companies.index') }}" class="menu-item">
                 <i class="fas fa-building"></i>
                 <span>Entreprises</span>
                 <span class="menu-badge">8</span>
             </a>
-            <a href="#" class="menu-item">
+            <a href="{{ route('admin.customers.index') }}" class="menu-item">
                 <i class="fas fa-users"></i>
                 <span>Clients</span>
             </a>
@@ -67,7 +71,7 @@
 
         <div class="menu-section">
             <div class="menu-label">Utilisateurs</div>
-            <a href="{{ route('admin.users') }}" class="menu-item">
+            <a href="{{ route('admin.users.index') }}" class="menu-item">
                 <i class="fas fa-user-cog"></i>
                 <span>Utilisateurs</span>
             </a>
