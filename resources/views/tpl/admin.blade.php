@@ -42,7 +42,7 @@
                 <i class="fas fa-users"></i>
                 <span>Clients</span>
             </a>
-            <a href="#" class="menu-item">
+            <a href="{{ route('admin.products.index') }}" class="menu-item">
                 <i class="fas fa-box"></i>
                 <span>Produits</span>
             </a>

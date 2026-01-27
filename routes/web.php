@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -54,6 +55,27 @@ Route::middleware('auth')->group(function () {
             Route::delete('/{customer}', [CustomerController::class, 'destroy'])->name('destroy');
             Route::post('/{customer}/activate', [CustomerController::class, 'activate'])->name('activate');
             Route::post('/{customer}/deactivate', [CustomerController::class, 'deactivate'])->name('deactivate');
+        });
+
+        Route::prefix('products')->name('products.')->group(function () {
+            Route::get('/', [ProductController::class, 'index'])->name('index');
+            Route::get('/create', [ProductController::class, 'create'])->name('create');
+            Route::post('/', [ProductController::class, 'store'])->name('store');
+            Route::get('/{product}', [ProductController::class, 'show'])->name('show');
+            Route::get('/{product}/edit', [ProductController::class, 'edit'])->name('edit');
+            Route::put('/{product}', [ProductController::class, 'update'])->name('update');
+            Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy');
+            Route::post('/{product}/activate', [ProductController::class, 'activate'])->name('activate');
+            Route::post('/{product}/deactivate', [ProductController::class, 'deactivate'])->name('deactivate');
+            Route::post('/{product}/publish', [ProductController::class, 'publish'])->name('publish');
+            Route::post('/{product}/unpublish', [ProductController::class, 'unpublish'])->name('unpublish');
+
+            // Variants
+            Route::get('/{product}/variants/create', [ProductController::class, 'createVariant'])->name('variants.create');
+            Route::post('/{product}/variants', [ProductController::class, 'storeVariant'])->name('variants.store');
+            Route::get('/{product}/variants/{variant}/edit', [ProductController::class, 'editVariant'])->name('variants.edit');
+            Route::put('/{product}/variants/{variant}', [ProductController::class, 'updateVariant'])->name('variants.update');
+            Route::delete('/{product}/variants/{variant}', [ProductController::class, 'destroyVariant'])->name('variants.destroy');
         });
     });
 });

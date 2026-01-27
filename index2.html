@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iPhone 15 Pro Max - CAURISHOP</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0066FF;
+            --secondary: #FF6B35;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --dark: #1A1A1A;
+            --gray: #64748B;
+            --light: #F8FAFC;
+            --border: #E2E8F0;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--white);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+        }
+
+        .product-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .product-images {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .main-image {
+            width: 100%;
+            aspect-ratio: 1;
+            background: var(--light);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 8rem;
+            color: var(--primary);
+        }
+
+        .thumbnail-images {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+
+        .thumbnail {
+            aspect-ratio: 1;
+            background: var(--light);
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .thumbnail:hover,
+        .thumbnail.active {
+            border-color: var(--primary);
+        }
+
+        .product-info h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stars {
+            color: #FFC107;
+        }
+
+        .rating-text {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .price-section {
+            padding: 1.5rem;
+            background: var(--light);
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .price-note {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .variant-selector {
+            margin-bottom: 2rem;
+        }
+
+        .variant-label {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .variant-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .variant-option {
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .variant-option:hover {
+            border-color: var(--primary);
+            background: rgba(0, 102, 255, 0.05);
+        }
+
+        .variant-option.active {
+            border-color: var(--primary);
+            background: rgba(0, 102, 255, 0.1);
+        }
+
+        .variant-option.active::after {
+            content: '✓';
+            position: absolute;
+            top: 0.25rem;
+            right: 0.25rem;
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            color: var(--white);
+            border-radius: 50%;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .variant-option input[type="radio"] {
+            display: none;
+        }
+
+        .variant-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .variant-price {
+            font-size: 0.85rem;
+            color: var(--primary);
+        }
+
+        .variant-stock {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-top: 0.25rem;
+        }
+
+        .variant-option.out-of-stock {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .credit-section {
+            padding: 1.5rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success);
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .credit-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--success);
+            margin-bottom: 1rem;
+        }
+
+        .credit-options {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .credit-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--white);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .credit-option:hover,
+        .credit-option.active {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .credit-option input[type="radio"] {
+            display: none;
+        }
+
+        .credit-duration {
+            font-weight: 600;
+        }
+
+        .credit-monthly {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .stock-info {
+            padding: 1rem;
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 3px solid var(--success);
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stock-info.low-stock {
+            background: rgba(245, 158, 11, 0.1);
+            border-left-color: var(--warning);
+            color: var(--warning);
+        }
+
+        .stock-info.out-of-stock {
+            background: rgba(239, 68, 68, 0.1);
+            border-left-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .quantity-label {
+            font-weight: 600;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .quantity-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: var(--light);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+        }
+
+        .quantity-btn:hover {
+            background: var(--border);
+        }
+
+        .quantity-input {
+            width: 60px;
+            height: 40px;
+            border: none;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: #0052CC;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .product-features {
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+        }
+
+        .features-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--light);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+
+        .product-description {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: var(--light);
+            border-radius: 12px;
+        }
+
+        .description-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .description-text {
+            color: var(--gray);
+            line-height: 1.8;
+        }
+
+        @media (max-width: 768px) {
+            .product-layout {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .product-images {
+                position: relative;
+                top: 0;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .variant-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="navbar-content">
+        <div class="logo">CAURISHOP</div>
+        <ul class="nav-links">
+            <li><a href="#">Accueil</a></li>
+            <li><a href="#">Produits</a></li>
+            <li><a href="#">À Crédit</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Produit -->
+<div class="container">
+    <div class="product-layout">
+        <!-- Images -->
+        <div class="product-images">
+            <div class="main-image">
+                <i class="fab fa-apple"></i>
+            </div>
+            <div class="thumbnail-images">
+                <div class="thumbnail active"></div>
+                <div class="thumbnail"></div>
+                <div class="thumbnail"></div>
+                <div class="thumbnail"></div>
+            </div>
+        </div>
+
+        <!-- Informations -->
+        <div class="product-info">
+            <h1>iPhone 15 Pro Max</h1>
+
+            <div class="product-rating">
+                <div class="stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                </div>
+                <span class="rating-text">4.5 (127 avis)</span>
+            </div>
+
+            <!-- Sélection des variantes -->
+            <div class="variant-selector">
+                <label class="variant-label">Capacité de stockage</label>
+                <div class="variant-options">
+                    <label class="variant-option">
+                        <input type="radio" name="capacity" value="128" data-price="3800000" data-stock="35">
+                        <div class="variant-name">128 GB</div>
+                        <div class="variant-price">3,800,000 GNF</div>
+                        <div class="variant-stock">35 en stock</div>
+                    </label>
+                    <label class="variant-option active">
+                        <input type="radio" name="capacity" value="256" data-price="4200000" data-stock="50" checked>
+                        <div class="variant-name">256 GB</div>
+                        <div class="variant-price">4,200,000 GNF</div>
+                        <div class="variant-stock">50 en stock</div>
+                    </label>
+                    <label class="variant-option">
+                        <input type="radio" name="capacity" value="512" data-price="5500000" data-stock="20">
+                        <div class="variant-name">512 GB</div>
+                        <div class="variant-price">5,500,000 GNF</div>
+                        <div class="variant-stock">20 en stock</div>
+                    </label>
+                    <label class="variant-option">
+                        <input type="radio" name="capacity" value="1024" data-price="7000000" data-stock="8">
+                        <div class="variant-name">1 TB</div>
+                        <div class="variant-price">7,000,000 GNF</div>
+                        <div class="variant-stock">8 en stock</div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="variant-selector">
+                <label class="variant-label">Couleur</label>
+                <div class="variant-options">
+                    <label class="variant-option active">
+                        <input type="radio" name="color" value="noir" checked>
+                        <div class="variant-name">Noir Titane</div>
+                    </label>
+                    <label class="variant-option">
+                        <input type="radio" name="color" value="bleu">
+                        <div class="variant-name">Bleu Titane</div>
+                    </label>
+                    <label class="variant-option">
+                        <input type="radio" name="color" value="blanc">
+                        <div class="variant-name">Blanc</div>
+                    </label>
+                    <label class="variant-option">
+                        <input type="radio" name="color" value="naturel">
+                        <div class="variant-name">Naturel</div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Prix -->
+            <div class="price-section">
+                <div class="price" id="displayPrice">4,200,000 GNF</div>
+                <div class="price-note">Prix comptant - TVA incluse</div>
+            </div>
+
+            <!-- Options de crédit -->
+            <div class="credit-section">
+                <div class="credit-header">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Payez en plusieurs fois sans frais</span>
+                </div>
+                <div class="credit-options">
+                    <label class="credit-option">
+                        <input type="radio" name="credit" value="3">
+                        <div>
+                            <div class="credit-duration">3 mois</div>
+                            <div style="font-size: 0.85rem; color: var(--gray);">Paiement rapide</div>
+                        </div>
+                        <div class="credit-monthly" id="credit-3">1,400,000 GNF/mois</div>
+                    </label>
+                    <label class="credit-option active">
+                        <input type="radio" name="credit" value="6" checked>
+                        <div>
+                            <div class="credit-duration">6 mois</div>
+                            <div style="font-size: 0.85rem; color: var(--gray);">Équilibre optimal</div>
+                        </div>
+                        <div class="credit-monthly" id="credit-6">700,000 GNF/mois</div>
+                    </label>
+                    <label class="credit-option">
+                        <input type="radio" name="credit" value="12">
+                        <div>
+                            <div class="credit-duration">12 mois</div>
+                            <div style="font-size: 0.85rem; color: var(--gray);">Mensualités réduites</div>
+                        </div>
+                        <div class="credit-monthly" id="credit-12">350,000 GNF/mois</div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Stock -->
+            <div class="stock-info" id="stockInfo">
+                <i class="fas fa-check-circle"></i>
+                <span>En stock - <strong id="stockQuantity">50</strong> unités disponibles</span>
+            </div>
+
+            <!-- Quantité -->
+            <div class="quantity-selector">
+                <span class="quantity-label">Quantité :</span>
+                <div class="quantity-controls">
+                    <button class="quantity-btn" onclick="decreaseQuantity()">−</button>
+                    <input type="number" class="quantity-input" id="quantity" value="1" min="1" max="50">
+                    <button class="quantity-btn" onclick="increaseQuantity()">+</button>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions">
+                <button class="btn btn-primary" onclick="addToCart()">
+                    <i class="fas fa-shopping-cart"></i>
+                    Ajouter au panier
+                </button>
+                <button class="btn btn-outline">
+                    <i class="fas fa-heart"></i>
+                    Favoris
+                </button>
+            </div>
+
+            <!-- Caractéristiques -->
+            <div class="product-features">
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-truck"></i>
+                        </div>
+                        <div>
+                            <strong>Livraison gratuite</strong>
+                            <div style="font-size: 0.85rem; color: var(--gray);">Sous 24-48h à Conakry</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div>
+                            <strong>Garantie 1 an</strong>
+                            <div style="font-size: 0.85rem; color: var(--gray);">Garantie constructeur Apple</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-undo"></i>
+                        </div>
+                        <div>
+                            <strong>Retour sous 14 jours</strong>
+                            <div style="font-size: 0.85rem; color: var(--gray);">Satisfait ou remboursé</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <div>
+                            <strong>Support client</strong>
+                            <div style="font-size: 0.85rem; color: var(--gray);">7j/7 de 8h à 20h</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Description -->
+    <div class="product-description">
+        <h2 class="description-title">Description du produit</h2>
+        <div class="description-text">
+            <p>L'iPhone 15 Pro Max représente le summum de la technologie mobile Apple. Équipé du nouveau chip A17 Pro, il offre des performances exceptionnelles pour toutes vos applications et jeux les plus exigeants.</p>
+            <br>
+            <p><strong>Caractéristiques principales :</strong></p>
+            <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
+                <li>Écran Super Retina XDR de 6,7 pouces</li>
+                <li>Chip A17 Pro avec GPU 6 cœurs</li>
+                <li>Système photo professionnel triple objectif 48 MP</li>
+                <li>Autonomie exceptionnelle toute la journée</li>
+                <li>Châssis en titane ultraléger et résistant</li>
+                <li>USB-C avec USB 3 pour des transferts ultra-rapides</li>
+                <li>iOS 17 avec toutes les dernières fonctionnalités</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentPrice = 4200000;
+    let currentStock = 50;
+    let maxQuantity = 50;
+
+    // Gestion des variantes
+    document.querySelectorAll('.variant-option').forEach(option => {
+        option.addEventListener('click', function() {
+            const parent = this.closest('.variant-selector');
+            parent.querySelectorAll('.variant-option').forEach(o => o.classList.remove('active'));
+            this.classList.add('active');
+
+            // Mettre à jour le prix si c'est une variante de capacité
+            const radio = this.querySelector('input[type="radio"]');
+            if (radio.name === 'capacity') {
+                currentPrice = parseInt(radio.dataset.price);
+                currentStock = parseInt(radio.dataset.stock);
+                maxQuantity = currentStock;
+                updatePrice();
+                updateStock();
+                document.getElementById('quantity').max = maxQuantity;
+            }
+        });
+    });
+
+    // Gestion des options de crédit
+    document.querySelectorAll('.credit-option').forEach(option => {
+        option.addEventListener('click', function() {
+            document.querySelectorAll('.credit-option').forEach(o => o.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    // Mise à jour du prix
+    function updatePrice() {
+        document.getElementById('displayPrice').textContent = formatPrice(currentPrice) + ' GNF';
+
+        // Mettre à jour les mensualités
+        document.getElementById('credit-3').textContent = formatPrice(Math.round(currentPrice / 3)) + ' GNF/mois';
+        document.getElementById('credit-6').textContent = formatPrice(Math.round(currentPrice / 6)) + ' GNF/mois';
+        document.getElementById('credit-12').textContent = formatPrice(Math.round(currentPrice / 12)) + ' GNF/mois';
+    }
+
+    // Mise à jour du stock
+    function updateStock() {
+        const stockInfo = document.getElementById('stockInfo');
+        const stockQuantity = document.getElementById('stockQuantity');
+
+        stockQuantity.textContent = currentStock;
+
+        if (currentStock === 0) {
+            stockInfo.className = 'stock-info out-of-stock';
+            stockInfo.innerHTML = '<i class="fas fa-times-circle"></i><span>Rupture de stock</span>';
+        } else if (currentStock <= 10) {
+            stockInfo.className = 'stock-info low-stock';
+            stockInfo.innerHTML = `<i class="fas fa-exclamation-triangle"></i><span>Stock limité - <strong>${currentStock}</strong> unités restantes</span>`;
+        } else {
+            stockInfo.className = 'stock-info';
+            stockInfo.innerHTML = `<i class="fas fa-check-circle"></i><span>En stock - <strong>${currentStock}</strong> unités disponibles</span>`;
+        }
+    }
+
+    // Gestion de la quantité
+    function increaseQuantity() {
+        const input = document.getElementById('quantity');
+        const current = parseInt(input.value);
+        if (current < maxQuantity) {
+            input.value = current + 1;
+        }
+    }
+
+    function decreaseQuantity() {
+        const input = document.getElementById('quantity');
+        const current = parseInt(input.value);
+        if (current > 1) {
+            input.value = current - 1;
+        }
+    }
+
+    // Ajouter au panier
+    function addToCart() {
+        const quantity = document.getElementById('quantity').value;
+        const capacity = document.querySelector('input[name="capacity"]:checked').value;
+        const color = document.querySelector('input[name="color"]:checked').value;
+        const credit = document.querySelector('input[name="credit"]:checked')?.value;
+
+        const product = {
+            name: 'iPhone 15 Pro Max',
+            capacity: capacity + ' GB',
+            color: color,
+            price: currentPrice,
+            quantity: quantity,
+            credit: credit ? credit + ' mois' : 'Comptant',
+            monthly: credit ? Math.round(currentPrice / parseInt(credit)) : null
+        };
+
+        console.log('Produit ajouté au panier:', product);
+        alert(`✅ ${product.name} ${product.capacity} ${product.color} ajouté au panier !\n\nQuantité: ${quantity}\nPaiement: ${product.credit}${product.monthly ? '\nMensualité: ' + formatPrice(product.monthly) + ' GNF' : ''}`);
+    }
+
+    // Formater le prix
+    function formatPrice(price) {
+        return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+</script>
+</body>
+</html>
