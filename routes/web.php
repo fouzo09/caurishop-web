@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +34,18 @@ Route::middleware('auth')->group(function () {
             Route::post('/{user}/suspend', [UserController::class, 'suspend'])->name('suspend');
             Route::post('/{user}/activate', [UserController::class, 'activate'])->name('activate');
             Route::post('/{user}/verify', [UserController::class, 'verify'])->name('verify');
+        });
+
+        Route::prefix('companies')->name('companies.')->group(function () {
+            Route::get('/', [CompanyController::class, 'index'])->name('index');
+            Route::get('/create', [CompanyController::class, 'create'])->name('create');
+            Route::post('/', [CompanyController::class, 'store'])->name('store');
+            Route::get('/{company}', [CompanyController::class, 'show'])->name('show');
+            Route::get('/{company}/edit', [CompanyController::class, 'edit'])->name('edit');
+            Route::put('/{company}', [CompanyController::class, 'update'])->name('update');
+            Route::delete('/{company}', [CompanyController::class, 'destroy'])->name('destroy');
+            Route::post('/{company}/activate', [CompanyController::class, 'activate'])->name('activate');
+            Route::post('/{company}/deactivate', [CompanyController::class, 'deactivate'])->name('deactivate');
         });
     });
 });

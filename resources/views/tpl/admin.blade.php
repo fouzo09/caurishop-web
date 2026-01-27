@@ -29,14 +29,14 @@
 
         <div class="menu-section">
             <div class="menu-label">Gestion</div>
-            <a href="#" class="menu-item">
+            <a href="{{ route('admin.companies') }}" class="menu-item">
                 <i class="fas fa-building"></i>
                 <span>Entreprises</span>
                 <span class="menu-badge">8</span>
             </a>
             <a href="#" class="menu-item">
                 <i class="fas fa-users"></i>
-                <span>Employés</span>
+                <span>Clients</span>
             </a>
             <a href="#" class="menu-item">
                 <i class="fas fa-box"></i>
