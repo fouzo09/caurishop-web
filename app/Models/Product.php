@@ -26,6 +26,8 @@ class Product extends Model
         'credit_enabled',
         'credit_duration_months',
         'credit_installments_count',
+        'is_service',
+        'provider',
     ];
 
     protected $casts = [
@@ -37,6 +39,7 @@ class Product extends Model
         'credit_enabled'           => 'boolean',
         'credit_duration_months'   => 'integer',
         'credit_installments_count'=> 'integer',
+        'is_service'               => 'boolean',
     ];
 
     protected $appends = ['display_price', 'stock_status', 'display_monthly_payment'];
@@ -81,6 +84,11 @@ class Product extends Model
                    ->where('stock_quantity', '>', 0);
             })->orWhere('type', self::TYPE_VARIABLE);
         });
+    }
+
+    public function isService(): bool
+    {
+        return (bool) $this->is_service;
     }
 
     // Type checks
@@ -135,7 +143,7 @@ class Product extends Model
     public function displayPrice(): string
     {
         if ($this->isVariable()) {
-            return 'Varie';
+            return 'Produit variant';
         }
 
         return number_format($this->price, 0, ',', ' ') . ' GNF';
@@ -164,6 +172,8 @@ class Product extends Model
 
     public function getStockStatusAttribute(): string
     {
+        if ($this->isService()) return 'disponible';
+
         if ($this->isVariable()) {
             return $this->hasStock() ? 'disponible' : 'rupture';
         }

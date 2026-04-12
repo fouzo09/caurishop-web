@@ -201,7 +201,7 @@
     <div class="product-grid">
         @foreach($products as $product)
         @php
-            $status = $product->stock_status; // disponible / faible / rupture
+            $status     = $product->stock_status;
             $stockClass = match($status) { 'faible' => 'low', 'rupture' => 'out', default => 'ok' };
             $stockLabel = match($status) { 'faible' => 'Stock faible', 'rupture' => 'Rupture', default => 'Disponible' };
         @endphp
@@ -226,13 +226,26 @@
                         <small>ou {{ $product->display_monthly_payment ?? '' }}/mois</small>
                         @endif
                     </div>
+                    @if($product->is_service)
+                    <span style="display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:500;color:#059669;">
+                        <i class="fas fa-concierge-bell"></i> Service
+                    </span>
+                    @else
                     <span class="stock-dot {{ $stockClass }}">{{ $stockLabel }}</span>
+                    @endif
                 </div>
                 <div style="margin-top: 0.85rem;">
+                    @if($status === 'rupture')
+                    <span class="btn-order-now" style="background:#d1d5db;color:#9ca3af;cursor:not-allowed;" onclick="event.stopPropagation()">
+                        <i class="fas fa-ban"></i> Rupture de stock
+                    </span>
+                    @else
                     <a href="{{ route('portal.orders.create', ['product' => $product->id]) }}"
                        class="btn-order-now" onclick="event.stopPropagation()">
-                        <i class="fas fa-cart-plus"></i> Commander
+                        <i class="{{ $product->is_service ? 'fas fa-calendar-check' : 'fas fa-cart-plus' }}"></i>
+                        {{ $product->is_service ? 'Réserver' : 'Commander' }}
                     </a>
+                    @endif
                 </div>
             </div>
         </div>

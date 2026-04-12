@@ -18,31 +18,28 @@ class UpdateProductRequest extends FormRequest
         $productId = $this->route('product')->id;
 
         $rules = [
-            'type' => 'required|in:' . Product::TYPE_SIMPLE . ',' . Product::TYPE_VARIABLE,
-            'name' => 'required|string|max:255',
-            'slug' => [
-                'nullable',
-                'string',
-                'max:255',
-                Rule::unique('products', 'slug')->ignore($productId),
-            ],
-            'description' => 'nullable|string',
-            'sku' => [
-                'nullable',
-                'string',
-                'max:100',
-                Rule::unique('products', 'sku')->ignore($productId),
-            ],
-            'is_published' => 'boolean',
-            'is_active' => 'boolean',
-            'credit_enabled' => 'boolean',
-            'credit_duration_months' => 'nullable|integer|min:1|max:24',
+            'type'                      => 'required|in:' . Product::TYPE_SIMPLE . ',' . Product::TYPE_VARIABLE,
+            'name'                      => 'required|string|max:255',
+            'slug'                      => ['nullable','string','max:255', Rule::unique('products','slug')->ignore($productId)],
+            'description'               => 'nullable|string',
+            'sku'                       => ['nullable','string','max:100', Rule::unique('products','sku')->ignore($productId)],
+            'is_published'              => 'boolean',
+            'is_active'                 => 'boolean',
+            'is_service'                => 'boolean',
+            'provider'                  => 'nullable|string|max:255',
+            'credit_enabled'            => 'boolean',
+            'credit_duration_months'    => 'nullable|integer|min:1|max:24',
             'credit_installments_count' => 'nullable|integer|min:1|max:12',
         ];
 
-        if ($this->input('type') === Product::TYPE_SIMPLE) {
-            $rules['price'] = 'required|numeric|min:0';
+        $isService = $this->boolean('is_service');
+
+        if ($this->input('type') === Product::TYPE_SIMPLE && !$isService) {
+            $rules['price']          = 'required|numeric|min:0';
             $rules['stock_quantity'] = 'required|integer|min:0';
+        } elseif ($this->input('type') === Product::TYPE_SIMPLE && $isService) {
+            $rules['price']          = 'nullable|numeric|min:0';
+            $rules['stock_quantity'] = 'nullable|integer|min:0';
         }
 
         return $rules;

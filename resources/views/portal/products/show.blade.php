@@ -64,7 +64,8 @@
             <h1 class="page-title">{{ $product->name }}</h1>
         </div>
         <a href="{{ route('portal.orders.create', ['product' => $product->id]) }}" class="btn btn-primary">
-            <i class="fas fa-cart-plus"></i> Commander ce produit
+            <i class="{{ $product->is_service ? 'fas fa-calendar-check' : 'fas fa-cart-plus' }}"></i>
+            {{ $product->is_service ? 'Réserver ce service' : 'Commander ce produit' }}
         </a>
     </div>
 
@@ -101,7 +102,17 @@
         <div>
             <div class="card" style="margin-bottom: 1.25rem;">
                 <div class="card-body">
-                    <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">{{ $product->name }}</h2>
+                    <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;flex-wrap:wrap;">
+                        <h2 style="font-size: 1.25rem; font-weight: 700; margin:0;">{{ $product->name }}</h2>
+                        @if($product->is_service)
+                        <span style="background:#d1fae5;color:#059669;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;"><i class="fas fa-concierge-bell"></i> Service</span>
+                        @endif
+                    </div>
+                    @if($product->provider)
+                    <div style="font-size:13px;color:var(--text-muted);margin-bottom:.75rem;">
+                        <i class="fas fa-store" style="margin-right:4px;"></i>{{ $product->provider }}
+                    </div>
+                    @endif
                     @if($product->description)
                     <p style="color: var(--text-muted); line-height: 1.65; margin-bottom: 1.25rem; font-size: 13.5px;">{{ $product->description }}</p>
                     @endif
@@ -121,6 +132,7 @@
                         </span>
                     </div>
                     @endif
+                    @if(!$product->is_service)
                     <div style="display:flex;justify-content:space-between;align-items:center;padding:.7rem 0;border-top:1px solid var(--border);">
                         <span style="font-size:13px;color:var(--text-muted);">Stock</span>
                         @if($product->stock_quantity > 0)
@@ -129,6 +141,7 @@
                         <span style="font-size:13px;font-weight:600;color:#b91c1c;">Rupture de stock</span>
                         @endif
                     </div>
+                    @endif
                     @endif
                 </div>
             </div>

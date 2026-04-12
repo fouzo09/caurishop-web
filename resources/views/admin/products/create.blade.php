@@ -30,6 +30,37 @@
                 <h3 class="card-title">Informations du Produit</h3>
             </div>
             <div class="card-body">
+
+                {{-- Catalogue : Produit physique ou Service --}}
+                <div class="form-group">
+                    <label class="form-label">Catégorie</label>
+                    <div style="display: flex; gap: 1rem;">
+                        <label style="display:flex;align-items:center;gap:.5rem;padding:.75rem 1.5rem;background:var(--light);border-radius:8px;cursor:pointer;border:2px solid var(--border);" onclick="toggleCatalogType(false)">
+                            <input type="checkbox" name="is_service" value="0" id="isServiceNo" {{ !old('is_service') ? 'checked' : '' }} style="display:none;">
+                            <div>
+                                <div style="font-weight:600;"><i class="fas fa-box"></i> Produit physique</div>
+                                <div style="font-size:.8rem;color:var(--gray);">Article avec stock</div>
+                            </div>
+                        </label>
+                        <label style="display:flex;align-items:center;gap:.5rem;padding:.75rem 1.5rem;background:var(--light);border-radius:8px;cursor:pointer;border:2px solid var(--border);" onclick="toggleCatalogType(true)">
+                            <input type="checkbox" name="is_service" value="1" id="isServiceYes" {{ old('is_service') ? 'checked' : '' }} style="display:none;">
+                            <div>
+                                <div style="font-weight:600;"><i class="fas fa-concierge-bell"></i> Service</div>
+                                <div style="font-size:.8rem;color:var(--gray);">Prestation / soin / cours</div>
+                            </div>
+                        </label>
+                    </div>
+                    <input type="hidden" name="is_service" id="isServiceHidden" value="{{ old('is_service', 0) }}">
+                </div>
+
+                {{-- Fournisseur (services) --}}
+                <div id="providerField" style="display:{{ old('is_service') ? '' : 'none' }};">
+                    <div class="form-group">
+                        <label class="form-label">Fournisseur / Prestataire</label>
+                        <input type="text" name="provider" class="form-input" placeholder="Ex : Beauty Palace, FitZone Conakry…" value="{{ old('provider') }}">
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label class="form-label">Type de produit</label>
                     <div style="display: flex; gap: 1rem;">
@@ -92,7 +123,7 @@
                             @enderror
                         </div>
 
-                        <div class="form-group">
+                        <div id="stockField" class="form-group">
                             <label class="form-label">Quantité en stock</label>
                             <input type="number" name="stock_quantity" class="form-input" placeholder="50" value="{{ old('stock_quantity', 0) }}" min="0">
                             @error('stock_quantity')
@@ -207,6 +238,21 @@
         input.files = dt.files;
         previewImages(input);
     });
+
+    let _isService = {{ old('is_service') ? 'true' : 'false' }};
+
+    function toggleCatalogType(isService) {
+        _isService = isService;
+        document.getElementById('isServiceHidden').value = isService ? 1 : 0;
+        document.getElementById('providerField').style.display = isService ? '' : 'none';
+        document.getElementById('stockField').style.display = isService ? 'none' : '';
+        // Highlight selected
+        const labels = document.querySelectorAll('[onclick^="toggleCatalogType"]');
+        labels[0].style.borderColor = !isService ? 'var(--primary)' : 'var(--border)';
+        labels[1].style.borderColor =  isService ? 'var(--primary)' : 'var(--border)';
+    }
+    // Init highlight
+    toggleCatalogType(_isService);
 
     function toggleProductType(type) {
         document.getElementById('simple-fields').style.display = type === 'simple' ? 'block' : 'none';

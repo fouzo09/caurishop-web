@@ -17,7 +17,7 @@ class ProductController extends Controller
             $query->where('name', 'ilike', "%{$search}%");
         }
 
-        $products = $query->with('images')->latest()->paginate(12);
+        $products = $query->with('images')->inRandomOrder()->paginate(12);
 
         return view('portal.products.index', compact('products'));
     }

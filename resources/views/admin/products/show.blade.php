@@ -105,7 +105,18 @@
                                 <i class="fas fa-boxes"></i> Variable
                             </span>
                             @endif
+                            @if($product->is_service)
+                            <span class="badge" style="background:rgba(16,185,129,.1);color:#059669;margin-left:.3rem;">
+                                <i class="fas fa-concierge-bell"></i> Service
+                            </span>
+                            @endif
                         </div>
+                        @if($product->provider)
+                        <div>
+                            <div style="font-size: 0.8rem; color: var(--gray); margin-bottom: 0.25rem;">Fournisseur</div>
+                            <div style="font-weight:600;">{{ $product->provider }}</div>
+                        </div>
+                        @endif
                         @if($product->isSimple())
                         <div>
                             <div style="font-size: 0.8rem; color: var(--gray); margin-bottom: 0.25rem;">Prix</div>
