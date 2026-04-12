@@ -17,13 +17,9 @@
     <nav class="sidebar-menu">
         <div class="menu-section">
             <div class="menu-label">Principal</div>
-            <a href="#" class="menu-item active">
+            <a href="{{ route('admin.dashboard') }}" class="menu-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                 <i class="fas fa-home"></i>
                 <span>Dashboard</span>
-            </a>
-            <a href="#" class="menu-item">
-                <i class="fas fa-chart-line"></i>
-                <span>Analytics</span>
             </a>
         </div>
 
@@ -70,11 +66,11 @@
                 <i class="fas fa-user-cog"></i>
                 <span>Utilisateurs</span>
             </a>
-            <a href="" class="menu-item">
+            <a href="{{ route('admin.roles.index') }}" class="menu-item">
                 <i class="fas fa-user-tag"></i>
                 <span>Rôles</span>
             </a>
-            <a href="" class="menu-item">
+            <a href="{{ route('admin.permissions.index') }}" class="menu-item">
                 <i class="fas fa-key"></i>
                 <span>Permissions</span>
             </a>
@@ -82,15 +78,19 @@
 
         <div class="menu-section">
             <div class="menu-label">Configuration</div>
-            <a href="#" class="menu-item">
+            <a href="{{ route('admin.settings.index') }}" class="menu-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                 <i class="fas fa-cog"></i>
                 <span>Paramètres</span>
             </a>
-            <a href="#" class="menu-item">
+            <a href="{{ route('admin.notifications.index') }}" class="menu-item {{ request()->routeIs('admin.notifications.*') ? 'active' : '' }}">
                 <i class="fas fa-bell"></i>
                 <span>Notifications</span>
+                @php $unread = app(\App\Services\Admin\NotificationService::class)->unreadCount(auth()->id()); @endphp
+                @if($unread > 0)
+                <span class="menu-badge" style="background: var(--danger);">{{ $unread > 99 ? '99+' : $unread }}</span>
+                @endif
             </a>
-            <a href="#" class="menu-item">
+            <a href="{{ route('admin.security.index') }}" class="menu-item {{ request()->routeIs('admin.security.*') ? 'active' : '' }}">
                 <i class="fas fa-shield-alt"></i>
                 <span>Sécurité</span>
             </a>
@@ -106,28 +106,80 @@
         </div>
 
         <div class="header-actions">
-            <button class="icon-btn">
+            <a href="{{ route('admin.notifications.index') }}" class="icon-btn" style="text-decoration: none; color: inherit;">
                 <i class="fas fa-bell"></i>
-                <span class="notification-badge">3</span>
-            </button>
+                @if($unread > 0)
+                <span class="notification-badge">{{ $unread > 99 ? '99+' : $unread }}</span>
+                @endif
+            </a>
 
-            <button class="icon-btn">
-                <i class="fas fa-envelope"></i>
-                <span class="notification-badge">7</span>
-            </button>
 
-            <div class="user-menu">
-                <div class="user-avatar">AD</div>
+            <div class="user-menu" id="userMenuTrigger" onclick="toggleUserDropdown()">
+                <div class="user-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 2)) }}</div>
                 <div>
-                    <div style="font-weight: 600; font-size: 0.9rem;">Admin</div>
-                    <div style="font-size: 0.75rem; color: var(--gray);">Super Admin</div>
+                    <div style="font-size:13px;font-weight:500;color:var(--text);">{{ auth()->user()->name }}</div>
                 </div>
-                <i class="fas fa-chevron-down" style="color: var(--gray); font-size: 0.8rem;"></i>
+                <i class="fas fa-chevron-down" id="userMenuChevron" style="color:var(--text-light);font-size:11px;transition:transform 0.2s;"></i>
+            </div>
+
+            <div id="userDropdown" class="user-dropdown">
+                <div class="user-dropdown-header">
+                    <div>{{ auth()->user()->name }}</div>
+                    <div>{{ auth()->user()->email }}</div>
+                </div>
+                <div class="user-dropdown-body">
+                    <a href="{{ route('admin.profile.show') }}" class="dropdown-item">
+                        <i class="fas fa-user-circle"></i>
+                        Mon Profil
+                    </a>
+                    <a href="{{ route('admin.profile.show') }}#password" class="dropdown-item" onclick="sessionStorage.setItem('profileTab','password')">
+                        <i class="fas fa-lock"></i>
+                        Changer le mot de passe
+                    </a>
+                </div>
+                <div class="user-dropdown-footer">
+                    <form action="{{ route('logout') }}" method="GET" style="margin: 0;">
+                        @csrf
+                        <button type="submit" class="dropdown-item logout-item" style="width: 100%; text-align: left; background: none; border: none; cursor: pointer; font-size: inherit; font-family: inherit;">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Déconnexion
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </header>
 
     @yield('content')
 </main>
+
+<style>
+    .header-actions { position: relative; }
+</style>
+
+<script>
+    function toggleUserDropdown() {
+        const dropdown = document.getElementById('userDropdown');
+        const chevron  = document.getElementById('userMenuChevron');
+        dropdown.classList.toggle('open');
+        chevron.style.transform = dropdown.classList.contains('open') ? 'rotate(180deg)' : '';
+    }
+
+    // Fermer en cliquant ailleurs
+    document.addEventListener('click', function(e) {
+        const trigger  = document.getElementById('userMenuTrigger');
+        const dropdown = document.getElementById('userDropdown');
+        if (!trigger.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.remove('open');
+            document.getElementById('userMenuChevron').style.transform = '';
+        }
+    });
+
+    // Ouvrir l'onglet mot de passe si demandé
+    if (sessionStorage.getItem('profileTab') === 'password') {
+        sessionStorage.removeItem('profileTab');
+        // Exécuté sur la page profil via le script inline de la vue
+    }
+</script>
 </body>
 </html>

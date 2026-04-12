@@ -39,9 +39,14 @@ class Product extends Model
         'credit_installments_count'=> 'integer',
     ];
 
-    protected $appends = ['display_price', 'stock_status'];
+    protected $appends = ['display_price', 'stock_status', 'display_monthly_payment'];
 
     // Relations
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class)->orderBy('sort_order')->orderBy('id');
+    }
+
     public function variants()
     {
         return $this->hasMany(ProductVariant::class);
@@ -166,5 +171,18 @@ class Product extends Model
         if ($this->isOutOfStock()) return 'rupture';
         if ($this->isLowStock())   return 'faible';
         return 'disponible';
+    }
+
+    public function getDisplayMonthlyPaymentAttribute(): ?string
+    {
+        return $this->displayMonthlyPayment();
+    }
+
+    public function coverUrl(): ?string
+    {
+        $primary = $this->images->firstWhere('is_primary', true)
+            ?? $this->images->first();
+
+        return $primary?->url;
     }
 }

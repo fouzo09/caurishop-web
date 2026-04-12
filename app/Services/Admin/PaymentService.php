@@ -6,6 +6,7 @@ use App\Models\CreditPlan;
 use App\Models\Installment;
 use App\Models\Payment;
 use App\Models\PaymentAllocation;
+use App\Services\Admin\NotificationService;
 use Illuminate\Support\Facades\DB;
 
 class PaymentService
@@ -58,6 +59,14 @@ class PaymentService
             if ($allPaid) {
                 $plan->update(['status' => CreditPlan::STATUS_CLOSED, 'outstanding_amount' => 0]);
             }
+
+            $customer = $installment->creditPlan->order->customer;
+            $customerName = trim(($customer?->first_name ?? '') . ' ' . ($customer?->last_name ?? ''));
+            app(NotificationService::class)->paymentReceived(
+                number_format($data['amount'], 0, ',', ' '),
+                $customerName,
+                route('admin.payments.index'),
+            );
 
             return $payment;
         });

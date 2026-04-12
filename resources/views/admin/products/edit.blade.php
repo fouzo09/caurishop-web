@@ -24,7 +24,7 @@
     </div>
     @endif
 
-    <form action="{{ route('admin.products.update', $product) }}" method="POST">
+    <form action="{{ route('admin.products.update', $product) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -142,6 +142,53 @@
                     </div>
                 </div>
 
+                {{-- Images --}}
+                <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+                    <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Images du produit</h4>
+
+                    @php $images = $product->images; @endphp
+                    @if($images->isNotEmpty())
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem;">
+                        @foreach($images as $img)
+                        <div style="position: relative; width: 110px;">
+                            <div style="width:110px;height:110px;border-radius:6px;overflow:hidden;border:2px solid {{ $img->is_primary ? 'var(--primary)' : 'var(--border)' }};">
+                                <img src="{{ $img->url }}" alt="" style="width:100%;height:100%;object-fit:cover;">
+                            </div>
+                            @if($img->is_primary)
+                            <span style="position:absolute;bottom:24px;left:0;right:0;text-align:center;background:var(--primary);color:#fff;font-size:10px;padding:1px 0;">Principale</span>
+                            @endif
+                            <div style="display:flex;gap:3px;margin-top:4px;">
+                                @if(!$img->is_primary)
+                                <form action="{{ route('admin.products.images.primary', [$product, $img]) }}" method="POST" style="flex:1;">
+                                    @csrf
+                                    <button type="submit" title="Définir principale"
+                                            style="width:100%;padding:2px 0;font-size:11px;border:1px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;">
+                                        <i class="fas fa-star"></i>
+                                    </button>
+                                </form>
+                                @endif
+                                <form action="{{ route('admin.products.images.destroy', [$product, $img]) }}" method="POST" style="flex:1;" onsubmit="return confirm('Supprimer cette image ?')">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" title="Supprimer"
+                                            style="width:100%;padding:2px 0;font-size:11px;border:1px solid var(--border);border-radius:4px;background:#fff;color:var(--danger);cursor:pointer;">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    @endif
+
+                    <div id="imageDropzone" onclick="document.getElementById('imageInput').click()"
+                         style="border:2px dashed var(--border);border-radius:8px;padding:1.5rem;text-align:center;cursor:pointer;background:var(--bg);">
+                        <i class="fas fa-plus-circle" style="font-size:1.5rem;color:var(--gray);opacity:.5;display:block;margin-bottom:.4rem;"></i>
+                        <div style="font-size:.85rem;color:var(--gray);">Ajouter des images</div>
+                    </div>
+                    <input type="file" id="imageInput" name="images[]" multiple accept="image/*" style="display:none;" onchange="previewImages(this)">
+                    <div id="imagePreviews" style="display:flex;flex-wrap:wrap;gap:.75rem;margin-top:.75rem;"></div>
+                </div>
+
                 {{-- Statut --}}
                 <div style="display: flex; gap: 1.5rem; margin-top: 1.5rem;">
                     <div class="form-group" style="margin-bottom: 0;">
@@ -172,6 +219,31 @@
 </div>
 
 <script>
+    function previewImages(input) {
+        const container = document.getElementById('imagePreviews');
+        container.innerHTML = '';
+        Array.from(input.files).forEach((file, i) => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const wrap = document.createElement('div');
+                wrap.style.cssText = 'width:100px;height:100px;border-radius:6px;overflow:hidden;border:2px solid var(--border);';
+                wrap.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
+                container.appendChild(wrap);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    const dz = document.getElementById('imageDropzone');
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.style.borderColor = 'var(--primary)'; });
+    dz.addEventListener('dragleave', () => { dz.style.borderColor = 'var(--border)'; });
+    dz.addEventListener('drop', e => {
+        e.preventDefault(); dz.style.borderColor = 'var(--border)';
+        const input = document.getElementById('imageInput');
+        const dt = new DataTransfer();
+        Array.from(e.dataTransfer.files).forEach(f => dt.items.add(f));
+        input.files = dt.files; previewImages(input);
+    });
+
     function toggleProductType(type) {
         document.getElementById('simple-fields').style.display = type === 'simple' ? 'block' : 'none';
     }

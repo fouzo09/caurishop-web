@@ -8,6 +8,21 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\InstallmentController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\PermissionController;
+use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\Admin\SecurityController;
+use App\Http\Controllers\Company\DashboardController as CompanyDashboard;
+use App\Http\Controllers\Company\OrderController as CompanyOrderController;
+use App\Http\Controllers\Company\EmployeeController as CompanyEmployeeController;
+use App\Http\Controllers\Company\ProfileController as CompanyProfileController;
+use App\Http\Controllers\Portal\DashboardController as PortalDashboard;
+use App\Http\Controllers\Portal\ProductController as PortalProductController;
+use App\Http\Controllers\Portal\OrderController as PortalOrderController;
+use App\Http\Controllers\Portal\PaymentController as PortalPaymentController;
+use App\Http\Controllers\Portal\ProfileController as PortalProfileController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,7 +36,13 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('admin')->name('admin.')->group(function () {
 
-        Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
+        Route::get('/', [HomeController::class, 'index'])->name('dashboard');
+
+        Route::prefix('profile')->name('profile.')->group(function () {
+            Route::get('/', [ProfileController::class, 'show'])->name('show');
+            Route::put('/', [ProfileController::class, 'update'])->name('update');
+            Route::put('/password', [ProfileController::class, 'changePassword'])->name('password');
+        });
 
         Route::prefix('users')->name('users.')->group(function () {
             Route::get('/', [UserController::class, 'index'])->name('index');
@@ -73,6 +94,11 @@ Route::middleware('auth')->group(function () {
             Route::post('/{product}/publish', [ProductController::class, 'publish'])->name('publish');
             Route::post('/{product}/unpublish', [ProductController::class, 'unpublish'])->name('unpublish');
 
+            // Images
+            Route::post('/{product}/images', [ProductController::class, 'storeImages'])->name('images.store');
+            Route::delete('/{product}/images/{image}', [ProductController::class, 'destroyImage'])->name('images.destroy');
+            Route::post('/{product}/images/{image}/primary', [ProductController::class, 'setPrimaryImage'])->name('images.primary');
+
             // Variants
             Route::get('/{product}/variants/create', [ProductController::class, 'createVariant'])->name('variants.create');
             Route::post('/{product}/variants', [ProductController::class, 'storeVariant'])->name('variants.store');
@@ -100,5 +126,100 @@ Route::middleware('auth')->group(function () {
             Route::post('/{order}/deliver', [OrderController::class, 'deliver'])->name('deliver');
             Route::post('/{order}/cancel', [OrderController::class, 'cancel'])->name('cancel');
         });
+
+        Route::prefix('roles')->name('roles.')->group(function () {
+            Route::get('/', [RoleController::class, 'index'])->name('index');
+            Route::get('/create', [RoleController::class, 'create'])->name('create');
+            Route::post('/', [RoleController::class, 'store'])->name('store');
+            Route::get('/{role}', [RoleController::class, 'show'])->name('show');
+            Route::get('/{role}/edit', [RoleController::class, 'edit'])->name('edit');
+            Route::put('/{role}', [RoleController::class, 'update'])->name('update');
+            Route::delete('/{role}', [RoleController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('permissions')->name('permissions.')->group(function () {
+            Route::get('/', [PermissionController::class, 'index'])->name('index');
+        });
+
+        Route::prefix('settings')->name('settings.')->group(function () {
+            Route::get('/', [SettingsController::class, 'index'])->name('index');
+            Route::put('/{group}', [SettingsController::class, 'update'])->name('update');
+        });
+
+        Route::prefix('notifications')->name('notifications.')->group(function () {
+            Route::get('/', [NotificationController::class, 'index'])->name('index');
+            Route::get('/unread', [NotificationController::class, 'unreadJson'])->name('unread');
+            Route::post('/{id}/read', [NotificationController::class, 'markRead'])->name('read');
+            Route::post('/read-all', [NotificationController::class, 'markAllRead'])->name('read-all');
+            Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('security')->name('security.')->group(function () {
+            Route::get('/', [SecurityController::class, 'index'])->name('index');
+        });
+    });
+
+    // ── Portail Admin Entreprise ─────────────────────────────────────
+    Route::prefix('company')->name('company.')->middleware('role:company_admin')->group(function () {
+        Route::get('/', [CompanyDashboard::class, 'index'])->name('dashboard');
+
+        Route::prefix('orders')->name('orders.')->group(function () {
+            Route::get('/', [CompanyOrderController::class, 'index'])->name('index');
+            Route::get('/create', [CompanyOrderController::class, 'create'])->name('create');
+            Route::post('/', [CompanyOrderController::class, 'store'])->name('store');
+            Route::get('/{order}', [CompanyOrderController::class, 'show'])->name('show');
+            Route::post('/{order}/approve', [CompanyOrderController::class, 'approve'])->name('approve');
+            Route::post('/{order}/reject', [CompanyOrderController::class, 'reject'])->name('reject');
+        });
+
+        Route::prefix('employees')->name('employees.')->group(function () {
+            Route::get('/', [CompanyEmployeeController::class, 'index'])->name('index');
+        });
+
+        Route::get('/profile', [CompanyProfileController::class, 'show'])->name('profile');
+        Route::put('/profile', [CompanyProfileController::class, 'update'])->name('profile.update');
+        Route::put('/profile/password', [CompanyProfileController::class, 'changePassword'])->name('profile.password');
+    });
+
+    // ── Portail Employé ──────────────────────────────────────────────
+    Route::prefix('portal')->name('portal.')->middleware('role:company_employee')->group(function () {
+        Route::get('/', [PortalDashboard::class, 'index'])->name('dashboard');
+
+        Route::prefix('products')->name('products.')->group(function () {
+            Route::get('/', [PortalProductController::class, 'index'])->name('index');
+            Route::get('/{product}', [PortalProductController::class, 'show'])->name('show');
+        });
+
+        Route::prefix('orders')->name('orders.')->group(function () {
+            Route::get('/', [PortalOrderController::class, 'index'])->name('index');
+            Route::get('/create', [PortalOrderController::class, 'create'])->name('create');
+            Route::post('/', [PortalOrderController::class, 'store'])->name('store');
+            Route::get('/{order}', [PortalOrderController::class, 'show'])->name('show');
+        });
+
+        Route::prefix('payments')->name('payments.')->group(function () {
+            Route::get('/', [PortalPaymentController::class, 'index'])->name('index');
+        });
+
+        Route::get('/profile', [PortalProfileController::class, 'show'])->name('profile');
+        Route::put('/profile', [PortalProfileController::class, 'update'])->name('profile.update');
+        Route::put('/profile/password', [PortalProfileController::class, 'changePassword'])->name('profile.password');
     });
 });
+
+
+//Tahoma - 400
+//
+//Family
+//Inter, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif
+//Style
+//normal
+//Weight
+//400
+//Color
+//rgb(31, 41, 55)
+//Size
+//14px
+//Line Height
+//20px
+//AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrS

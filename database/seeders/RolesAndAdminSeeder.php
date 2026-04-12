@@ -11,34 +11,27 @@ class RolesAndAdminSeeder extends Seeder
 {
     public function run(): void
     {
-        // Roles
+        // Rôles plateforme
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
-        $employeeRole = Role::firstOrCreate(['name' => 'employee']);
 
-        // Admin user
+        // Rôles entreprise (legacy conservé)
+        Role::firstOrCreate(['name' => 'employee']);
+
+        // Nouveaux rôles
+        Role::firstOrCreate(['name' => 'company_admin']);
+        Role::firstOrCreate(['name' => 'company_employee']);
+
+        // Super Admin CauriShop
         $admin = User::firstOrCreate(
             ['email' => 'admin@caurishop.test'],
             [
-                'name' => 'CAURISHOP Admin',
+                'name'     => 'CAURISHOP Admin',
                 'password' => Hash::make('password'),
             ]
         );
 
         if (!$admin->hasRole($adminRole)) {
             $admin->assignRole($adminRole);
-        }
-
-        // Employee user
-        $employee = User::firstOrCreate(
-            ['email' => 'employee@caurishop.test'],
-            [
-                'name' => 'CAURISHOP Employee',
-                'password' => Hash::make('password'),
-            ]
-        );
-
-        if (!$employee->hasRole($employeeRole)) {
-            $employee->assignRole($employeeRole);
         }
     }
 }

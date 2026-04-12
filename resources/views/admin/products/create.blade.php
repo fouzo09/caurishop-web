@@ -22,7 +22,7 @@
     </div>
     @endif
 
-    <form action="{{ route('admin.products.store') }}" method="POST">
+    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div class="card">
@@ -148,6 +148,20 @@
                         </label>
                     </div>
                 </div>
+
+                {{-- Images --}}
+                <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+                    <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;">Images du produit</h4>
+                    <p style="font-size: 0.85rem; color: var(--gray); margin-bottom: 1rem;">Vous pouvez ajouter plusieurs images. La première sera l'image principale.</p>
+                    <div id="imageDropzone" onclick="document.getElementById('imageInput').click()"
+                         style="border: 2px dashed var(--border); border-radius: 8px; padding: 2rem; text-align: center; cursor: pointer; transition: border-color .15s; background: var(--bg);">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--gray); opacity: 0.5; display: block; margin-bottom: 0.5rem;"></i>
+                        <div style="font-size: 0.9rem; color: var(--gray);">Cliquez pour sélectionner des images</div>
+                        <div style="font-size: 0.8rem; color: var(--gray); margin-top: 0.25rem;">JPG, PNG, WEBP — max 4 Mo chacune</div>
+                    </div>
+                    <input type="file" id="imageInput" name="images[]" multiple accept="image/*" style="display:none;" onchange="previewImages(this)">
+                    <div id="imagePreviews" style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem;"></div>
+                </div>
             </div>
             <div class="card-footer" style="display: flex; gap: 1rem; justify-content: flex-end;">
                 <a href="{{ route('admin.products.index') }}" class="btn btn-outline">
@@ -164,6 +178,36 @@
 </div>
 
 <script>
+    function previewImages(input) {
+        const container = document.getElementById('imagePreviews');
+        container.innerHTML = '';
+        Array.from(input.files).forEach((file, i) => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const wrap = document.createElement('div');
+                wrap.style.cssText = 'position:relative;width:100px;height:100px;border-radius:6px;overflow:hidden;border:2px solid ' + (i === 0 ? 'var(--primary)' : 'var(--border)');
+                wrap.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">` +
+                    (i === 0 ? '<span style="position:absolute;bottom:3px;left:3px;background:var(--primary);color:#fff;font-size:10px;padding:1px 5px;border-radius:3px;">Principale</span>' : '');
+                container.appendChild(wrap);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // Drag & drop
+    const dz = document.getElementById('imageDropzone');
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.style.borderColor = 'var(--primary)'; });
+    dz.addEventListener('dragleave', () => { dz.style.borderColor = 'var(--border)'; });
+    dz.addEventListener('drop', e => {
+        e.preventDefault();
+        dz.style.borderColor = 'var(--border)';
+        const input = document.getElementById('imageInput');
+        const dt = new DataTransfer();
+        Array.from(e.dataTransfer.files).forEach(f => dt.items.add(f));
+        input.files = dt.files;
+        previewImages(input);
+    });
+
     function toggleProductType(type) {
         document.getElementById('simple-fields').style.display = type === 'simple' ? 'block' : 'none';
         document.getElementById('sku-optional-label').style.display = type === 'variable' ? 'inline' : 'none';

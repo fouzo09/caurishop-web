@@ -1,0 +1,40 @@
+CAURISHOP — Comptes de test
+===========================
+Mot de passe universel : password
+
+SUPER ADMIN
+-----------
+Email    : 2 minutes ago
+Accès    : /admin
+
+ADMIN ENTREPRISE A (CAURISHOP Entreprise A)
+-------------------------------------------
+Email    : admin@entreprise-a.test
+Accès    : /company
+
+EMPLOYÉ ENTREPRISE A — Ibrahima Bah
+-------------------------------------
+Email    : ibrahima@entreprise-a.test
+Accès    : /portal
+
+EMPLOYÉ ENTREPRISE A — Mariama Sow
+------------------------------------
+Email    : mariama@entreprise-a.test
+Accès    : /portal
+
+ADMIN ENTREPRISE B (CAURISHOP Entreprise B)
+-------------------------------------------
+Email    : admin@entreprise-b.test
+Accès    : /company
+
+EMPLOYÉ ENTREPRISE B — Aissatou Barry
+---------------------------------------
+Email    : aissatou@entreprise-b.test
+Accès    : /portal
+
+===========================
+Workflow de test :
+1. Employé  → passe une commande → statut : pending_approval
+2. Admin co → approuve la commande → statut : draft
+3. Super admin → confirme → statut : confirmed
+4. Super admin → livre → statut : completed

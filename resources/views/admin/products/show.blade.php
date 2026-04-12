@@ -237,6 +237,37 @@
 
         {{-- Panneau latéral --}}
         <div>
+            {{-- Images --}}
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
+                    <h3 class="card-title">Images ({{ $product->images->count() }})</h3>
+                    <a href="{{ route('admin.products.edit', $product) }}#images" class="btn btn-outline btn-sm">
+                        <i class="fas fa-plus"></i> Gérer
+                    </a>
+                </div>
+                <div class="card-body" style="padding: 0.75rem;">
+                    @if($product->images->isEmpty())
+                    <div style="text-align:center;padding:1.5rem;color:var(--gray);font-size:0.85rem;">
+                        <i class="fas fa-images" style="display:block;font-size:1.5rem;margin-bottom:.4rem;opacity:.3;"></i>
+                        Aucune image
+                    </div>
+                    @else
+                    @php $primary = $product->images->firstWhere('is_primary', true) ?? $product->images->first(); @endphp
+                    <img src="{{ $primary->url }}" alt="{{ $product->name }}"
+                         style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:6px;margin-bottom:.75rem;">
+                    @if($product->images->count() > 1)
+                    <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+                        @foreach($product->images as $img)
+                        <div style="width:52px;height:52px;border-radius:5px;overflow:hidden;border:2px solid {{ $img->is_primary ? 'var(--primary)' : 'var(--border)' }};">
+                            <img src="{{ $img->url }}" style="width:100%;height:100%;object-fit:cover;">
+                        </div>
+                        @endforeach
+                    </div>
+                    @endif
+                    @endif
+                </div>
+            </div>
+
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Statut</h3>

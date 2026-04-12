@@ -22,7 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'is_active', // optionnel mais cohérent avec ta migration
+        'is_active',
+        'company_id',
     ];
 
     /**
@@ -44,7 +45,43 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
         ];
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Models\Company::class);
+    }
+
+    public function customer()
+    {
+        return $this->hasOne(\App\Models\Customer::class);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasRole('admin');
+    }
+
+    public function isCompanyAdmin(): bool
+    {
+        return $this->hasRole('company_admin');
+    }
+
+    public function isCompanyEmployee(): bool
+    {
+        return $this->hasRole('company_employee');
+    }
+
+    /**
+     * Retourne le portail d'accueil selon le rôle.
+     */
+    public function homeRoute(): string
+    {
+        if ($this->isSuperAdmin())     return route('admin.dashboard');
+        if ($this->isCompanyAdmin())   return route('company.dashboard');
+        if ($this->isCompanyEmployee()) return route('portal.dashboard');
+        return route('login');
     }
 }

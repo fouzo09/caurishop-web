@@ -14,6 +14,7 @@ class Customer extends Model
     public const TYPE_COMPANY = 'company';
 
     protected $fillable = [
+        'user_id',
         'type',
         'company_id',
         'first_name',
@@ -30,6 +31,11 @@ class Customer extends Model
         'credit_limit' => 'decimal:2',
         'is_active'    => 'boolean',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function company()
     {

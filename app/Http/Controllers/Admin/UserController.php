@@ -9,17 +9,27 @@ use App\Services\Admin\UserService;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 use Spatie\Permission\Models\Role;
 
-class UserController extends Controller
+class UserController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:users.view', only: ['index', 'show']),
+            new Middleware('permission:users.create', only: ['create', 'store']),
+            new Middleware('permission:users.edit', only: ['edit', 'update']),
+            new Middleware('permission:users.delete', only: ['destroy']),
+            new Middleware('permission:users.suspend', only: ['suspend', 'activate', 'verify']),
+        ];
+    }
+
     public function __construct(
         protected UserService $userService
-    ) {
-        // Supprimer temporairement les middlewares de permission pour tester
-        // Ou ajuster selon vos besoins
-    }
+    ) {}
 
     public function index(Request $request): View
     {

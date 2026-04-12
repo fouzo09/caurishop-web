@@ -9,13 +9,28 @@ use App\Http\Requests\Admin\CreateVariantRequest;
 use App\Http\Requests\Admin\UpdateVariantRequest;
 use App\Services\Admin\ProductService;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\ProductVariant;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 
-class ProductController extends Controller
+class ProductController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:products.view', only: ['index', 'show']),
+            new Middleware('permission:products.create', only: ['create', 'store', 'createVariant', 'storeVariant']),
+            new Middleware('permission:products.edit', only: ['edit', 'update', 'editVariant', 'updateVariant']),
+            new Middleware('permission:products.delete', only: ['destroy', 'destroyVariant']),
+            new Middleware('permission:products.publish', only: ['publish', 'unpublish', 'activate', 'deactivate']),
+        ];
+    }
+
     public function __construct(
         protected ProductService $productService
     ) {}
@@ -45,6 +60,8 @@ class ProductController extends Controller
         try {
             $product = $this->productService->createProduct($request->validated());
 
+            $this->handleImageUploads($request, $product);
+
             if ($product->isVariable()) {
                 return redirect()->route('admin.products.show', $product)
                     ->with('success', 'Produit variable créé. Ajoutez maintenant ses variantes.');
@@ -61,7 +78,7 @@ class ProductController extends Controller
 
     public function show(Product $product): View
     {
-        $product->load(['variants']);
+        $product->load(['variants', 'images']);
         return view('admin.products.show', compact('product'));
     }
 
@@ -75,12 +92,64 @@ class ProductController extends Controller
         try {
             $this->productService->updateProduct($product, $request->validated());
 
-            return redirect()->route('admin.products.index')
+            $this->handleImageUploads($request, $product);
+
+            return redirect()->route('admin.products.show', $product)
                 ->with('success', 'Produit mis à jour avec succès.');
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Erreur lors de la mise à jour: ' . $e->getMessage())
                 ->withInput();
+        }
+    }
+
+    public function storeImages(Request $request, Product $product): RedirectResponse
+    {
+        $request->validate(['images' => 'required|array', 'images.*' => 'image|max:4096']);
+        $this->handleImageUploads($request, $product);
+        return back()->with('success', 'Images ajoutées.');
+    }
+
+    public function destroyImage(Product $product, ProductImage $image): RedirectResponse
+    {
+        abort_unless($image->product_id === $product->id, 404);
+        Storage::delete($image->path);
+        $wasPrimary = $image->is_primary;
+        $image->delete();
+
+        if ($wasPrimary) {
+            $product->images()->oldest()->first()?->update(['is_primary' => true]);
+        }
+
+        return back()->with('success', 'Image supprimée.');
+    }
+
+    public function setPrimaryImage(Product $product, ProductImage $image): RedirectResponse
+    {
+        abort_unless($image->product_id === $product->id, 404);
+        $product->images()->update(['is_primary' => false]);
+        $image->update(['is_primary' => true]);
+        return back()->with('success', 'Image principale définie.');
+    }
+
+    private function handleImageUploads(Request $request, Product $product): void
+    {
+        if (!$request->hasFile('images')) return;
+
+        $hasExisting = $product->images()->exists();
+        $sort = (int) $product->images()->max('sort_order') + 1;
+
+        foreach ($request->file('images') as $i => $file) {
+            $path = $file->store("products/{$product->id}", 'public');
+            $isPrimary = !$hasExisting && $i === 0;
+
+            $product->images()->create([
+                'path'       => $path,
+                'sort_order' => $sort++,
+                'is_primary' => $isPrimary,
+            ]);
+
+            $hasExisting = true;
         }
     }
 

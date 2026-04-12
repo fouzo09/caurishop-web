@@ -10,10 +10,20 @@ use App\Repositories\Admin\InstallmentRepository;
 use App\Services\Admin\PaymentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 
-class InstallmentController extends Controller
+class InstallmentController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:installments.view', only: ['index']),
+            new Middleware('permission:installments.pay', only: ['pay', 'recordPayment']),
+        ];
+    }
+
     public function __construct(
         protected InstallmentRepository $installmentRepository,
         protected PaymentService        $paymentService,

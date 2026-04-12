@@ -10,10 +10,23 @@ use App\Models\Customer;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 
-class OrderController extends Controller
+class OrderController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:orders.view', only: ['index', 'show']),
+            new Middleware('permission:orders.create', only: ['create', 'store']),
+            new Middleware('permission:orders.confirm', only: ['confirm']),
+            new Middleware('permission:orders.deliver', only: ['deliver']),
+            new Middleware('permission:orders.cancel', only: ['cancel']),
+        ];
+    }
+
     public function __construct(
         protected OrderService $orderService
     ) {}

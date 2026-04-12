@@ -3,121 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAURISHOP - Connexion</title>
+    <title>CAURISHOP — Connexion</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets/admin/login.css') }}">
 </head>
 <body>
-<div class="login-container">
-    <h1 class="logo">CAURISHOP</h1>
 
-    @if(session('success'))
-    <div class="alert alert-success">
-        <i class="fas fa-check-circle"></i>
-        <span>{{ session('success') }}</span>
+{{-- ── Panneau gauche ──────────────────────────────────────────── --}}
+<div class="panel-left">
+    <div class="panel-brand">
+        <span class="logo-text">Caurishop</span>
     </div>
-    @endif
 
-    @if(session('error'))
-    <div class="alert alert-danger">
-        <i class="fas fa-exclamation-triangle"></i>
-        <span>{{ session('error') }}</span>
-    </div>
-    @endif
+    <div class="panel-center">
+        <h2>Gérez vos ventes à crédit en toute simplicité.</h2>
+        <p>Plateforme B2B dédiée aux entreprises guinéennes pour gérer commandes, clients et échéanciers.</p>
 
-    @if($errors->any())
-    <div class="alert alert-danger">
-        <i class="fas fa-exclamation-circle"></i>
-        <div>
-            @foreach($errors->all() as $error)
-            <div>{{ $error }}</div>
-            @endforeach
-        </div>
-    </div>
-    @endif
-
-    <form method="POST" action="{{ route('login.authenticate') }}" id="loginForm">
-        @csrf
-
-        <div class="form-group">
-            <label class="form-label">Email</label>
-            <input
-                type="email"
-                class="form-input @error('email') error @enderror"
-                id="email"
-                name="email"
-                value="{{ old('email') }}"
-                placeholder="admin@caurishop.com"
-                required
-                autocomplete="email"
-            >
-            @error('email')
-            <div class="alert alert-danger" style="margin-top: 0.5rem; margin-bottom: 0;">
-                <i class="fas fa-exclamation-circle"></i>
-                <span>{{ $message }}</span>
+        <div class="feature-list">
+            <div class="feature-item">
+                <span class="feature-dot"></span>
+                Suivi des commandes et livraisons
             </div>
-            @enderror
-        </div>
-
-        <div class="form-group">
-            <label class="form-label">Mot de passe</label>
-            <input
-                type="password"
-                class="form-input @error('password') error @enderror"
-                id="password"
-                name="password"
-                placeholder="••••••••"
-                required
-                autocomplete="current-password"
-            >
-            @error('password')
-            <div class="alert alert-danger" style="margin-top: 0.5rem; margin-bottom: 0;">
-                <i class="fas fa-exclamation-circle"></i>
-                <span>{{ $message }}</span>
+            <div class="feature-item">
+                <span class="feature-dot"></span>
+                Gestion des crédits et échéanciers
             </div>
-            @enderror
+            <div class="feature-item">
+                <span class="feature-dot"></span>
+                Portail employé avec validation hiérarchique
+            </div>
+            <div class="feature-item">
+                <span class="feature-dot"></span>
+                Tableau de bord en temps réel
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-footer">
+        &copy; {{ date('Y') }} Caurishop. Tous droits réservés.
+    </div>
+</div>
+
+{{-- ── Panneau droit (formulaire) ─────────────────────────────── --}}
+<div class="panel-right">
+    <div class="login-box">
+
+        <div class="login-heading">
+            <h1>Connexion</h1>
+            <p>Entrez vos identifiants pour accéder à votre espace.</p>
         </div>
 
-        <div class="form-options">
-            <a href="#" class="forgot-password">Mot de passe oublié ?</a>
+        @if(session('error'))
+        <div class="alert alert-danger" id="alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ session('error') }}</span>
         </div>
+        @endif
 
-        <button type="submit" class="btn btn-primary" id="loginButton">
-            <span id="normal-text">Se connecter</span>
-            <span id="loading-text" class="loading-text" style="display: none;">
-                    <i class="fas fa-spinner fa-spin"></i> Connexion...
+        @if(session('success'))
+        <div class="alert alert-success" id="alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span>{{ session('success') }}</span>
+        </div>
+        @endif
+
+        @if($errors->has('email') && !$errors->has('password'))
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ $errors->first('email') }}</span>
+        </div>
+        @endif
+
+        <form method="POST" action="{{ route('login.authenticate') }}" id="loginForm">
+            @csrf
+
+            <div class="form-group">
+                <label class="form-label" for="email">Adresse email</label>
+                <div class="input-wrap">
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="form-input {{ $errors->has('email') ? 'is-error' : '' }}"
+                        value="{{ old('email') }}"
+                        placeholder="vous@exemple.com"
+                        autocomplete="email"
+                        autofocus
+                        required
+                    >
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.35rem;">
+                    <label class="form-label" for="password" style="margin:0;">Mot de passe</label>
+                </div>
+                <div class="input-wrap">
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="form-input {{ $errors->has('password') ? 'is-error' : '' }}"
+                        placeholder="••••••••"
+                        autocomplete="current-password"
+                        required
+                    >
+                    <button type="button" class="toggle-pwd" onclick="togglePwd()" tabindex="-1" id="toggleBtn">
+                        <i class="fas fa-eye" id="toggleIcon"></i>
+                    </button>
+                </div>
+                @if($errors->has('password'))
+                <div class="field-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ $errors->first('password') }}
+                </div>
+                @endif
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <span id="btn-text">Se connecter</span>
+                <span id="btn-loading" style="display:none;align-items:center;gap:0.4rem;">
+                    <i class="fas fa-circle-notch fa-spin"></i> Connexion…
                 </span>
-        </button>
-    </form>
-
-    <div class="login-footer" style="text-align: center; color: var(--gray-600); font-size: 0.9rem; margin-top: 1rem;">
-        <p>&copy; 2025 CAURISHOP. Tous droits réservés.</p>
+            </button>
+        </form>
     </div>
 </div>
 
 <script>
-    document.getElementById('loginForm').addEventListener('submit', function() {
-        const button = document.getElementById('loginButton');
-        const normalText = document.getElementById('normal-text');
-        const loadingText = document.getElementById('loading-text');
+    function togglePwd() {
+        const input = document.getElementById('password');
+        const icon  = document.getElementById('toggleIcon');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    }
 
-        button.disabled = true;
-        normalText.style.display = 'none';
-        loadingText.style.display = 'inline-flex';
+    document.getElementById('loginForm').addEventListener('submit', function () {
+        const btn = document.getElementById('submitBtn');
+        document.getElementById('btn-text').style.display    = 'none';
+        document.getElementById('btn-loading').style.display = 'flex';
+        btn.disabled = true;
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(function(alert) {
-            setTimeout(function() {
-                alert.style.opacity = '0';
-                alert.style.transform = 'translateY(-10px)';
-                setTimeout(function() {
-                    alert.style.display = 'none';
-                }, 300);
-            }, 5000);
-        });
+    // Auto-dismiss alerts
+    ['alert-error','alert-success'].forEach(function(id) {
+        const el = document.getElementById(id);
+        if (el) setTimeout(function() {
+            el.style.transition = 'opacity 0.4s';
+            el.style.opacity    = '0';
+            setTimeout(function() { el.remove(); }, 400);
+        }, 5000);
     });
 </script>
 </body>

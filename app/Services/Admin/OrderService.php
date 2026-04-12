@@ -9,6 +9,7 @@ use App\Models\Installment;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Repositories\Admin\OrderRepository;
+use App\Services\Admin\NotificationService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -71,12 +72,21 @@ class OrderService
                 }
             }
 
+            // Statut initial selon le contexte
+            // - pending_approval = soumis par un employé (doit être validé par l'admin entreprise)
+            // - draft            = créé par admin plateforme ou admin entreprise (bypass direct)
+            if (!empty($data['pending_approval'])) {
+                $initialStatus = Order::STATUS_PENDING_APPROVAL;
+            } else {
+                $initialStatus = Order::STATUS_DRAFT;
+            }
+
             // Création de la commande
             $order = $this->orderRepository->create([
                 'order_number'              => $this->generateOrderNumber(),
                 'customer_id'               => $data['customer_id'],
                 'order_type'                => $data['order_type'],
-                'status'                    => Order::STATUS_DRAFT,
+                'status'                    => $initialStatus,
                 'total_amount'              => $totalAmount,
                 'down_payment'              => $data['down_payment'] ?? 0,
                 'credit_installments_count' => $data['credit_installments_count'] ?? null,
@@ -90,6 +100,14 @@ class OrderService
             }
 
             DB::commit();
+
+            $order->load('customer');
+            $customerName = trim(($order->customer?->first_name ?? '') . ' ' . ($order->customer?->last_name ?? ''));
+            app(NotificationService::class)->newOrder(
+                $order->order_number,
+                $customerName,
+                route('admin.orders.show', $order->id),
+            );
 
             return $order->fresh(['items.product', 'items.variant', 'customer']);
         } catch (\Exception $e) {

@@ -9,10 +9,23 @@ use App\Services\Admin\CompanyService;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 
-class CompanyController extends Controller
+class CompanyController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:companies.view', only: ['index', 'show']),
+            new Middleware('permission:companies.create', only: ['create', 'store']),
+            new Middleware('permission:companies.edit', only: ['edit', 'update']),
+            new Middleware('permission:companies.delete', only: ['destroy']),
+            new Middleware('permission:companies.activate', only: ['activate', 'deactivate']),
+        ];
+    }
+
     public function __construct(
         protected CompanyService $companyService
     ) {}

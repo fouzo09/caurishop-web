@@ -6,10 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Repositories\Admin\PaymentRepository;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 
-class PaymentController extends Controller
+class PaymentController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:payments.view', only: ['index']),
+        ];
+    }
+
     public function __construct(
         protected PaymentRepository $paymentRepository,
     ) {}
