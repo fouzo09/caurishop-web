@@ -17,14 +17,16 @@ class CreditPlan extends Model
         'duration_months',
         'installments_count',
         'total_amount',
+        'down_payment_amount',
         'outstanding_amount',
         'status',
     ];
 
     protected $casts = [
-        'duration_months' => 'integer',
+        'duration_months'    => 'integer',
         'installments_count' => 'integer',
-        'total_amount' => 'decimal:2',
+        'total_amount'       => 'decimal:2',
+        'down_payment_amount'=> 'decimal:2',
         'outstanding_amount' => 'decimal:2',
     ];
 

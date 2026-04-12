@@ -46,26 +46,21 @@
                 <i class="fas fa-box"></i>
                 <span>Produits</span>
             </a>
-            <a href="#" class="menu-item">
+            <a href="{{ route('admin.orders.index') }}" class="menu-item">
                 <i class="fas fa-shopping-cart"></i>
                 <span>Commandes</span>
-                <span class="menu-badge">12</span>
             </a>
         </div>
 
         <div class="menu-section">
             <div class="menu-label">Finances</div>
-            <a href="#" class="menu-item">
+            <a href="{{ route('admin.payments.index') }}" class="menu-item">
                 <i class="fas fa-wallet"></i>
                 <span>Paiements</span>
             </a>
-            <a href="#" class="menu-item">
+            <a href="{{ route('admin.installments.index') }}" class="menu-item">
                 <i class="fas fa-file-invoice"></i>
                 <span>Échéanciers</span>
-            </a>
-            <a href="#" class="menu-item">
-                <i class="fas fa-chart-pie"></i>
-                <span>Transactions</span>
             </a>
         </div>
 

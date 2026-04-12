@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\CreditPlan;
 
 class Customer extends Model
 {
@@ -21,11 +22,13 @@ class Customer extends Model
         'email',
         'phone',
         'address',
+        'credit_limit',
         'is_active',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
+        'credit_limit' => 'decimal:2',
+        'is_active'    => 'boolean',
     ];
 
     public function company()
@@ -41,6 +44,53 @@ class Customer extends Model
     public function payments()
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function isEmployee(): bool
+    {
+        return $this->type === self::TYPE_COMPANY && !is_null($this->company_id);
+    }
+
+    public function isIndividual(): bool
+    {
+        return $this->type === self::TYPE_INDIVIDUAL;
+    }
+
+    /**
+     * Plafond crédit effectif.
+     * Override individuel en priorité, sinon héritage du plafond de l'entreprise.
+     */
+    public function effectiveCreditLimit(): ?float
+    {
+        if (!is_null($this->credit_limit)) {
+            return (float) $this->credit_limit;
+        }
+
+        return $this->company?->credit_limit ? (float) $this->company->credit_limit : null;
+    }
+
+    /**
+     * Montant de crédit déjà engagé (plans actifs non soldés).
+     */
+    public function usedCredit(): float
+    {
+        return (float) CreditPlan::whereHas('order', fn($q) => $q->where('customer_id', $this->id))
+            ->where('status', 'active')
+            ->sum('outstanding_amount');
+    }
+
+    /**
+     * Crédit restant disponible. Null = pas de plafond défini.
+     */
+    public function availableCredit(): ?float
+    {
+        $limit = $this->effectiveCreditLimit();
+
+        if (is_null($limit)) {
+            return null;
+        }
+
+        return max(0, $limit - $this->usedCredit());
     }
 
     public function isCompany(): bool

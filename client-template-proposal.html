@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CauriShop — Achetez à crédit</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;font-size:14px;color:#1a1a1a;background:#f5f5f5}
+a{text-decoration:none;color:inherit;cursor:pointer}
+img{display:block;max-width:100%}
+
+/* DEMO NAV */
+.demo-nav{position:fixed;top:0;left:50%;transform:translateX(-50%);background:#111;padding:.35rem .75rem;border-radius:0 0 8px 8px;z-index:9999;display:flex;gap:.4rem;align-items:center}
+.demo-nav span{color:rgba(255,255,255,.4);font-size:.68rem;margin-right:.2rem}
+.demo-btn{padding:.25rem .65rem;background:#222;color:rgba(255,255,255,.6);border:none;border-radius:4px;font-size:.68rem;cursor:pointer;font-family:'Inter',sans-serif}
+.demo-btn.active{background:#00b374;color:#fff}
+.page{display:none}.page.active{display:block}
+
+/* ── TOP STRIP ── */
+.top-strip{background:#1a1a2e;padding:.35rem 0;font-size:.72rem;color:rgba(255,255,255,.6);text-align:center}
+.top-strip span{margin:0 1rem}
+.top-strip a{color:#f0c040;font-weight:600}
+
+/* ── HEADER ── */
+.header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:200}
+.header-main{max-width:1280px;margin:0 auto;padding:.6rem 1.25rem;display:flex;align-items:center;gap:1rem}
+.logo{font-size:1.5rem;font-weight:800;color:#1a1a1a;letter-spacing:-1px;flex-shrink:0}
+.logo span{color:#00b374}
+.logo sub{font-size:.55rem;font-weight:400;color:#888;letter-spacing:0;vertical-align:top;margin-top:.3rem;display:inline-block}
+
+.search-wrap{flex:1;max-width:560px;display:flex;border:2px solid #00b374;border-radius:4px;overflow:hidden}
+.search-cat{padding:0 .75rem;background:#f5f5f5;border-right:1px solid #ddd;font-size:.78rem;color:#555;display:flex;align-items:center;gap:.35rem;white-space:nowrap;cursor:pointer}
+.search-cat i{font-size:.65rem;color:#999}
+.search-input{flex:1;border:none;outline:none;padding:.55rem .75rem;font-size:.88rem;font-family:'Inter',sans-serif}
+.search-btn{background:#00b374;color:#fff;border:none;padding:0 1rem;cursor:pointer;font-size:.9rem;display:flex;align-items:center}
+.search-btn:hover{background:#009660}
+
+.header-actions{margin-left:auto;display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+.credit-pill{display:flex;flex-direction:column;align-items:flex-end;padding:.3rem .75rem;background:#f0fdf8;border:1px solid #bbf0dd;border-radius:4px;cursor:pointer}
+.credit-pill-label{font-size:.65rem;color:#666}
+.credit-pill-val{font-size:.88rem;font-weight:700;color:#00b374}
+.hdr-btn{display:flex;flex-direction:column;align-items:center;gap:.1rem;padding:.3rem .65rem;background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;color:#333;font-size:.65rem;border-radius:4px;transition:background .15s}
+.hdr-btn:hover{background:#f5f5f5}
+.hdr-btn i{font-size:1rem;color:#1a1a1a}
+.hdr-btn .cart-count{background:#e53935;color:#fff;font-size:.58rem;font-weight:700;border-radius:99px;padding:.05rem .3rem;margin-top:-.15rem}
+
+/* ── NAVBAR ── */
+.navbar{background:#1a1a2e;border-bottom:2px solid #00b374}
+.navbar-inner{max-width:1280px;margin:0 auto;padding:0 1.25rem;display:flex;align-items:center;gap:0}
+.nav-item{padding:.6rem .9rem;color:rgba(255,255,255,.8);font-size:.8rem;font-weight:500;display:flex;align-items:center;gap:.35rem;white-space:nowrap;cursor:pointer;transition:background .15s}
+.nav-item:hover,.nav-item.active{background:rgba(255,255,255,.1);color:#fff}
+.nav-item i{font-size:.65rem;opacity:.7}
+.nav-item.highlight{background:#00b374;color:#fff;font-weight:700}
+.nav-item.highlight:hover{background:#009660}
+.nav-sep{width:1px;background:rgba(255,255,255,.1);height:20px;margin:0 .25rem}
+
+/* ── LAYOUT ── */
+.container{max-width:1280px;margin:0 auto;padding:0 1.25rem}
+
+/* ── HERO BANNER ── */
+.hero-banner{margin:1rem 0;display:grid;grid-template-columns:1fr 320px;gap:.75rem}
+.hero-main{border-radius:6px;overflow:hidden;background:linear-gradient(135deg,#0f1923 0%,#1a3a2e 100%);padding:2.5rem 2rem;display:flex;align-items:center;justify-content:space-between;min-height:220px;position:relative}
+.hero-main::after{content:'';position:absolute;right:-30px;top:-30px;width:280px;height:280px;border-radius:50%;background:rgba(0,179,116,.08)}
+.hero-text{position:relative;z-index:1}
+.hero-tag{display:inline-block;background:rgba(0,179,116,.2);color:#00b374;border:1px solid rgba(0,179,116,.4);padding:.2rem .6rem;border-radius:3px;font-size:.72rem;font-weight:700;letter-spacing:.3px;text-transform:uppercase;margin-bottom:.75rem}
+.hero-title{font-size:1.7rem;font-weight:800;color:#fff;line-height:1.2;margin-bottom:.5rem}
+.hero-title em{color:#00b374;font-style:normal}
+.hero-desc{font-size:.82rem;color:rgba(255,255,255,.55);margin-bottom:1.25rem;line-height:1.6}
+.hero-cta{display:inline-flex;align-items:center;gap:.4rem;background:#00b374;color:#fff;padding:.6rem 1.25rem;border-radius:4px;font-weight:700;font-size:.85rem;transition:background .15s}
+.hero-cta:hover{background:#009660}
+.hero-product{position:relative;z-index:1;text-align:right}
+.hero-product-img{font-size:5rem;color:rgba(255,255,255,.2)}
+.hero-product-price{font-size:.78rem;color:rgba(255,255,255,.5);margin-top:.5rem}
+.hero-product-amount{font-size:1.4rem;font-weight:800;color:#fff}
+.hero-product-monthly{font-size:.72rem;background:rgba(0,179,116,.2);color:#00b374;padding:.15rem .4rem;border-radius:3px;display:inline-block;margin-top:.2rem}
+
+.hero-side{display:grid;grid-template-rows:1fr 1fr;gap:.75rem}
+.promo-card{border-radius:6px;padding:1rem 1.25rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;transition:opacity .15s;overflow:hidden;position:relative}
+.promo-card:hover{opacity:.92}
+.promo-card-1{background:linear-gradient(135deg,#1a1a2e,#2d3a6e)}
+.promo-card-2{background:linear-gradient(135deg,#2d1a10,#6e3a1a)}
+.promo-card i{font-size:1.8rem;opacity:.5}
+.promo-text-tag{font-size:.65rem;text-transform:uppercase;letter-spacing:.5px;opacity:.65;color:#fff;margin-bottom:.2rem}
+.promo-text-title{font-size:.92rem;font-weight:700;color:#fff}
+.promo-text-sub{font-size:.72rem;color:rgba(255,255,255,.5);margin-top:.15rem}
+
+/* ── SECTION ── */
+.section{background:#fff;border:1px solid #e8e8e8;border-radius:6px;margin-bottom:1rem}
+.section-head{padding:.75rem 1rem;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between}
+.section-head h2{font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:.4rem}
+.section-head h2 i{color:#00b374;font-size:.85rem}
+.section-head a{font-size:.78rem;color:#00b374;font-weight:600;display:flex;align-items:center;gap:.3rem}
+.section-head a:hover{color:#009660}
+
+/* ── CATEGORY STRIP ── */
+.cat-strip{display:flex;gap:.75rem;padding:.75rem 1rem;overflow-x:auto;scrollbar-width:none}
+.cat-strip::-webkit-scrollbar{display:none}
+.cat-chip{display:flex;flex-direction:column;align-items:center;gap:.4rem;min-width:70px;cursor:pointer;padding:.4rem;border-radius:6px;transition:background .15s}
+.cat-chip:hover{background:#f5f5f5}
+.cat-chip-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.cat-chip-label{font-size:.68rem;font-weight:600;color:#444;text-align:center;line-height:1.3}
+
+/* ── PRODUCTS ── */
+.products-row{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-top:1px solid #f0f0f0}
+.products-row-4{grid-template-columns:repeat(4,1fr)}
+.product-card{border-right:1px solid #f0f0f0;border-bottom:1px solid #f0f0f0;padding:.75rem;cursor:pointer;transition:box-shadow .2s;position:relative;background:#fff}
+.product-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.1);z-index:2}
+.product-card:nth-child(5n){border-right:none}
+.products-row-4 .product-card:nth-child(4n){border-right:none}
+
+.product-img-wrap{height:150px;display:flex;align-items:center;justify-content:center;margin-bottom:.6rem;position:relative;background:#f9f9f9;border-radius:4px}
+.product-img-wrap i{font-size:3.5rem;color:#ddd}
+.product-img-wrap img{max-height:140px;max-width:100%;object-fit:contain}
+.p-badge{position:absolute;top:.4rem;left:.4rem;padding:.15rem .45rem;border-radius:3px;font-size:.62rem;font-weight:700;letter-spacing:.2px}
+.p-badge-new{background:#7c3aed;color:#fff}
+.p-badge-promo{background:#e53935;color:#fff}
+.p-badge-credit{background:#00b374;color:#fff}
+
+.product-brand{font-size:.65rem;color:#999;text-transform:uppercase;letter-spacing:.3px;margin-bottom:.2rem}
+.product-name{font-size:.8rem;font-weight:500;color:#1a1a1a;line-height:1.4;margin-bottom:.5rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.product-rating{display:flex;align-items:center;gap:.3rem;margin-bottom:.4rem}
+.stars{color:#f59600;font-size:.65rem}
+.rating-count{font-size:.65rem;color:#999}
+.product-price-main{font-size:1rem;font-weight:800;color:#1a1a1a;margin-bottom:.1rem}
+.product-price-main sup{font-size:.6rem;font-weight:500;vertical-align:super}
+.product-old-price{font-size:.72rem;color:#999;text-decoration:line-through;margin-bottom:.15rem}
+.product-monthly{font-size:.7rem;color:#00b374;font-weight:600;margin-bottom:.5rem}
+.product-delivery{font-size:.65rem;color:#666;display:flex;align-items:center;gap:.25rem}
+.product-delivery i{font-size:.6rem}
+.product-delivery .free{color:#00b374;font-weight:600}
+.product-actions{display:flex;gap:.4rem;margin-top:.6rem}
+.btn-cart{flex:1;background:#00b374;color:#fff;border:none;padding:.45rem .5rem;border-radius:3px;font-size:.75rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:.3rem;transition:background .15s}
+.btn-cart:hover{background:#009660}
+.btn-heart{width:30px;height:30px;border:1.5px solid #e5e5e5;background:#fff;border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:.78rem;flex-shrink:0;transition:all .15s}
+.btn-heart:hover{border-color:#e53935;color:#e53935}
+
+/* ── SIDEBAR LAYOUT ── */
+.sidebar-layout{display:grid;grid-template-columns:220px 1fr;gap:1rem;align-items:start}
+.sidebar{background:#fff;border:1px solid #e8e8e8;border-radius:6px;overflow:hidden}
+.sidebar-section{border-bottom:1px solid #f0f0f0;padding:.65rem .85rem}
+.sidebar-section:last-child{border-bottom:none}
+.sidebar-title{font-size:.78rem;font-weight:700;color:#1a1a1a;margin-bottom:.5rem}
+.filter-item{display:flex;align-items:center;gap:.4rem;padding:.2rem 0;font-size:.78rem;color:#444;cursor:pointer}
+.filter-item:hover{color:#00b374}
+.filter-item input[type=checkbox]{accent-color:#00b374;cursor:pointer}
+.filter-count{margin-left:auto;font-size:.65rem;color:#aaa}
+
+/* ── SORT BAR ── */
+.sort-bar{background:#fff;border:1px solid #e8e8e8;border-radius:6px;padding:.5rem .85rem;margin-bottom:.75rem;display:flex;align-items:center;gap:.75rem;font-size:.78rem;color:#444}
+.sort-label{font-weight:600;white-space:nowrap}
+.sort-btn{padding:.3rem .7rem;border:1.5px solid #e5e5e5;border-radius:3px;background:#fff;font-size:.75rem;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s}
+.sort-btn:hover,.sort-btn.active{border-color:#00b374;color:#00b374;background:#f0fdf8}
+.results-count{margin-left:auto;color:#888;font-size:.75rem}
+
+/* ── CATALOG GRID ── */
+.catalog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
+.catalog-card{background:#fff;border:1.5px solid #e8e8e8;border-radius:6px;overflow:hidden;cursor:pointer;transition:border-color .2s,box-shadow .2s}
+.catalog-card:hover{border-color:#00b374;box-shadow:0 4px 16px rgba(0,179,116,.12)}
+.catalog-img{height:160px;background:#f9f9f9;display:flex;align-items:center;justify-content:center;position:relative}
+.catalog-img i{font-size:4rem;color:#ddd}
+.catalog-body{padding:.75rem}
+.catalog-brand{font-size:.65rem;color:#999;text-transform:uppercase;letter-spacing:.3px}
+.catalog-name{font-size:.82rem;font-weight:600;color:#1a1a1a;margin:.2rem 0 .5rem;line-height:1.4}
+.catalog-price{font-size:1.05rem;font-weight:800;color:#1a1a1a}
+.catalog-monthly{font-size:.7rem;color:#00b374;font-weight:600;margin-top:.15rem}
+.catalog-meta{display:flex;align-items:center;justify-content:space-between;margin-top:.5rem;padding-top:.5rem;border-top:1px solid #f0f0f0}
+.catalog-rating{display:flex;align-items:center;gap:.2rem;font-size:.65rem;color:#888}
+.catalog-rating .stars{color:#f59600}
+.catalog-stock{font-size:.65rem;font-weight:600}
+.catalog-stock.low{color:#e53935}
+.catalog-stock.ok{color:#00b374}
+
+/* ── PRODUCT DETAIL ── */
+.pd-layout{display:grid;grid-template-columns:380px 1fr 280px;gap:1.5rem;padding:1.25rem 0}
+.pd-gallery{background:#fff;border:1px solid #e8e8e8;border-radius:6px;overflow:hidden}
+.pd-gallery-main{height:320px;display:flex;align-items:center;justify-content:center;background:#f9f9f9;font-size:6rem;color:#ddd;border-bottom:1px solid #f0f0f0}
+.pd-thumbs{display:flex;gap:.4rem;padding:.5rem;justify-content:center}
+.pd-thumb{width:48px;height:48px;border:1.5px solid #e5e5e5;border-radius:3px;background:#f9f9f9;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#ddd;cursor:pointer;transition:border-color .15s}
+.pd-thumb:hover,.pd-thumb.active{border-color:#00b374}
+
+.pd-info{}
+.pd-breadcrumb{font-size:.72rem;color:#999;margin-bottom:.75rem;display:flex;align-items:center;gap:.3rem}
+.pd-breadcrumb a:hover{color:#00b374}
+.pd-breadcrumb i{font-size:.55rem}
+.pd-title{font-size:1.1rem;font-weight:700;color:#1a1a1a;line-height:1.4;margin-bottom:.5rem}
+.pd-ref{font-size:.7rem;color:#aaa;margin-bottom:.5rem}
+.pd-rating{display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem;padding-bottom:.75rem;border-bottom:1px solid #f0f0f0}
+.pd-rating .stars{font-size:.8rem}
+.pd-rating span{font-size:.78rem;color:#888}
+.pd-rating a{font-size:.78rem;color:#00b374}
+
+.pd-price-block{background:#f9f9f9;border-radius:4px;padding:.85rem;margin-bottom:.85rem}
+.pd-old-price{font-size:.78rem;color:#999;text-decoration:line-through;margin-bottom:.15rem}
+.pd-price{font-size:1.6rem;font-weight:800;color:#1a1a1a;margin-bottom:.4rem}
+.pd-credit-box{background:#e6f9f3;border:1px solid #a7f3d0;border-radius:4px;padding:.6rem .85rem;display:flex;align-items:center;gap:.6rem}
+.pd-credit-box i{color:#00b374;font-size:.95rem;flex-shrink:0}
+.pd-credit-box strong{display:block;font-size:.85rem;color:#065f46;font-weight:700}
+.pd-credit-box span{font-size:.72rem;color:#047857}
+
+.pd-variants{margin-bottom:.85rem}
+.pd-variant-label{font-size:.78rem;font-weight:600;color:#1a1a1a;margin-bottom:.4rem}
+.pd-variant-list{display:flex;gap:.4rem;flex-wrap:wrap}
+.pd-variant-btn{padding:.35rem .8rem;border:1.5px solid #e5e5e5;border-radius:3px;font-size:.78rem;cursor:pointer;background:#fff;font-family:'Inter',sans-serif;transition:all .15s}
+.pd-variant-btn:hover,.pd-variant-btn.active{border-color:#00b374;color:#00b374;background:#f0fdf8}
+
+.pd-features{font-size:.78rem;color:#555;line-height:1.8;margin-bottom:.85rem}
+.pd-features li{list-style:none;display:flex;align-items:flex-start;gap:.4rem}
+.pd-features li::before{content:'✓';color:#00b374;font-weight:700;flex-shrink:0}
+
+.pd-sidebar{}
+.pd-box{background:#fff;border:1px solid #e8e8e8;border-radius:6px;padding:1rem;margin-bottom:.75rem}
+.pd-box-title{font-size:.82rem;font-weight:700;margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid #f0f0f0}
+.pd-credit-options{}
+.pd-credit-option{display:flex;align-items:center;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid #f5f5f5;font-size:.78rem}
+.pd-credit-option:last-child{border-bottom:none}
+.pd-credit-option-dur{font-weight:600;color:#1a1a1a}
+.pd-credit-option-amt{font-weight:700;color:#00b374}
+.pd-credit-selected{background:#f0fdf8;border:1.5px solid #00b374;border-radius:4px;padding:.6rem .75rem;margin-bottom:.75rem}
+.pd-credit-selected-label{font-size:.7rem;color:#047857;margin-bottom:.15rem}
+.pd-credit-selected-val{font-size:1rem;font-weight:800;color:#065f46}
+.btn-buy-now{width:100%;background:#00b374;color:#fff;border:none;padding:.7rem;border-radius:4px;font-size:.88rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:.5rem;transition:background .15s}
+.btn-buy-now:hover{background:#009660}
+.btn-cart-full{width:100%;background:#fff;color:#1a1a1a;border:1.5px solid #1a1a1a;padding:.65rem;border-radius:4px;font-size:.85rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:.4rem}
+.btn-cart-full:hover{background:#1a1a1a;color:#fff}
+.pd-delivery-info{font-size:.75rem;color:#555;margin-top:.75rem;display:flex;flex-direction:column;gap:.3rem}
+.pd-delivery-info span{display:flex;align-items:center;gap:.4rem}
+.pd-delivery-info i{color:#00b374;width:12px}
+.pd-delivery-info .bold{font-weight:600;color:#1a1a1a}
+
+/* ── ACCOUNT PAGE ── */
+.account-layout{display:grid;grid-template-columns:220px 1fr;gap:1rem;padding:1rem 0}
+.account-sidebar-nav{background:#fff;border:1px solid #e8e8e8;border-radius:6px;overflow:hidden}
+.acc-nav-header{padding:.75rem .85rem;background:#1a1a2e;color:#fff}
+.acc-nav-name{font-weight:700;font-size:.9rem}
+.acc-nav-company{font-size:.7rem;color:rgba(255,255,255,.5);margin-top:.1rem}
+.acc-nav-credit{background:#00b374;margin:.5rem;border-radius:4px;padding:.5rem .7rem;color:#fff}
+.acc-nav-credit-label{font-size:.65rem;opacity:.8}
+.acc-nav-credit-val{font-size:1rem;font-weight:800}
+.acc-nav-credit-sub{font-size:.65rem;opacity:.6}
+.acc-menu-item{display:flex;align-items:center;gap:.6rem;padding:.65rem .85rem;font-size:.82rem;color:#444;border-bottom:1px solid #f5f5f5;cursor:pointer;transition:all .15s}
+.acc-menu-item:last-child{border-bottom:none}
+.acc-menu-item:hover,.acc-menu-item.active{background:#f0fdf8;color:#00b374;padding-left:1.1rem}
+.acc-menu-item i{width:14px;text-align:center;font-size:.8rem}
+.acc-menu-item.danger:hover{background:#fff5f5;color:#e53935;padding-left:1.1rem}
+
+.acc-main{}
+.acc-card{background:#fff;border:1px solid #e8e8e8;border-radius:6px;margin-bottom:.75rem;overflow:hidden}
+.acc-card-head{padding:.65rem .9rem;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between}
+.acc-card-head h3{font-size:.85rem;font-weight:700;display:flex;align-items:center;gap:.4rem}
+.acc-card-head h3 i{color:#00b374;font-size:.8rem}
+.acc-card-head a{font-size:.75rem;color:#00b374}
+
+.acc-stats{display:grid;grid-template-columns:repeat(4,1fr)}
+.acc-stat{padding:.85rem;border-right:1px solid #f0f0f0;text-align:center}
+.acc-stat:last-child{border-right:none}
+.acc-stat-val{font-size:1.3rem;font-weight:800;color:#1a1a1a}
+.acc-stat-label{font-size:.68rem;color:#888;margin-top:.15rem}
+
+.order-table{width:100%;border-collapse:collapse;font-size:.78rem}
+.order-table th{padding:.55rem .85rem;text-align:left;font-weight:600;color:#888;font-size:.7rem;border-bottom:2px solid #f0f0f0;white-space:nowrap}
+.order-table td{padding:.65rem .85rem;border-bottom:1px solid #f7f7f7;vertical-align:middle}
+.order-table tr:last-child td{border-bottom:none}
+.order-table tr:hover td{background:#fafafa}
+.order-num{font-weight:700;color:#00b374}
+.order-status{display:inline-flex;align-items:center;gap:.25rem;padding:.15rem .5rem;border-radius:3px;font-size:.68rem;font-weight:600}
+.status-delivered{background:#dcfce7;color:#166534}
+.status-pending{background:#fef9c3;color:#713f12}
+.status-credit{background:#ede9fe;color:#5b21b6}
+
+.installment-table{width:100%;border-collapse:collapse;font-size:.78rem}
+.installment-table th{padding:.5rem .85rem;text-align:left;font-weight:600;color:#888;font-size:.7rem;border-bottom:2px solid #f0f0f0}
+.installment-table td{padding:.6rem .85rem;border-bottom:1px solid #f7f7f7;vertical-align:middle}
+.installment-table tr:last-child td{border-bottom:none}
+.installment-table tr:hover td{background:#fafafa}
+.inst-status{display:inline-flex;padding:.15rem .45rem;border-radius:3px;font-size:.68rem;font-weight:600}
+.inst-paid{background:#dcfce7;color:#166534}
+.inst-upcoming{background:#fef9c3;color:#713f12}
+.inst-pending{background:#f5f5f5;color:#666}
+
+/* ── FOOTER ── */
+.footer{background:#1a1a2e;color:rgba(255,255,255,.65);margin-top:1.5rem}
+.footer-inner{max-width:1280px;margin:0 auto;padding:2rem 1.25rem}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem;margin-bottom:1.5rem}
+.footer-logo{font-size:1.3rem;font-weight:800;color:#fff;letter-spacing:-1px;margin-bottom:.5rem}
+.footer-logo span{color:#00b374}
+.footer-desc{font-size:.75rem;line-height:1.7;color:rgba(255,255,255,.4)}
+.footer-col-title{font-weight:700;color:#fff;margin-bottom:.75rem;font-size:.82rem}
+.footer-link{display:block;font-size:.78rem;margin-bottom:.4rem;cursor:pointer;transition:color .15s}
+.footer-link:hover{color:#00b374}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:1rem;display:flex;justify-content:space-between;align-items:center;font-size:.72rem;color:rgba(255,255,255,.3)}
+</style>
+</head>
+<body>
+
+<!-- DEMO NAV -->
+<div class="demo-nav">
+    <span>Pages :</span>
+    <button class="demo-btn active" onclick="show('home')">Accueil</button>
+    <button class="demo-btn" onclick="show('catalog')">Catalogue</button>
+    <button class="demo-btn" onclick="show('product')">Produit</button>
+    <button class="demo-btn" onclick="show('account')">Mon compte</button>
+</div>
+
+<!-- ══════════ ACCUEIL ══════════ -->
+<div class="page active" id="page-home">
+<div class="top-strip"><span>Livraison à Conakry et en région</span><span>|</span><span>Paiement à crédit · <a>Voir les conditions</a></span><span>|</span><span>Assistance 7j/7 · 621 000 000</span></div>
+<div class="header">
+    <div class="header-main">
+        <div class="logo">Cauri<span>Shop</span><sub>.gn</sub></div>
+        <div class="search-wrap">
+            <div class="search-cat">Toutes catégories <i class="fas fa-chevron-down"></i></div>
+            <input class="search-input" type="text" placeholder="Rechercher un produit, une marque...">
+            <button class="search-btn"><i class="fas fa-search"></i></button>
+        </div>
+        <div class="header-actions">
+            <div class="credit-pill" onclick="show('account')">
+                <span class="credit-pill-label">Crédit disponible</span>
+                <span class="credit-pill-val">650 000 GNF</span>
+            </div>
+            <button class="hdr-btn" onclick="show('account')"><i class="fas fa-user"></i><span>Mon compte</span></button>
+            <button class="hdr-btn"><i class="fas fa-heart"></i><span>Favoris</span></button>
+            <button class="hdr-btn"><i class="fas fa-shopping-cart"></i><span class="cart-count">2</span><span>Panier</span></button>
+        </div>
+    </div>
+</div>
+<div class="navbar">
+    <div class="navbar-inner">
+        <div class="nav-item"><i class="fas fa-bars"></i> Toutes catégories</div>
+        <div class="nav-sep"></div>
+        <div class="nav-item active">Téléphones</div>
+        <div class="nav-item">TV & Écrans</div>
+        <div class="nav-item">Électroménager</div>
+        <div class="nav-item">Informatique</div>
+        <div class="nav-item">Mobilier</div>
+        <div class="nav-item">Climatisation</div>
+        <div class="nav-item">Son & Photo</div>
+        <div class="nav-sep"></div>
+        <div class="nav-item highlight"><i class="fas fa-bolt"></i> Crédit 0%</div>
+    </div>
+</div>
+
+<div class="container" style="padding-top:.75rem;padding-bottom:1.5rem">
+
+    <!-- Hero -->
+    <div class="hero-banner">
+        <div class="hero-main">
+            <div class="hero-text">
+                <div class="hero-tag"><i class="fas fa-credit-card"></i> &nbsp;Achat à crédit 0%</div>
+                <div class="hero-title">Les meilleurs produits,<br>payables en <em>mensualités</em></div>
+                <div class="hero-desc">Utilisez votre plafond crédit entreprise.<br>Sans intérêts, sans conditions cachées.</div>
+                <a class="hero-cta" onclick="show('catalog')"><i class="fas fa-shopping-bag"></i> Voir le catalogue</a>
+            </div>
+            <div class="hero-product">
+                <div class="hero-product-img"><i class="fas fa-mobile-alt"></i></div>
+                <div class="hero-product-price">Samsung Galaxy A55</div>
+                <div class="hero-product-amount">540 000 GNF</div>
+                <div class="hero-product-monthly">dès 45 000 GNF/mois</div>
+            </div>
+        </div>
+        <div class="hero-side">
+            <div class="promo-card promo-card-1">
+                <i class="fas fa-tv" style="color:#a0a8f0;font-size:2.2rem"></i>
+                <div>
+                    <div class="promo-text-tag">Nouveautés</div>
+                    <div class="promo-text-title">TV & Écrans 4K</div>
+                    <div class="promo-text-sub">À partir de 80 000 GNF/mois</div>
+                </div>
+            </div>
+            <div class="promo-card promo-card-2">
+                <i class="fas fa-blender" style="color:#f0a080;font-size:2.2rem"></i>
+                <div>
+                    <div class="promo-text-tag">Promo</div>
+                    <div class="promo-text-title">Électroménager</div>
+                    <div class="promo-text-sub">Frigos, lave-linge, cuisinières</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Catégories -->
+    <div class="section">
+        <div class="section-head">
+            <h2><i class="fas fa-th-large"></i> Catégories populaires</h2>
+        </div>
+        <div class="cat-strip">
+            <div class="cat-chip"><div class="cat-chip-icon" style="background:#ede9fe;color:#7c3aed"><i class="fas fa-mobile-alt"></i></div><div class="cat-chip-label">Téléphones</div></div>
+            <div class="cat-chip"><div class="cat-chip-icon" style="background:#fef3c7;color:#d97706"><i class="fas fa-tv"></i></div><div class="cat-chip-label">TV & Écrans</div></div>
+            <div class="cat-chip"><div class="cat-chip-icon" style="background:#dcfce7;color:#16a34a"><i class="fas fa-blender"></i></div><div class="cat-chip-label">Électro-ménager</div></div>
+            <div class="cat-chip"><div class="cat-chip-icon" style="background:#dbeafe;color:#2563eb"><i class="fas fa-laptop"></i></div><div class="cat-chip-label">Informatique</div></div>
+            <div class="cat-chip"><div class="cat-chip-icon" style="background:#fee2e2;color:#dc2626"><i class="fas fa-couch"></i></div><div class="cat-chip-label">Mobilier</div></div>
+            <div class="cat-chip"><div class="cat-chip-icon" style="background:#e0f2fe;color:#0284c7"><i class="fas fa-wind"></i></div><div class="cat-chip-label">Climati-sation</div></div>
+            <div class="cat-chip"><div class="cat-chip-icon" style="background:#fce7f3;color:#db2777"><i class="fas fa-camera"></i></div><div class="cat-chip-label">Photo & Son</div></div>
+            <div class="cat-chip"><div class="cat-chip-icon" style="background:#f5f5f5;color:#555"><i class="fas fa-ellipsis-h"></i></div><div class="cat-chip-label">Tout voir</div></div>
+        </div>
+    </div>
+
+    <!-- Produits du moment -->
+    <div class="section">
+        <div class="section-head">
+            <h2><i class="fas fa-fire"></i> Produits du moment</h2>
+            <a onclick="show('catalog')">Voir tout <i class="fas fa-chevron-right"></i></a>
+        </div>
+        <div class="products-row">
+            <div class="product-card" onclick="show('product')">
+                <div class="product-img-wrap"><i class="fas fa-mobile-alt"></i><span class="p-badge p-badge-new">NOUVEAU</span></div>
+                <div class="product-brand">Samsung</div>
+                <div class="product-name">Galaxy A55 5G 128Go — Bleu Navy</div>
+                <div class="product-rating"><span class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></span><span class="rating-count">(128)</span></div>
+                <div class="product-price-main"><sup>GNF </sup>540 000</div>
+                <div class="product-monthly">dès 45 000/mois × 12</div>
+                <div class="product-delivery"><i class="fas fa-truck"></i><span class="free">Livraison offerte</span></div>
+                <div class="product-actions"><button class="btn-cart"><i class="fas fa-cart-plus"></i> Ajouter</button><button class="btn-heart"><i class="fas fa-heart"></i></button></div>
+            </div>
+            <div class="product-card">
+                <div class="product-img-wrap" style="background:#1a1a2e"><i class="fas fa-tv" style="color:#444"></i><span class="p-badge p-badge-promo">-15%</span></div>
+                <div class="product-brand">LG</div>
+                <div class="product-name">Smart TV 43" 4K UHD WebOS</div>
+                <div class="product-rating"><span class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></span><span class="rating-count">(64)</span></div>
+                <div class="product-old-price">GNF 1 150 000</div>
+                <div class="product-price-main"><sup>GNF </sup>980 000</div>
+                <div class="product-monthly">dès 81 667/mois × 12</div>
+                <div class="product-delivery"><i class="fas fa-truck"></i><span class="free">Livraison offerte</span></div>
+                <div class="product-actions"><button class="btn-cart"><i class="fas fa-cart-plus"></i> Ajouter</button><button class="btn-heart"><i class="fas fa-heart"></i></button></div>
+            </div>
+            <div class="product-card">
+                <div class="product-img-wrap" style="background:#e8f4f8"><i class="fas fa-snowflake" style="color:#7ec8e3"></i><span class="p-badge p-badge-credit">CRÉDIT</span></div>
+                <div class="product-brand">Hisense</div>
+                <div class="product-name">Réfrigérateur 2 portes No Frost 320L</div>
+                <div class="product-rating"><span class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span><span class="rating-count">(42)</span></div>
+                <div class="product-price-main"><sup>GNF </sup>1 200 000</div>
+                <div class="product-monthly">dès 100 000/mois × 12</div>
+                <div class="product-delivery"><i class="fas fa-truck"></i><span>Livraison : 20 000 GNF</span></div>
+                <div class="product-actions"><button class="btn-cart"><i class="fas fa-cart-plus"></i> Ajouter</button><button class="btn-heart"><i class="fas fa-heart"></i></button></div>
+            </div>
+            <div class="product-card">
+                <div class="product-img-wrap" style="background:#1a1a1a"><i class="fas fa-laptop" style="color:#444"></i><span class="p-badge p-badge-new">NOUVEAU</span></div>
+                <div class="product-brand">HP</div>
+                <div class="product-name">Laptop 15s Intel Core i5 8Go 512Go SSD</div>
+                <div class="product-rating"><span class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></span><span class="rating-count">(37)</span></div>
+                <div class="product-price-main"><sup>GNF </sup>2 400 000</div>
+                <div class="product-monthly">dès 200 000/mois × 12</div>
+                <div class="product-delivery"><i class="fas fa-truck"></i><span class="free">Livraison offerte</span></div>
+                <div class="product-actions"><button class="btn-cart"><i class="fas fa-cart-plus"></i> Ajouter</button><button class="btn-heart"><i class="fas fa-heart"></i></button></div>
+            </div>
+            <div class="product-card">
+                <div class="product-img-wrap" style="background:#f5f0e8"><i class="fas fa-couch" style="color:#c8a97a"></i></div>
+                <div class="product-brand">Luxor</div>
+                <div class="product-name">Canapé 3 places tissu beige — Collection 2026</div>
+                <div class="product-rating"><span class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></span><span class="rating-count">(18)</span></div>
+                <div class="product-price-main"><sup>GNF </sup>850 000</div>
+                <div class="product-monthly">dès 70 834/mois × 12</div>
+                <div class="product-delivery"><i class="fas fa-truck"></i><span>Livraison : 30 000 GNF</span></div>
+                <div class="product-actions"><button class="btn-cart"><i class="fas fa-cart-plus"></i> Ajouter</button><button class="btn-heart"><i class="fas fa-heart"></i></button></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="footer">
+    <div class="footer-inner">
+        <div class="footer-grid">
+            <div><div class="footer-logo">Cauri<span>Shop</span></div><div class="footer-desc">La plateforme d'achat à crédit pour les employés d'entreprises partenaires en Guinée. Achetez maintenant, payez en mensualités.</div></div>
+            <div><div class="footer-col-title">Navigation</div><div class="footer-link">Accueil</div><div class="footer-link">Catalogue</div><div class="footer-link">Offres spéciales</div><div class="footer-link">Mon compte</div></div>
+            <div><div class="footer-col-title">Aide</div><div class="footer-link">Comment ça marche</div><div class="footer-link">Conditions du crédit</div><div class="footer-link">Livraison</div><div class="footer-link">Contact</div></div>
+            <div><div class="footer-col-title">Contact</div><div class="footer-link"><i class="fas fa-phone" style="margin-right:.4rem"></i>+224 621 000 000</div><div class="footer-link"><i class="fas fa-envelope" style="margin-right:.4rem"></i>contact@caurishop.gn</div><div class="footer-link"><i class="fas fa-map-marker-alt" style="margin-right:.4rem"></i>Conakry, Guinée</div></div>
+        </div>
+        <div class="footer-bottom"><span>© 2026 CauriShop. Tous droits réservés.</span><span>CGU · Confidentialité · Cookies</span></div>
+    </div>
+</div>
+</div>
+
+<!-- ══════════ CATALOGUE ══════════ -->
+<div class="page" id="page-catalog">
+<div class="header">
+    <div class="header-main">
+        <div class="logo" onclick="show('home')" style="cursor:pointer">Cauri<span>Shop</span><sub>.gn</sub></div>
+        <div class="search-wrap"><div class="search-cat">Toutes catégories <i class="fas fa-chevron-down"></i></div><input class="search-input" type="text" placeholder="Rechercher..."><button class="search-btn"><i class="fas fa-search"></i></button></div>
+        <div class="header-actions"><div class="credit-pill" onclick="show('account')"><span class="credit-pill-label">Crédit disponible</span><span class="credit-pill-val">650 000 GNF</span></div><button class="hdr-btn" onclick="show('account')"><i class="fas fa-user"></i><span>Compte</span></button><button class="hdr-btn"><i class="fas fa-shopping-cart"></i><span class="cart-count">2</span><span>Panier</span></button></div>
+    </div>
+</div>
+<div class="navbar"><div class="navbar-inner"><div class="nav-item" onclick="show('home')"><i class="fas fa-home"></i> Accueil</div><div class="nav-sep"></div><div class="nav-item active">Téléphones</div><div class="nav-item">TV & Écrans</div><div class="nav-item">Électroménager</div><div class="nav-item">Informatique</div><div class="nav-item highlight"><i class="fas fa-bolt"></i> Crédit 0%</div></div></div>
+
+<div class="container" style="padding-top:.75rem;padding-bottom:2rem">
+    <div style="font-size:.75rem;color:#888;padding:.5rem 0;margin-bottom:.5rem">
+        <a onclick="show('home')" style="color:#00b374">Accueil</a> <i class="fas fa-chevron-right" style="font-size:.55rem"></i> Téléphones &nbsp;—&nbsp; <strong style="color:#1a1a1a">128 produits</strong>
+    </div>
+    <div class="sidebar-layout">
+        <div class="sidebar">
+            <div class="sidebar-section"><div class="sidebar-title">Marque</div><label class="filter-item"><input type="checkbox"> Samsung <span class="filter-count">42</span></label><label class="filter-item"><input type="checkbox"> iPhone <span class="filter-count">18</span></label><label class="filter-item"><input type="checkbox"> Xiaomi <span class="filter-count">31</span></label><label class="filter-item"><input type="checkbox"> Tecno <span class="filter-count">24</span></label><label class="filter-item"><input type="checkbox"> Infinix <span class="filter-count">13</span></label></div>
+            <div class="sidebar-section"><div class="sidebar-title">Prix (GNF)</div><label class="filter-item"><input type="checkbox"> Moins de 500 000 <span class="filter-count">38</span></label><label class="filter-item"><input type="checkbox" checked> 500 000 – 1 000 000 <span class="filter-count">54</span></label><label class="filter-item"><input type="checkbox"> Plus de 1 000 000 <span class="filter-count">36</span></label></div>
+            <div class="sidebar-section"><div class="sidebar-title">Mensualité</div><label class="filter-item"><input type="checkbox"> Moins de 50 000/mois</label><label class="filter-item"><input type="checkbox"> 50 000 – 100 000/mois</label><label class="filter-item"><input type="checkbox"> Plus de 100 000/mois</label></div>
+            <div class="sidebar-section"><div class="sidebar-title">Stockage</div><label class="filter-item"><input type="checkbox"> 64 Go <span class="filter-count">12</span></label><label class="filter-item"><input type="checkbox"> 128 Go <span class="filter-count">48</span></label><label class="filter-item"><input type="checkbox"> 256 Go <span class="filter-count">35</span></label></div>
+            <div class="sidebar-section"><div class="sidebar-title">Note</div><label class="filter-item"><input type="checkbox"><span class="stars" style="font-size:.72rem"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>et + <span class="filter-count">72</span></label><label class="filter-item"><input type="checkbox"><span class="stars" style="font-size:.72rem"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>et + <span class="filter-count">108</span></label></div>
+        </div>
+        <div>
+            <div class="sort-bar"><span class="sort-label">Trier par :</span><button class="sort-btn active">Pertinence</button><button class="sort-btn">Prix croissant</button><button class="sort-btn">Prix décroissant</button><button class="sort-btn">Meilleures notes</button><span class="results-count">128 résultats</span></div>
+            <div class="catalog-grid">
+                <div class="catalog-card" onclick="show('product')"><div class="catalog-img"><i class="fas fa-mobile-alt"></i><span class="p-badge p-badge-new" style="top:.5rem;left:.5rem">NOUVEAU</span></div><div class="catalog-body"><div class="catalog-brand">Samsung</div><div class="catalog-name">Galaxy A55 5G 128Go Bleu Navy</div><div class="catalog-price">540 000 GNF</div><div class="catalog-monthly">dès 45 000 GNF/mois × 12</div><div class="catalog-meta"><div class="catalog-rating"><span class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></span>(128)</div><div class="catalog-stock ok"><i class="fas fa-check"></i> En stock</div></div></div></div>
+                <div class="catalog-card"><div class="catalog-img" style="background:#1a1a1a"><i class="fas fa-mobile-alt" style="color:#444"></i></div><div class="catalog-body"><div class="catalog-brand">iPhone</div><div class="catalog-name">iPhone 15 128Go — Noir</div><div class="catalog-price">3 200 000 GNF</div><div class="catalog-monthly">dès 266 667 GNF/mois × 12</div><div class="catalog-meta"><div class="catalog-rating"><span class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>(214)</div><div class="catalog-stock ok"><i class="fas fa-check"></i> En stock</div></div></div></div>
+                <div class="catalog-card"><div class="catalog-img" style="background:#f0f0f0"><i class="fas fa-mobile-alt" style="color:#aaa"></i></div><div class="catalog-body"><div class="catalog-brand">Xiaomi</div><div class="catalog-name">Redmi Note 13 Pro 256Go</div><div class="catalog-price">680 000 GNF</div><div class="catalog-monthly">dès 56 667 GNF/mois × 12</div><div class="catalog-meta"><div class="catalog-rating"><span class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></span>(87)</div><div class="catalog-stock low"><i class="fas fa-exclamation-circle"></i> Plus que 3</div></div></div></div>
+                <div class="catalog-card"><div class="catalog-img" style="background:#0a2a0a"><i class="fas fa-mobile-alt" style="color:#2a5a2a"></i></div><div class="catalog-body"><div class="catalog-brand">Tecno</div><div class="catalog-name">Camon 20 Pro 256Go Noir</div><div class="catalog-price">420 000 GNF</div><div class="catalog-monthly">dès 35 000 GNF/mois × 12</div><div class="catalog-meta"><div class="catalog-rating"><span class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></span>(53)</div><div class="catalog-stock ok"><i class="fas fa-check"></i> En stock</div></div></div></div>
+                <div class="catalog-card"><div class="catalog-img" style="background:#fff8e1"><i class="fas fa-mobile-alt" style="color:#f59600"></i></div><div class="catalog-body"><div class="catalog-brand">Infinix</div><div class="catalog-name">Hot 40 Pro 128Go Or</div><div class="catalog-price">320 000 GNF</div><div class="catalog-monthly">dès 26 667 GNF/mois × 12</div><div class="catalog-meta"><div class="catalog-rating"><span class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i></span>(29)</div><div class="catalog-stock ok"><i class="fas fa-check"></i> En stock</div></div></div></div>
+                <div class="catalog-card"><div class="catalog-img"><i class="fas fa-mobile-alt"></i></div><div class="catalog-body"><div class="catalog-brand">Samsung</div><div class="catalog-name">Galaxy S24 256Go — Gris Phantom</div><div class="catalog-price">4 800 000 GNF</div><div class="catalog-monthly">dès 400 000 GNF/mois × 12</div><div class="catalog-meta"><div class="catalog-rating"><span class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>(176)</div><div class="catalog-stock ok"><i class="fas fa-check"></i> En stock</div></div></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- ══════════ PRODUIT ══════════ -->
+<div class="page" id="page-product">
+<div class="header"><div class="header-main"><div class="logo" onclick="show('home')" style="cursor:pointer">Cauri<span>Shop</span><sub>.gn</sub></div><div class="search-wrap"><div class="search-cat">Toutes catégories <i class="fas fa-chevron-down"></i></div><input class="search-input" type="text" placeholder="Rechercher..."><button class="search-btn"><i class="fas fa-search"></i></button></div><div class="header-actions"><div class="credit-pill" onclick="show('account')"><span class="credit-pill-label">Crédit disponible</span><span class="credit-pill-val">650 000 GNF</span></div><button class="hdr-btn"><i class="fas fa-shopping-cart"></i><span class="cart-count">2</span><span>Panier</span></button></div></div></div>
+
+<div class="container" style="padding-top:.5rem;padding-bottom:2rem">
+<div class="pd-breadcrumb"><a onclick="show('home')">Accueil</a><i class="fas fa-chevron-right"></i><a onclick="show('catalog')">Téléphones</a><i class="fas fa-chevron-right"></i><span>Samsung</span><i class="fas fa-chevron-right"></i><span style="color:#888">Galaxy A55 5G</span></div>
+<div class="pd-layout">
+    <div class="pd-gallery">
+        <div class="pd-gallery-main"><i class="fas fa-mobile-alt"></i></div>
+        <div class="pd-thumbs"><div class="pd-thumb active"><i class="fas fa-mobile-alt"></i></div><div class="pd-thumb"><i class="fas fa-mobile-alt"></i></div><div class="pd-thumb"><i class="fas fa-mobile-alt"></i></div></div>
+    </div>
+    <div class="pd-info">
+        <div class="pd-title">Samsung Galaxy A55 5G 128Go — Bleu Navy</div>
+        <div class="pd-ref">Réf. produit : SM-A556B/DS · SKU : SAM-A55-128-BLU</div>
+        <div class="pd-rating"><span class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></span><span>4,5/5</span><a>128 avis clients</a><span>·</span><span style="color:#00b374;font-weight:600"><i class="fas fa-check"></i> En stock</span></div>
+        <div class="pd-price-block">
+            <div class="pd-old-price">GNF 600 000</div>
+            <div class="pd-price">540 000 <span style="font-size:.85rem;font-weight:400;color:#888">GNF</span></div>
+            <div class="pd-credit-box"><i class="fas fa-calendar-check"></i><div class="pd-credit-box-text"><strong>dès 45 000 GNF / mois sur 12 mois</strong><span>Votre crédit disponible : 650 000 GNF ✓ — Financement approuvé</span></div></div>
+        </div>
+        <div class="pd-variants"><div class="pd-variant-label">Couleur :</div><div class="pd-variant-list"><div class="pd-variant-btn active">Bleu Navy</div><div class="pd-variant-btn">Noir</div><div class="pd-variant-btn">Blanc Crème</div></div></div>
+        <div class="pd-variants"><div class="pd-variant-label">Stockage :</div><div class="pd-variant-list"><div class="pd-variant-btn active">128 Go</div><div class="pd-variant-btn">256 Go — +60 000 GNF</div></div></div>
+        <ul class="pd-features"><li>Écran Super AMOLED 6,6" 120Hz</li><li>Processeur Exynos 1480 · 8 Go RAM</li><li>Quadruple caméra 50 MP + OIS</li><li>Batterie 5000 mAh · Charge 25W</li><li>Android 14 · 4 mises à jour garanties</li></ul>
+    </div>
+    <div class="pd-sidebar">
+        <div class="pd-box">
+            <div class="pd-box-title">Choisir les mensualités</div>
+            <div class="pd-credit-options">
+                <div class="pd-credit-option"><span class="pd-credit-option-dur">3 mois</span><span class="pd-credit-option-amt">180 000 GNF/mois</span></div>
+                <div class="pd-credit-option"><span class="pd-credit-option-dur">6 mois</span><span class="pd-credit-option-amt">90 000 GNF/mois</span></div>
+                <div class="pd-credit-option" style="background:#f0fdf8;border-radius:4px;padding:.3rem .4rem;margin:0 -.4rem"><span class="pd-credit-option-dur" style="color:#00b374">12 mois ✓</span><span class="pd-credit-option-amt">45 000 GNF/mois</span></div>
+            </div>
+            <div class="pd-credit-selected" style="margin-top:.75rem"><div class="pd-credit-selected-label">Option sélectionnée</div><div class="pd-credit-selected-val">45 000 GNF × 12 mois</div></div>
+            <button class="btn-buy-now">Commander à crédit</button>
+            <button class="btn-cart-full"><i class="fas fa-shopping-cart"></i> Ajouter au panier</button>
+            <div class="pd-delivery-info">
+                <span><i class="fas fa-truck"></i><span><span class="bold">Livraison offerte</span> à Conakry</span></span>
+                <span><i class="fas fa-calendar"></i><span>Livraison estimée : <span class="bold">2–4 jours ouvrés</span></span></span>
+                <span><i class="fas fa-shield-alt"></i><span>Garantie <span class="bold">12 mois</span> constructeur</span></span>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ COMPTE ══════════ -->
+<div class="page" id="page-account">
+<div class="header"><div class="header-main"><div class="logo" onclick="show('home')" style="cursor:pointer">Cauri<span>Shop</span><sub>.gn</sub></div><div class="search-wrap"><div class="search-cat">Catégories <i class="fas fa-chevron-down"></i></div><input class="search-input" type="text" placeholder="Rechercher..."><button class="search-btn"><i class="fas fa-search"></i></button></div><div class="header-actions"><button class="hdr-btn"><i class="fas fa-shopping-cart"></i><span class="cart-count">2</span><span>Panier</span></button></div></div></div>
+
+<div class="container" style="padding-top:.75rem;padding-bottom:2rem">
+<div class="account-layout">
+    <div>
+        <div class="account-sidebar-nav">
+            <div class="acc-nav-header"><div class="acc-nav-name">Mohamed Diallo</div><div class="acc-nav-company">Orange Guinée · Employé</div></div>
+            <div class="acc-nav-credit"><div class="acc-nav-credit-label">Crédit disponible</div><div class="acc-nav-credit-val">650 000 GNF</div><div class="acc-nav-credit-sub">Plafond : 1 000 000 GNF</div></div>
+            <div class="acc-menu-item active"><i class="fas fa-home"></i> Tableau de bord</div>
+            <div class="acc-menu-item"><i class="fas fa-shopping-bag"></i> Mes commandes</div>
+            <div class="acc-menu-item"><i class="fas fa-calendar-alt"></i> Mon échéancier</div>
+            <div class="acc-menu-item"><i class="fas fa-wallet"></i> Mes paiements</div>
+            <div class="acc-menu-item"><i class="fas fa-user-edit"></i> Mon profil</div>
+            <div class="acc-menu-item danger" onclick="show('home')"><i class="fas fa-sign-out-alt"></i> Déconnexion</div>
+        </div>
+    </div>
+    <div class="acc-main">
+        <div class="acc-card">
+            <div class="acc-stats">
+                <div class="acc-stat"><div class="acc-stat-val">3</div><div class="acc-stat-label">Commandes actives</div></div>
+                <div class="acc-stat"><div class="acc-stat-val" style="color:#f59600">2</div><div class="acc-stat-label">Échéances ce mois</div></div>
+                <div class="acc-stat"><div class="acc-stat-val" style="color:#00b374">650 000</div><div class="acc-stat-label">Crédit dispo (GNF)</div></div>
+                <div class="acc-stat"><div class="acc-stat-val" style="color:#dc2626">0</div><div class="acc-stat-label">En retard</div></div>
+            </div>
+        </div>
+        <div class="acc-card">
+            <div class="acc-card-head"><h3><i class="fas fa-shopping-bag"></i> Mes commandes récentes</h3><a>Voir toutes</a></div>
+            <table class="order-table">
+                <thead><tr><th>N° commande</th><th>Produit</th><th>Date</th><th>Montant</th><th>Mensualité</th><th>Statut</th></tr></thead>
+                <tbody>
+                <tr><td class="order-num">CS-20260315-0001</td><td>Samsung Galaxy A55 5G</td><td>15/03/2026</td><td>540 000 GNF</td><td>45 000 × 12</td><td><span class="order-status status-pending">En livraison</span></td></tr>
+                <tr><td class="order-num">CS-20260210-0003</td><td>Télévision LG 43" 4K</td><td>10/02/2026</td><td>280 000 GNF</td><td>—</td><td><span class="order-status status-delivered">Soldé</span></td></tr>
+                <tr><td class="order-num">CS-20260105-0001</td><td>Mixeur Moulinex Pro</td><td>05/01/2026</td><td>85 000 GNF</td><td>—</td><td><span class="order-status status-delivered">Livré</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="acc-card">
+            <div class="acc-card-head"><h3><i class="fas fa-calendar-alt"></i> Échéancier — CS-20260315-0001</h3><a>Voir tout</a></div>
+            <table class="installment-table">
+                <thead><tr><th>#</th><th>Échéance</th><th>Montant dû</th><th>Payé</th><th>Reste</th><th>Statut</th></tr></thead>
+                <tbody>
+                <tr><td>1</td><td>01/01/2026</td><td>45 000 GNF</td><td style="color:#00b374">45 000 GNF</td><td>0 GNF</td><td><span class="inst-status inst-paid">Payée</span></td></tr>
+                <tr><td>2</td><td>01/02/2026</td><td>45 000 GNF</td><td style="color:#00b374">45 000 GNF</td><td>0 GNF</td><td><span class="inst-status inst-paid">Payée</span></td></tr>
+                <tr><td>3</td><td>01/03/2026</td><td>45 000 GNF</td><td style="color:#00b374">45 000 GNF</td><td>0 GNF</td><td><span class="inst-status inst-paid">Payée</span></td></tr>
+                <tr style="background:#fffbeb"><td><strong>4</strong></td><td><strong>01/04/2026</strong></td><td><strong>45 000 GNF</strong></td><td>0 GNF</td><td style="font-weight:700">45 000 GNF</td><td><span class="inst-status inst-upcoming">À payer · J-2</span></td></tr>
+                <tr><td>5</td><td>01/05/2026</td><td>45 000 GNF</td><td>—</td><td>45 000 GNF</td><td><span class="inst-status inst-pending">En attente</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<script>
+function show(name){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.demo-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('page-'+name).classList.add('active');
+    const map={home:'Accueil',catalog:'Catalogue',product:'Produit',account:'Mon compte'};
+    document.querySelectorAll('.demo-btn').forEach(b=>{if(b.textContent===map[name])b.classList.add('active')});
+    window.scrollTo(0,0);
+}
+document.querySelectorAll('.pd-variant-btn').forEach(btn=>{
+    btn.addEventListener('click',function(){this.closest('.pd-variant-list').querySelectorAll('.pd-variant-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')});
+});
+document.querySelectorAll('.sort-btn').forEach(btn=>{
+    btn.addEventListener('click',function(){this.closest('.sort-bar').querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')});
+});
+</script>
+</body>
+</html>

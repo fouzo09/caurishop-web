@@ -24,13 +24,19 @@ class Order extends Model
         'order_type',
         'status',
         'total_amount',
+        'down_payment',
+        'credit_installments_count',
         'created_by',
         'confirmed_at',
+        'delivered_at',
     ];
 
     protected $casts = [
-        'total_amount' => 'decimal:2',
-        'confirmed_at' => 'datetime',
+        'total_amount'              => 'decimal:2',
+        'down_payment'              => 'decimal:2',
+        'credit_installments_count' => 'integer',
+        'confirmed_at'              => 'datetime',
+        'delivered_at'              => 'datetime',
     ];
 
     public function customer()

@@ -76,6 +76,52 @@
                 Nouveau Produit
             </a>
         </div>
+
+        {{-- Filtres --}}
+        <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); background: var(--light);">
+            <form method="GET" action="{{ route('admin.products.index') }}" style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: flex-end;">
+                <div>
+                    <input type="text" name="search" class="form-input" placeholder="Rechercher (nom, SKU...)"
+                        value="{{ request('search') }}" style="min-width: 220px;">
+                </div>
+                <div>
+                    <select name="type" class="form-input">
+                        <option value="">Tous les types</option>
+                        <option value="simple" {{ request('type') === 'simple' ? 'selected' : '' }}>Simple</option>
+                        <option value="variable" {{ request('type') === 'variable' ? 'selected' : '' }}>Variable</option>
+                    </select>
+                </div>
+                <div>
+                    <select name="is_published" class="form-input">
+                        <option value="">Publication</option>
+                        <option value="1" {{ request('is_published') === '1' ? 'selected' : '' }}>Publié</option>
+                        <option value="0" {{ request('is_published') === '0' ? 'selected' : '' }}>Brouillon</option>
+                    </select>
+                </div>
+                <div>
+                    <select name="is_active" class="form-input">
+                        <option value="">Statut</option>
+                        <option value="1" {{ request('is_active') === '1' ? 'selected' : '' }}>Actif</option>
+                        <option value="0" {{ request('is_active') === '0' ? 'selected' : '' }}>Inactif</option>
+                    </select>
+                </div>
+                <div>
+                    <select name="credit_enabled" class="form-input">
+                        <option value="">Crédit</option>
+                        <option value="1" {{ request('credit_enabled') === '1' ? 'selected' : '' }}>Avec crédit</option>
+                        <option value="0" {{ request('credit_enabled') === '0' ? 'selected' : '' }}>Sans crédit</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="fas fa-search"></i> Filtrer
+                </button>
+                @if(request()->hasAny(['search', 'type', 'is_published', 'is_active', 'credit_enabled']))
+                <a href="{{ route('admin.products.index') }}" class="btn btn-outline btn-sm">
+                    <i class="fas fa-times"></i> Réinitialiser
+                </a>
+                @endif
+            </form>
+        </div>
         <div class="card-body">
             <div class="table-container">
                 <table>
@@ -123,13 +169,18 @@
                         </td>
                         <td>
                             @if($product->isSimple())
-                            @if($product->stock_quantity > 0)
-                            <span class="badge success">{{ $product->stock_quantity }}</span>
+                                @if($product->stock_quantity > 0)
+                                <span class="badge success">{{ $product->stock_quantity }}</span>
+                                @else
+                                <span class="badge danger">Rupture</span>
+                                @endif
                             @else
-                            <span class="badge danger">Rupture</span>
-                            @endif
-                            @else
-                            <span style="font-size: 0.85rem; color: var(--gray);">—</span>
+                                @php $totalStock = $product->variants->sum('stock_quantity'); @endphp
+                                @if($totalStock > 0)
+                                <span class="badge success">{{ $totalStock }}</span>
+                                @else
+                                <span class="badge danger">Rupture</span>
+                                @endif
                             @endif
                         </td>
                         <td>

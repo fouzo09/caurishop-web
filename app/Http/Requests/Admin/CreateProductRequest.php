@@ -19,7 +19,7 @@ class CreateProductRequest extends FormRequest
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:products,slug',
             'description' => 'nullable|string',
-            'sku' => 'required|string|max:100|unique:products,sku',
+            'sku' => 'nullable|string|max:100|unique:products,sku',
             'is_published' => 'boolean',
             'is_active' => 'boolean',
             'credit_enabled' => 'boolean',

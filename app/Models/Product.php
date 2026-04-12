@@ -29,14 +29,14 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
-        'stock_quantity' => 'integer',
-        'low_stock_threshold' => 'integer',
-        'is_published' => 'boolean',
-        'is_active' => 'boolean',
-        'credit_enabled' => 'boolean',
-        'credit_duration_months' => 'integer',
-        'credit_installments_count' => 'integer',
+        'price'                    => 'decimal:2',
+        'stock_quantity'           => 'integer',
+        'low_stock_threshold'      => 'integer',
+        'is_published'             => 'boolean',
+        'is_active'                => 'boolean',
+        'credit_enabled'           => 'boolean',
+        'credit_duration_months'   => 'integer',
+        'credit_installments_count'=> 'integer',
     ];
 
     protected $appends = ['display_price', 'stock_status'];
@@ -45,16 +45,6 @@ class Product extends Model
     public function variants()
     {
         return $this->hasMany(ProductVariant::class);
-    }
-
-    public function categories()
-    {
-        return $this->belongsToMany(Category::class, 'product_category');
-    }
-
-    public function images()
-    {
-        return $this->hasMany(ProductImage::class)->orderBy('sort_order');
     }
 
     public function orderItems()
@@ -80,7 +70,12 @@ class Product extends Model
 
     public function scopeInStock($query)
     {
-        return $query->where('stock_quantity', '>', 0);
+        return $query->where(function ($q) {
+            $q->where(function ($q2) {
+                $q2->where('type', self::TYPE_SIMPLE)
+                   ->where('stock_quantity', '>', 0);
+            })->orWhere('type', self::TYPE_VARIABLE);
+        });
     }
 
     // Type checks
@@ -104,25 +99,46 @@ class Product extends Model
         return $this->variants()->where('is_active', true)->sum('stock_quantity') > 0;
     }
 
+    public function totalStock(): int
+    {
+        if ($this->isSimple()) {
+            return (int) $this->stock_quantity;
+        }
+
+        return (int) $this->variants()->where('is_active', true)->sum('stock_quantity');
+    }
+
     public function isLowStock(): bool
     {
-        return $this->stock_quantity <= $this->low_stock_threshold && $this->stock_quantity > 0;
+        if ($this->isVariable()) {
+            return false;
+        }
+
+        return $this->stock_quantity > 0 && $this->stock_quantity <= $this->low_stock_threshold;
     }
 
     public function isOutOfStock(): bool
     {
+        if ($this->isVariable()) {
+            return !$this->hasStock();
+        }
+
         return $this->stock_quantity <= 0;
     }
 
     // Price & Credit
     public function displayPrice(): string
     {
+        if ($this->isVariable()) {
+            return 'Varie';
+        }
+
         return number_format($this->price, 0, ',', ' ') . ' GNF';
     }
 
     public function monthlyPayment(): ?float
     {
-        if (!$this->credit_enabled || !$this->credit_installments_count) {
+        if (!$this->credit_enabled || !$this->credit_installments_count || $this->isVariable()) {
             return null;
         }
 
@@ -143,8 +159,12 @@ class Product extends Model
 
     public function getStockStatusAttribute(): string
     {
+        if ($this->isVariable()) {
+            return $this->hasStock() ? 'disponible' : 'rupture';
+        }
+
         if ($this->isOutOfStock()) return 'rupture';
-        if ($this->isLowStock()) return 'faible';
+        if ($this->isLowStock())   return 'faible';
         return 'disponible';
     }
 }

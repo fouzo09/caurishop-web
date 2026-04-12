@@ -15,6 +15,7 @@ class ProductVariant extends Model
         'name',
         'attributes',
         'price',
+        'stock_quantity',
         'is_active',
         'credit_enabled',
         'credit_duration_months',
@@ -22,12 +23,13 @@ class ProductVariant extends Model
     ];
 
     protected $casts = [
-        'attributes' => 'array', // jsonb
-        'price' => 'decimal:2',
-        'is_active' => 'boolean',
-        'credit_enabled' => 'boolean',
-        'credit_duration_months' => 'integer',
-        'credit_installments_count' => 'integer',
+        'attributes'               => 'array',
+        'price'                    => 'decimal:2',
+        'stock_quantity'           => 'integer',
+        'is_active'                => 'boolean',
+        'credit_enabled'           => 'boolean',
+        'credit_duration_months'   => 'integer',
+        'credit_installments_count'=> 'integer',
     ];
 
     public function product()
@@ -35,9 +37,19 @@ class ProductVariant extends Model
         return $this->belongsTo(Product::class);
     }
 
-    /**
-     * Crédit effectif: si override défini sur variante -> sinon produit.
-     */
+    // Stock
+    public function hasStock(): bool
+    {
+        return $this->stock_quantity > 0;
+    }
+
+    // Prix
+    public function displayPrice(): string
+    {
+        return number_format($this->price, 0, ',', ' ') . ' GNF';
+    }
+
+    // Crédit effectif : override variante, sinon héritage du produit parent
     public function effectiveCreditEnabled(): bool
     {
         if (!is_null($this->credit_enabled)) {
@@ -55,5 +67,22 @@ class ProductVariant extends Model
     public function effectiveCreditInstallmentsCount(): ?int
     {
         return $this->credit_installments_count ?? $this->product?->credit_installments_count;
+    }
+
+    public function monthlyPayment(): ?float
+    {
+        $installments = $this->effectiveCreditInstallmentsCount();
+
+        if (!$this->effectiveCreditEnabled() || !$installments) {
+            return null;
+        }
+
+        return $this->price / $installments;
+    }
+
+    public function displayMonthlyPayment(): ?string
+    {
+        $monthly = $this->monthlyPayment();
+        return $monthly ? number_format($monthly, 0, ',', ' ') . ' GNF' : null;
     }
 }

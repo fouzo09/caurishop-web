@@ -5,6 +5,9 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\InstallmentController;
+use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -76,6 +79,26 @@ Route::middleware('auth')->group(function () {
             Route::get('/{product}/variants/{variant}/edit', [ProductController::class, 'editVariant'])->name('variants.edit');
             Route::put('/{product}/variants/{variant}', [ProductController::class, 'updateVariant'])->name('variants.update');
             Route::delete('/{product}/variants/{variant}', [ProductController::class, 'destroyVariant'])->name('variants.destroy');
+        });
+
+        Route::prefix('installments')->name('installments.')->group(function () {
+            Route::get('/', [InstallmentController::class, 'index'])->name('index');
+            Route::get('/{installment}/pay', [InstallmentController::class, 'pay'])->name('pay');
+            Route::post('/{installment}/pay', [InstallmentController::class, 'recordPayment'])->name('record-payment');
+        });
+
+        Route::prefix('payments')->name('payments.')->group(function () {
+            Route::get('/', [PaymentController::class, 'index'])->name('index');
+        });
+
+        Route::prefix('orders')->name('orders.')->group(function () {
+            Route::get('/', [OrderController::class, 'index'])->name('index');
+            Route::get('/create', [OrderController::class, 'create'])->name('create');
+            Route::post('/', [OrderController::class, 'store'])->name('store');
+            Route::get('/{order}', [OrderController::class, 'show'])->name('show');
+            Route::post('/{order}/confirm', [OrderController::class, 'confirm'])->name('confirm');
+            Route::post('/{order}/deliver', [OrderController::class, 'deliver'])->name('deliver');
+            Route::post('/{order}/cancel', [OrderController::class, 'cancel'])->name('cancel');
         });
     });
 });

@@ -136,6 +136,10 @@ class ProductService
             throw new \Exception('Le produit est déjà publié.');
         }
 
+        if ($product->isVariable() && $product->variants()->where('is_active', true)->count() === 0) {
+            throw new \Exception('Impossible de publier un produit variable sans variantes actives.');
+        }
+
         return $this->productRepository->publish($product);
     }
 

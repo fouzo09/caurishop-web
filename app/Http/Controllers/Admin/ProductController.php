@@ -45,6 +45,11 @@ class ProductController extends Controller
         try {
             $product = $this->productService->createProduct($request->validated());
 
+            if ($product->isVariable()) {
+                return redirect()->route('admin.products.show', $product)
+                    ->with('success', 'Produit variable créé. Ajoutez maintenant ses variantes.');
+            }
+
             return redirect()->route('admin.products.index')
                 ->with('success', 'Produit créé avec succès.');
         } catch (\Exception $e) {
