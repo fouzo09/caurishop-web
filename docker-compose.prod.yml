@@ -2,33 +2,24 @@ name: caurishop
 
 services:
 
-  # ── Application (PHP-FPM + Nginx via artisan serve en dev) ───
+  # ── Application ───────────────────────────────────────────────
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: production
+    image: ghcr.io/${GITHUB_REPOSITORY:-fouzo09/caurishop}:${IMAGE_TAG:-latest}
     container_name: caurishop_app
     restart: unless-stopped
+    env_file: .env
     environment:
-      APP_ENV:         local
-      APP_DEBUG:       "true"
-      DB_HOST:         db
-      DB_PORT:         5432
-      DB_DATABASE:     caurishop
-      DB_USERNAME:     caurishop
-      DB_PASSWORD:     secret
-      REDIS_HOST:      redis
+      DB_HOST:          db
+      DB_PORT:          5432
+      REDIS_HOST:       redis
       QUEUE_CONNECTION: redis
-      CACHE_STORE:     redis
-      SESSION_DRIVER:  redis
+      CACHE_STORE:      redis
+      SESSION_DRIVER:   redis
     volumes:
-      - .:/var/www/html
-      - /var/www/html/vendor        # keep container vendor
-      - /var/www/html/node_modules  # keep container node_modules
       - storage_data:/var/www/html/storage/app/public
     ports:
-      - "8080:80"
+      - "80:80"
+      - "443:443"
     depends_on:
       db:
         condition: service_healthy
@@ -42,17 +33,18 @@ services:
     image: postgres:16-alpine
     container_name: caurishop_db
     restart: unless-stopped
+    env_file: .env
     environment:
-      POSTGRES_DB:       caurishop
-      POSTGRES_USER:     caurishop
-      POSTGRES_PASSWORD: secret
+      POSTGRES_DB:       ${DB_DATABASE}
+      POSTGRES_USER:     ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5435:5432"
+      - "127.0.0.1:5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U caurishop -d caurishop"]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}"]
+      interval: 10s
       timeout: 5s
       retries: 10
     networks:
@@ -63,27 +55,16 @@ services:
     image: redis:7-alpine
     container_name: caurishop_redis
     restart: unless-stopped
-    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru --requirepass ${REDIS_PASSWORD:-}
     volumes:
       - redis_data:/data
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
+      interval: 10s
       timeout: 3s
       retries: 10
-    networks:
-      - caurishop
-
-  # ── Mailpit (dev mail catcher) ────────────────────────────────
-  mailpit:
-    image: axllent/mailpit:latest
-    container_name: caurishop_mail
-    restart: unless-stopped
-    ports:
-      - "1025:1025"   # SMTP
-      - "8025:8025"   # Web UI → http://localhost:8025
     networks:
       - caurishop
 

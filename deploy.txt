@@ -1,0 +1,50 @@
+Tout est en place. Voici un résumé de la configuration Docker/CI-CD complète :
+
+---
+
+Fichiers créés
+
+Docker
+
+┌────────────────────────────────────┬─────────────────────────────────────────────────────────────────────┐
+│               Fichier              │                                Rôle                                 │
+├────────────────────────────────────┼─────────────────────────────────────────────────────────────────────┤
+│ Dockerfile                         │ Multi-stage: node (Vite) → composer (vendor) → php:8.2-fpm-alpine   │
+├────────────────────────────────────┼─────────────────────────────────────────────────────────────────────┤
+│ docker-compose.yml                 │ Dev local — app + postgres:16 + redis:7 + mailpit                   │
+├────────────────────────────────────┼─────────────────────────────────────────────────────────────────────┤
+│ docker-compose.prod.yml            │ Production — tire l'image depuis ghcr.io, pas de volume code        │
+├────────────────────────────────────┼─────────────────────────────────────────────────────────────────────┤
+│ docker/nginx/default.conf          │ Nginx Laravel (try_files, fastcgi vers PHP-FPM, gzip, cache assets) │
+├────────────────────────────────────┼─────────────────────────────────────────────────────────────────────┤
+│ docker/php/php.ini                 │ OPcache, 256M memory, upload 20M, timezone Africa/Conakry           │
+├────────────────────────────────────┼─────────────────────────────────────────────────────────────────────┤
+│ docker/php/php-fpm.conf            │ dynamic pm, max 20 workers, listen 127.0.0.1:9000                   │
+├────────────────────────────────────┼─────────────────────────────────────────────────────────────────────┤
+│ docker/supervisor/supervisord.conf │ nginx + php-fpm + 2 queue workers + scheduler                       │
+└────────────────────────────────────┴─────────────────────────────────────────────────────────────────────┘
+
+CI/CD GitHub Actions
+
+┌──────────────────────────────┬───────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│           Fichier            │                                                   Rôle                                                    │
+├──────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ .github/workflows/ci.yml     │ Tests sur push/PR : PHP 8.2, PostgreSQL service, migrations, php artisan test --parallel, Pint lint       │
+├──────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ .github/workflows/deploy.yml │ Sur push main/tag : build image → push ghcr.io → SSH VPS → docker compose pull && up -d → migrate → cache │
+└──────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+Environnements
+
+┌─────────────────────────┬───────────────────────────────────────────────────────────────┐
+│         Fichier         │                             Rôle                              │
+├─────────────────────────┼───────────────────────────────────────────────────────────────┤
+│ .env.ci                 │ Env pour les tests GitHub Actions (DB=array, queue=sync)      │
+├─────────────────────────┼───────────────────────────────────────────────────────────────┤
+│ .env.production.example │ Template à copier sur le VPS (à compléter avec vrais secrets) │
+└─────────────────────────┴───────────────────────────────────────────────────────────────┘
+
+Secrets à configurer dans GitHub
+
+- VPS_HOST, VPS_USER, VPS_SSH_KEY, VPS_PORT, DEPLOY_PATH
+- GITHUB_TOKEN est automatiquement fourni pour push vers ghcr.io

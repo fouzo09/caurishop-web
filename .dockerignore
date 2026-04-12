@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+docker-compose*.yml
+Dockerfile
+
+# Node
+node_modules
+
+# Laravel dev files
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*
+
+# Tests & CI
+tests
+.github
+phpunit.xml
+.phpunit.cache
+
+# Docs & configs
+*.md
+.editorconfig
+.styleci.yml
+
+# Local env
+.env
+.env.ci
+.env.local
+.env.*.local
+.env.production.example
+
+# IDE
+.idea
+.vscode
+*.swp
