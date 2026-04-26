@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CauriShop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:#fff;color:#111;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+
+:root{
+  --g: #1a9e50;
+  --bl: #2663EB;
+  --t: #111111;
+  --s: #6b7280;
+  --b: #e8e8e8;
+  --f: #f7f7f7;
+}
+
+/* ══ NAV ════════════════════════════════ */
+nav{
+  position:fixed;inset:0 0 auto;z-index:99;
+  height:64px;padding:0 48px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(255,255,255,.94);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--b);
+}
+.logo{display:flex;align-items:center;gap:9px}
+.logo-name{font-size:17px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
+.nav-menu{display:flex;gap:32px}
+.nav-menu a{font-size:14px;font-weight:500;color:var(--s);transition:color .15s}
+.nav-menu a:hover{color:var(--t)}
+.nav-r{display:flex;align-items:center;gap:12px}
+.nav-r .in{font-size:14px;font-weight:500;color:var(--s);transition:color .15s}
+.nav-r .in:hover{color:var(--t)}
+.nav-r .cta{font-size:14px;font-weight:700;padding:9px 22px;border-radius:8px;background:var(--bl);color:#fff;transition:opacity .15s}
+.nav-r .cta:hover{opacity:.8}
+
+/* ══ HERO ═══════════════════════════════ */
+.hero{
+  min-height:100vh;padding:0 48px;
+  display:flex;align-items:center;
+  background:#fff;
+}
+.hero-inner{
+  max-width:1120px;margin:0 auto;width:100%;
+  display:grid;grid-template-columns:1fr 1fr;gap:80px;
+  align-items:center;padding:100px 0 72px;
+}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:12px;font-weight:600;color:var(--s);
+  text-transform:uppercase;letter-spacing:1px;
+  margin-bottom:22px;
+  animation:up .6s ease both;
+}
+.hero-tag i{width:6px;height:6px;border-radius:50%;background:var(--bl);display:block;flex-shrink:0}
+.hero h1{
+  font-size:60px;font-weight:900;line-height:1.05;letter-spacing:-2.5px;
+  color:var(--t);margin-bottom:20px;
+  animation:up .7s ease both .1s;
+}
+.hero h1 mark{background:none;color:var(--t)}
+.hero-desc{
+  font-size:17px;color:var(--s);line-height:1.75;max-width:420px;
+  margin-bottom:36px;
+  animation:up .7s ease both .18s;
+}
+.hero-btns{
+  display:flex;gap:12px;margin-bottom:44px;
+  animation:up .7s ease both .26s;
+}
+.btn-fill{font-size:15px;font-weight:700;padding:13px 28px;border-radius:9px;background:var(--bl);color:#fff;transition:opacity .15s,transform .15s}
+.btn-fill:hover{opacity:.82;transform:translateY(-1px)}
+.btn-out{font-size:15px;font-weight:600;padding:13px 28px;border-radius:9px;border:1.5px solid var(--b);color:var(--t);background:#fff;transition:border-color .15s,transform .15s}
+.btn-out:hover{border-color:#aaa;transform:translateY(-1px)}
+.hero-logos{
+  padding-top:28px;border-top:1px solid var(--b);
+  animation:up .7s ease both .34s;
+}
+.hero-logos p{font-size:11px;font-weight:600;color:#bbb;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
+.logo-strip{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.logo-strip img{height:40px;width:auto;opacity:.7;transition:opacity .2s;object-fit:contain}
+.logo-strip img:hover{opacity:1}
+.hero-photo{position:relative;animation:up .9s ease both .15s}
+.hero-photo img{
+  width:100%;aspect-ratio:3/4;object-fit:cover;
+  border-radius:24px;
+  box-shadow:0 40px 90px rgba(0,0,0,.15);
+  display:block;
+}
+.fbadge{
+  position:absolute;
+  background:#fff;border:1px solid var(--b);border-radius:14px;
+  padding:11px 16px;box-shadow:0 8px 28px rgba(0,0,0,.10);
+  display:flex;align-items:center;gap:10px;min-width:190px;
+}
+.fbadge-ico{
+  width:34px;height:34px;border-radius:9px;background:var(--f);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.fbadge-ico svg{width:16px;height:16px;stroke:var(--t);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fbadge-label{font-size:11px;color:var(--s);margin-bottom:2px;font-weight:500}
+.fbadge-val{font-size:13px;font-weight:800;color:var(--t)}
+.fb1{bottom:32px;left:-32px;animation:flt 4s ease-in-out infinite}
+.fb2{top:40px;right:-28px;animation:flt 4s ease-in-out infinite .9s}
+
+@keyframes flt{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@keyframes up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ SECTION BASE ═══════════════════════ */
+.s{padding:96px 48px}
+.si{max-width:1120px;margin:0 auto}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--s);display:block;margin-bottom:14px}
+.h2{font-size:44px;font-weight:900;letter-spacing:-1.6px;line-height:1.08;color:var(--t)}
+.h2-s{font-size:17px;color:var(--s);line-height:1.7;max-width:480px;margin-top:12px}
+
+/* ══ SPLIT ══════════════════════════════ */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.st h2{font-size:36px;font-weight:900;letter-spacing:-1.2px;line-height:1.1;color:var(--t);margin-bottom:14px}
+.st p{font-size:16px;color:var(--s);line-height:1.75;margin-bottom:24px}
+.ckl{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.ckl li{font-size:14px;color:#333;display:flex;align-items:center;gap:10px}
+.ck{
+  width:20px;height:20px;border-radius:6px;flex-shrink:0;
+  background:var(--f);border:1px solid var(--b);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;color:var(--t);
+}
+.arr{font-size:14px;font-weight:700;color:var(--t);display:inline-flex;align-items:center;gap:5px;transition:gap .2s}
+.arr:hover{gap:9px}
+
+/* ══ STEPS ══════════════════════════════ */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--b);border-radius:20px;overflow:hidden;margin-top:48px}
+.step{background:#fff;padding:48px 40px}
+.step-n{width:36px;height:36px;border-radius:10px;background:var(--bl);color:#fff;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:24px}
+.step h3{font-size:18px;font-weight:800;letter-spacing:-.3px;margin-bottom:10px}
+.step p{font-size:14px;color:var(--s);line-height:1.7}
+
+/* ══ CTA ════════════════════════════════ */
+.cta{padding:112px 48px;text-align:center;background:var(--f);border-top:1px solid var(--b)}
+.cta h2{font-size:52px;font-weight:900;letter-spacing:-2.2px;line-height:1.06;color:var(--t);margin-bottom:16px}
+.cta h2 em{font-style:normal;color:var(--t)}
+.cta p{font-size:17px;color:var(--s);margin-bottom:44px}
+.cta-row{display:flex;justify-content:center;gap:12px}
+.cta-row .btn-fill{font-size:15px;padding:14px 32px;border-radius:10px}
+
+/* ══ FOOTER ═════════════════════════════ */
+footer{background:#fff;border-top:1px solid var(--b);padding:64px 48px 40px}
+.ft{max-width:1120px;margin:0 auto}
+.ft-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px}
+.ft-about p{font-size:14px;color:var(--s);line-height:1.7;margin-top:12px;max-width:220px}
+.ft-col h4{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#ccc;margin-bottom:16px}
+.ft-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.ft-col ul a{font-size:14px;color:var(--s);transition:color .15s}
+.ft-col ul a:hover{color:var(--t)}
+.ft-bot{display:flex;justify-content:space-between;align-items:center;padding-top:24px;border-top:1px solid var(--b)}
+.ft-bot p,.ft-bot a{font-size:13px;color:#bbb}
+.ft-bot a:hover{color:var(--s)}
+.ft-links{display:flex;gap:20px}
+
+/* ══ SCROLL REVEAL ══════════════════════ */
+.r{opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+.r.on{opacity:1;transform:none}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}
+
+/* séparateur entre les deux blocs solutions */
+.d-block-gap{gap:60px}
+.d-block-gap .st:first-child{padding-right:60px;border-right:1px solid var(--b)}
+
+/* ══ RESPONSIVE ═════════════════════════ */
+@media(max-width:960px){
+  nav,.hero,.s,.cta,footer{padding-left:20px;padding-right:20px}
+  .nav-menu{display:none}
+  .hero-inner{grid-template-columns:1fr;padding:100px 0 60px}
+  .hero h1{font-size:44px}
+  .hero-photo{display:none}
+  .split{grid-template-columns:1fr}
+  .ft-top{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr}
+  .d-block-gap .st:first-child{padding-right:0;border-right:none;padding-bottom:48px;border-bottom:1px solid var(--b)}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="{{ route('home') }}" class="logo">
+    <span class="logo-name">CauriShop</span>
+  </a>
+  <div class="nav-menu">
+    <a href="#solutions">Pour qui ?</a>
+    <a href="#comment">Comment ça marche</a>
+    <a href="#entreprise">Compte entreprise</a>
+  </div>
+  <div class="nav-r">
+    <a href="{{ route('login') }}" class="in">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;margin-right:6px;vertical-align:middle"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      Connexion
+    </a>
+    <a href="{{ route('get-started') }}" class="cta">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;margin-right:6px;vertical-align:middle"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      Démarrer
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-tag"><i></i>Marketplace guinéenne</div>
+      <h1>Achète maintenant,<br/>paie <mark>molo molo.</mark></h1>
+      <p class="hero-desc">Produits, mode, alimentation et services — beauté, sport, massage — tout sur une seule plateforme.</p>
+      <div class="hero-btns">
+        <a href="{{ route('get-started') }}" class="btn-fill">Explorer la boutique →</a>
+        <a href="#comment" class="btn-out">Comment ça marche</a>
+      </div>
+      <div class="hero-logos">
+        <p>Ils rejoignent CauriShop</p>
+        <div class="logo-strip">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Orange_logo.svg" alt="Orange GN"/>
+          <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/MTN_2022_logo.svg" alt="MTN Guinée"/>
+          <img src="https://upload.wikimedia.org/wikipedia/commons/9/98/Ecobank_Logo.svg" alt="Ecobank"/>
+          <img src="https://upload.wikimedia.org/wikipedia/commons/d/dd/Bollor%C3%A9_Logo_2021.svg" alt="Bolloré"/>
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCANeHvd7-U5-6tz-PiecTJ_6jhyGGJ6k_sA&s" alt="Sonoco" style="height:100px"/>
+        </div>
+      </div>
+    </div>
+    <div class="hero-photo">
+      <img
+        src="https://images.pexels.com/photos/6969625/pexels-photo-6969625.jpeg?auto=compress&cs=tinysrgb&w=900"
+        alt="Femme africaine"
+      />
+      <div class="fbadge fb1">
+        <div class="fbadge-ico">
+          <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <div>
+          <div class="fbadge-label">Mode · Tech · Beauté · Services</div>
+          <div class="fbadge-val">Tout en un seul endroit</div>
+        </div>
+      </div>
+      <div class="fbadge fb2">
+        <div class="fbadge-ico">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div>
+          <div class="fbadge-label">Vendeurs & Acheteurs</div>
+          <div class="fbadge-val">Rejoignez la plateforme</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr style="border:none;border-top:1px solid var(--b);margin:0"/>
+
+<!-- SOLUTIONS -->
+<section class="s" id="solutions">
+  <div class="si">
+    <div class="split d-block-gap">
+      <div class="st r">
+        <span class="eyebrow">Pour les commerçants</span>
+        <h2>Vous fournissez, nous vendons pour vous</h2>
+        <p>Pas besoin de gérer une boutique en ligne. Confiez-nous vos produits et services — nous nous chargeons de les référencer et de les vendre à des milliers d'acheteurs.</p>
+        <ul class="ckl">
+          <li><span class="ck">✓</span>Enregistrement de vos produits &amp; services par notre équipe</li>
+          <li><span class="ck">✓</span>Mise en ligne et visibilité immédiate sur la plateforme</li>
+          <li><span class="ck">✓</span>Commandes transmises directement chez vous</li>
+          <li><span class="ck">✓</span>Aucune gestion technique de votre côté</li>
+        </ul>
+        <a href="{{ route('get-started') }}" class="arr">Nous contacter →</a>
+      </div>
+      <div class="st r d1">
+        <span class="eyebrow">Pour les acheteurs</span>
+        <h2>Des centaines de produits à portée de main</h2>
+        <p>Parcourez un catalogue varié, commandez en quelques clics et suivez votre livraison depuis chez vous.</p>
+        <ul class="ckl">
+          <li><span class="ck">✓</span>Catalogue riche — tech, mode, food, services</li>
+          <li><span class="ck">✓</span>Commande simplifiée en 3 clics</li>
+          <li><span class="ck">✓</span>Suivi de livraison en temps réel</li>
+          <li><span class="ck">✓</span>Produits physiques &amp; services réservables</li>
+        </ul>
+        <a href="{{ route('get-started') }}" class="arr">Explorer la boutique →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STEPS -->
+<section class="s" id="comment" style="background:var(--f)">
+  <div class="si">
+    <div class="r">
+      <span class="eyebrow">Simple &amp; rapide</span>
+      <h2 class="h2">Commandez en 3 étapes</h2>
+      <p class="h2-s">Inscription, navigation et confirmation — c'est tout.</p>
+    </div>
+    <div class="steps r">
+      <div class="step"><div class="step-n">1</div><h3>Créez votre compte</h3><p>Inscription gratuite en 2 minutes. Aucune carte bancaire requise pour explorer.</p></div>
+      <div class="step"><div class="step-n">2</div><h3>Choisissez vos produits</h3><p>Parcourez par catégorie, filtrez et ajoutez au panier en un clic.</p></div>
+      <div class="step"><div class="step-n">3</div><h3>Confirmez et recevez</h3><p>Validez votre commande et suivez votre livraison en temps réel.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA ENTREPRISE -->
+<section class="cta" id="entreprise">
+  <div class="r">
+    <span class="eyebrow" style="display:block;margin-bottom:14px">Compte entreprise</span>
+    <h2>Vos employés méritent <em>mieux.</em></h2>
+    <p>Ouvrez un compte entreprise sur CauriShop et permettez à vos employés de passer leurs commandes directement depuis la plateforme.</p>
+    <div class="cta-row">
+      <a href="{{ route('get-started') }}" class="btn-fill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;margin-right:8px;vertical-align:middle"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        Démarrer
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft">
+    <div class="ft-top">
+      <div class="ft-about">
+        <a href="{{ route('home') }}" class="logo">
+          <span class="logo-name">CauriShop</span>
+        </a>
+        <p>La marketplace guinéenne pour acheter, vendre et réserver des services.</p>
+      </div>
+      <div class="ft-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="#solutions">Pour qui ?</a></li>
+          <li><a href="#comment">Comment ça marche</a></li>
+          <li><a href="#entreprise">Compte entreprise</a></li>
+        </ul>
+      </div>
+      <div class="ft-col">
+        <h4>Rejoindre</h4>
+        <ul>
+          <li><a href="{{ route('get-started') }}">Explorer la boutique</a></li>
+          <li><a href="{{ route('get-started') }}">Nous contacter</a></li>
+          <li><a href="{{ route('get-started') }}">Démarrer</a></li>
+        </ul>
+      </div>
+      <div class="ft-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="#">Conakry, Guinée</a></li>
+          <li><a href="#">contact@caurishop.gn</a></li>
+          <li><a href="#">+224 XXX XXX XXX</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="ft-bot">
+      <p>© {{ date('Y') }} CauriShop. Tous droits réservés.</p>
+      <div class="ft-links">
+        <a href="#">Conditions</a>
+        <a href="#">Confidentialité</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver(
+    e => e.forEach(x => { if(x.isIntersecting) x.target.classList.add('on') }),
+    { threshold: 0.1 }
+  );
+  document.querySelectorAll('.r').forEach(el => io.observe(el));
+  window.addEventListener('scroll', () => {
+    document.querySelector('nav').style.boxShadow =
+      scrollY > 10 ? '0 2px 20px rgba(0,0,0,.07)' : 'none';
+  });
+</script>
+</body>
+</html>

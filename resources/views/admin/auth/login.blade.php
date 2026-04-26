@@ -12,7 +12,9 @@
 {{-- ── Panneau gauche ──────────────────────────────────────────── --}}
 <div class="panel-left">
     <div class="panel-brand">
-        <span class="logo-text">Caurishop</span>
+        <a href="{{ route('home') }}" style="text-decoration:none;color:inherit;">
+            <span class="logo-text">Caurishop</span>
+        </a>
     </div>
 
     <div class="panel-center">

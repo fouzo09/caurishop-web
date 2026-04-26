@@ -26,8 +26,27 @@ use App\Http\Controllers\Portal\ProfileController as PortalProfileController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/', fn() => view('landing'))->name('home');
+
+Route::get('/demarrer', fn() => view('get-started'))->name('get-started');
+Route::post('/demarrer', function (\Illuminate\Http\Request $request) {
+    $request->validate([
+        'g_nom'      => 'required|string|max:100',
+        'g_prenom'   => 'required|string|max:100',
+        'g_tel'      => 'required|string|max:30',
+        'g_piece'    => 'required|string|max:100',
+        'g_adresse'  => 'required|string|max:255',
+        'e_raison'   => 'required|string|max:200',
+        'e_tel'      => 'required|string|max:30',
+        'e_date'     => 'required|date',
+        'e_employes' => 'required|string|max:50',
+        'e_adresse'  => 'required|string|max:255',
+    ]);
+    return redirect()->route('get-started')->with('success', true);
+})->name('get-started.store');
+
 Route::middleware('guest')->group(function () {
-    Route::get('/', [AuthController::class, 'login'])->name('login');
+    Route::get('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/login', [AuthController::class, 'authenticate'])->name('login.authenticate');
 });
 
