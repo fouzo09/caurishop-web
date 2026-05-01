@@ -125,4 +125,16 @@ class NotificationService
             link:    $link,
         );
     }
+
+    public function newCompanyRegistration(string $companyName, string $link): void
+    {
+        $this->notify(
+            type:    'company_registration',
+            title:   'Nouvelle demande d\'inscription',
+            message: "{$companyName} a soumis une demande d'inscription et attend validation.",
+            icon:    'fa-building',
+            color:   'warning',
+            link:    $link,
+        );
+    }
 }

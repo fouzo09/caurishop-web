@@ -32,7 +32,10 @@
             <a href="{{ route('admin.companies.index') }}" class="menu-item">
                 <i class="fas fa-building"></i>
                 <span>Entreprises</span>
-                <span class="menu-badge">8</span>
+                @php $pendingCompanies = app(\App\Services\Admin\CompanyService::class)->pendingCount(); @endphp
+                @if($pendingCompanies > 0)
+                <span class="menu-badge" style="background:var(--warning);">{{ $pendingCompanies }}</span>
+                @endif
             </a>
             <a href="{{ route('admin.customers.index') }}" class="menu-item">
                 <i class="fas fa-users"></i>

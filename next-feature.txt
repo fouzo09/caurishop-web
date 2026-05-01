@@ -1,0 +1,74 @@
+CAURISHOP — FONCTIONNALITÉS AVANT LANCEMENT
+===========================================
+
+🔴 BLOQUANTS — sans ça, le flux ne fonctionne pas
+---------------------------------------------------
+
+1. Onboarding après approbation
+   Quand une entreprise est approuvée, le responsable doit recevoir automatiquement
+   ses identifiants de connexion (User company_admin créé automatiquement).
+   Actuellement c'est une création manuelle dans l'admin.
+
+2. Invitation des employés
+   Le EmployeeController n'a qu'un index(). Le company_admin peut voir ses employés
+   mais ne peut pas en ajouter depuis son portail.
+   Il manque les routes create/store/invite côté entreprise.
+
+3. Réinitialisation de mot de passe
+   Aucune route password/reset dans web.php.
+   Les utilisateurs sont bloqués dès qu'ils oublient leur mot de passe.
+
+
+🟡 IMPORTANTS — impactent la confiance
+---------------------------------------
+
+4. Emails transactionnels
+   Aucun Mailable dans le projet. Emails manquants :
+   - Confirmation de demande d'inscription (à l'entreprise)
+   - Notification approbation / rejet
+   - Nouvelle commande
+   - Rappel échéancier à venir / en retard
+
+5. Page de confirmation post-inscription
+   Après /demarrer, simple redirect avec success: true.
+   Il faut une page qui explique les étapes suivantes et le délai de traitement.
+
+
+🟢 NICE-TO-HAVE POUR LE LANCEMENT
+-----------------------------------
+
+6. Génération PDF des factures
+7. Catalogue public consultable avant inscription
+8. Alertes limite de crédit (notification à 80% consommé)
+
+
+CONTEXTE GUINÉEN
+=================
+
+Communication
+-------------
+- Notifications WhatsApp & SMS
+  En Guinée, personne ne surveille ses emails. WhatsApp est le canal business
+  par excellence. Les rappels d'échéanciers, confirmations de commande et
+  approbations doivent passer par là.
+
+Paiement
+--------
+- Mobile Money (Orange Money, MTN MoMo, Wave)
+  C'est comme ça que les entreprises paient en Guinée. Sans ça, la collecte
+  des échéanciers va être compliquée.
+
+- Paiement partiel à la livraison
+  Pratique très courante localement (acompte + solde à réception).
+
+
+INNOVATIONS POST-LANCEMENT
+===========================
+
+- Budget par employé (plafond individuel fixé par le company_admin)
+- Catégories de produits autorisées par employé
+- Score crédit dynamique (évolue selon l'historique de paiement)
+- Commandes récurrentes / modèles de commande
+- Tableau de bord analytics entreprise (dépenses par employé, crédit utilisé)
+- Devis en ligne (demande → réponse admin → conversion commande)
+- Relances automatiques des échéanciers (J-3, J0, J+3)

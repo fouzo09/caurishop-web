@@ -29,19 +29,58 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', fn() => view('landing'))->name('home');
 
 Route::get('/demarrer', fn() => view('get-started'))->name('get-started');
-Route::post('/demarrer', function (\Illuminate\Http\Request $request) {
+Route::post('/demarrer', function (\Illuminate\Http\Request $request, \App\Services\Admin\CompanyService $companyService) {
     $request->validate([
-        'g_nom'      => 'required|string|max:100',
-        'g_prenom'   => 'required|string|max:100',
-        'g_tel'      => 'required|string|max:30',
-        'g_piece'    => 'required|string|max:100',
-        'g_adresse'  => 'required|string|max:255',
-        'e_raison'   => 'required|string|max:200',
-        'e_tel'      => 'required|string|max:30',
-        'e_date'     => 'required|date',
-        'e_employes' => 'required|string|max:50',
-        'e_adresse'  => 'required|string|max:255',
+        'g_nom'           => 'required|string|max:100',
+        'g_prenom'        => 'required|string|max:100',
+        'g_tel'           => 'required|string|max:30',
+        'g_piece'         => 'required|string|max:100',
+        'g_adresse'       => 'required|string|max:255',
+        'e_raison'        => 'required|string|max:200',
+        'e_email'         => 'required|email|unique:companies,email',
+        'e_tel'           => 'required|string|max:30',
+        'e_registration'  => 'nullable|string|max:100',
+        'e_date'          => 'required|date',
+        'e_employes'      => 'required|string|max:50',
+        'e_adresse'       => 'required|string|max:255',
+        'e_ville'         => 'required|string|max:100',
+        'e_pays'          => 'required|string|max:100',
+        'doc_rccm'        => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        'doc_nif'         => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        'doc_statuts'     => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        'doc_cni'         => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        'doc_patente'     => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        'doc_domicile'    => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
     ]);
+
+    $data = [
+        'raison_sociale'      => $request->e_raison,
+        'email'               => $request->e_email,
+        'phone'               => $request->e_tel,
+        'registration_number' => $request->e_registration,
+        'address'             => $request->e_adresse,
+        'city'                => $request->e_ville,
+        'country'             => $request->e_pays,
+        'date_creation'       => $request->e_date,
+        'nombre_employes'     => $request->e_employes,
+        'gerant_nom'          => $request->g_nom,
+        'gerant_prenom'       => $request->g_prenom,
+        'gerant_tel'          => $request->g_tel,
+        'gerant_piece'        => $request->g_piece,
+        'gerant_adresse'      => $request->g_adresse,
+    ];
+
+    $files = [
+        'doc_rccm'     => $request->file('doc_rccm'),
+        'doc_nif'      => $request->file('doc_nif'),
+        'doc_statuts'  => $request->file('doc_statuts'),
+        'doc_cni'      => $request->file('doc_cni'),
+        'doc_patente'  => $request->file('doc_patente'),
+        'doc_domicile' => $request->file('doc_domicile'),
+    ];
+
+    $companyService->createRegistrationRequest($data, $files);
+
     return redirect()->route('get-started')->with('success', true);
 })->name('get-started.store');
 
@@ -86,6 +125,8 @@ Route::middleware('auth')->group(function () {
             Route::delete('/{company}', [CompanyController::class, 'destroy'])->name('destroy');
             Route::post('/{company}/activate', [CompanyController::class, 'activate'])->name('activate');
             Route::post('/{company}/deactivate', [CompanyController::class, 'deactivate'])->name('deactivate');
+            Route::post('/{company}/approve', [CompanyController::class, 'approve'])->name('approve');
+            Route::post('/{company}/reject', [CompanyController::class, 'reject'])->name('reject');
         });
 
         Route::prefix('customers')->name('customers.')->group(function () {
