@@ -1,0 +1,16 @@
+---
+deploy_user: caurishop
+deploy_path: /opt/caurishop
+deploy_port: 80
+
+# Firewall — ports ouverts
+firewall_allowed_ports:
+  - "22"
+  - "80"
+  - "443"
+
+# Docker
+docker_compose_version: "2.27.0"
+
+# Swap (utile sur les petites Droplets)
+swap_size: "2G"

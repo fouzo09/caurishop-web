@@ -1,0 +1,109 @@
+---
+- name: Mettre à jour les paquets
+  apt:
+    update_cache: yes
+    upgrade: dist
+    cache_valid_time: 3600
+
+- name: Installer les dépendances système
+  apt:
+    name:
+      - curl
+      - wget
+      - git
+      - unzip
+      - ufw
+      - fail2ban
+      - htop
+      - ca-certificates
+      - gnupg
+      - lsb-release
+      - python3-pip
+    state: present
+
+- name: Configurer le timezone
+  timezone:
+    name: Africa/Conakry
+
+- name: Créer le swap
+  block:
+    - name: Vérifier si swap existe
+      stat:
+        path: /swapfile
+      register: swap_file
+
+    - name: Créer le fichier swap
+      command: fallocate -l {{ swap_size }} /swapfile
+      when: not swap_file.stat.exists
+
+    - name: Définir les permissions swap
+      file:
+        path: /swapfile
+        mode: "0600"
+      when: not swap_file.stat.exists
+
+    - name: Formater le swap
+      command: mkswap /swapfile
+      when: not swap_file.stat.exists
+
+    - name: Activer le swap
+      command: swapon /swapfile
+      when: not swap_file.stat.exists
+
+    - name: Persister le swap dans fstab
+      lineinfile:
+        path: /etc/fstab
+        line: "/swapfile none swap sw 0 0"
+        state: present
+
+- name: Configurer le pare-feu UFW
+  block:
+    - name: Autoriser les ports nécessaires
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+      loop: "{{ firewall_allowed_ports }}"
+
+    - name: Activer UFW
+      ufw:
+        state: enabled
+        policy: deny
+        direction: incoming
+
+- name: Configurer fail2ban
+  service:
+    name: fail2ban
+    state: started
+    enabled: yes
+
+- name: Créer le groupe déploiement
+  group:
+    name: "{{ deploy_user }}"
+    state: present
+
+- name: Créer l'utilisateur déploiement
+  user:
+    name: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+    shell: /bin/bash
+    create_home: yes
+    state: present
+
+- name: Désactiver le login SSH par mot de passe
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^PasswordAuthentication"
+    line: "PasswordAuthentication no"
+    state: present
+  notify: Redémarrer SSH
+
+- name: Optimiser les paramètres kernel
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    sysctl_set: yes
+  loop:
+    - { name: "net.core.somaxconn", value: "65535" }
+    - { name: "vm.swappiness", value: "10" }
+    - { name: "vm.overcommit_memory", value: "1" }

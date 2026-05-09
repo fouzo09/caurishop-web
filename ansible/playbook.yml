@@ -1,0 +1,33 @@
+---
+- name: Préparer la Droplet DigitalOcean pour CauriShop
+  hosts: droplet
+  become: yes
+  gather_facts: yes
+
+  pre_tasks:
+    - name: Vérifier la connexion
+      ping:
+
+    - name: Afficher les infos du serveur
+      debug:
+        msg: "Serveur: {{ inventory_hostname }} | OS: {{ ansible_distribution }} {{ ansible_distribution_version }} | RAM: {{ ansible_memtotal_mb }}MB"
+
+  roles:
+    - role: server
+      tags: server
+
+    - role: docker
+      tags: docker
+
+    - role: app
+      tags: app
+
+  post_tasks:
+    - name: Afficher le résumé
+      debug:
+        msg:
+          - "================================================"
+          - "Droplet prête pour CauriShop !"
+          - "Prochaine étape : configurer /opt/caurishop/.env"
+          - "puis lancer : git push origin main"
+          - "================================================"

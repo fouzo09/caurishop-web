@@ -1,0 +1,68 @@
+---
+- name: Créer le dossier de déploiement
+  file:
+    path: "{{ deploy_path }}"
+    state: directory
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+    mode: "0750"
+
+- name: Créer les sous-dossiers de l'app
+  file:
+    path: "{{ deploy_path }}/{{ item }}"
+    state: directory
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+    mode: "0750"
+  loop:
+    - storage
+    - storage/app/public
+    - storage/logs
+    - storage/framework/cache
+    - storage/framework/sessions
+    - storage/framework/views
+
+- name: Copier le docker-compose.prod.yml
+  copy:
+    src: "{{ playbook_dir }}/../docker-compose.prod.yml"
+    dest: "{{ deploy_path }}/docker-compose.prod.yml"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+    mode: "0640"
+
+- name: Générer le fichier .env depuis le vault
+  template:
+    src: env.j2
+    dest: "{{ deploy_path }}/.env"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+    mode: "0600"
+
+- name: Configurer le logrotate pour les logs Laravel
+  copy:
+    dest: /etc/logrotate.d/caurishop
+    content: |
+      {{ deploy_path }}/storage/logs/*.log {
+          daily
+          missingok
+          rotate 14
+          compress
+          delaycompress
+          notifempty
+          create 0640 {{ deploy_user }} {{ deploy_user }}
+      }
+
+- name: Ajouter la clé SSH GitHub Actions (deploy key)
+  authorized_key:
+    user: "{{ deploy_user }}"
+    key: "{{ github_deploy_pubkey | default('') }}"
+    state: present
+  when: github_deploy_pubkey is defined and github_deploy_pubkey != ''
+
+- name: Activer le nettoyage automatique des images Docker
+  cron:
+    name: "Docker image prune"
+    user: "{{ deploy_user }}"
+    minute: "0"
+    hour: "3"
+    job: "docker image prune -f >> /var/log/docker-prune.log 2>&1"
