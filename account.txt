@@ -31,7 +31,3 @@ EMPLOYÉ ENTREPRISE B — Aissatou Barry
 ---------------------------------------
 Email    : aissatou@entreprise-b.test
 Accès    : /portal
-
-
-ti2U554G.&/p7-V_8W4d
-postgres://96543083d97e3f9b4d6b90958362c6c1a2bd567279cd9cbafe7df2f64849929b:sk_656I8V5aEeI2mNqT97GPm@db.prisma.io:5432/postgres?sslmode=require

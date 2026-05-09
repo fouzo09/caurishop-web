@@ -9,8 +9,6 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
-      DB_HOST:          db
-      DB_PORT:          5432
       REDIS_HOST:       redis
       QUEUE_CONNECTION: redis
       CACHE_STORE:      redis
@@ -21,32 +19,8 @@ services:
       - "80:80"
       - "443:443"
     depends_on:
-      db:
-        condition: service_healthy
       redis:
         condition: service_healthy
-    networks:
-      - caurishop
-
-  # ── PostgreSQL ────────────────────────────────────────────────
-  db:
-    image: postgres:16-alpine
-    container_name: caurishop_db
-    restart: unless-stopped
-    env_file: .env
-    environment:
-      POSTGRES_DB:       ${DB_DATABASE}
-      POSTGRES_USER:     ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "127.0.0.1:5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
     networks:
       - caurishop
 
@@ -61,7 +35,7 @@ services:
     ports:
       - "127.0.0.1:6379:6379"
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-}", "ping"]
       interval: 10s
       timeout: 3s
       retries: 10
@@ -69,7 +43,6 @@ services:
       - caurishop
 
 volumes:
-  postgres_data:
   redis_data:
   storage_data:
 

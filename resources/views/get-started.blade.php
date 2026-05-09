@@ -176,29 +176,34 @@ footer{background:#fff;border-top:1px solid var(--b);padding:64px 48px 40px}
     <div class="fields">
       <div class="field">
         <label class="fl" for="g-nom">Nom</label>
-        <input type="text" id="g-nom" name="g_nom" placeholder="Diallo"/>
+        <input type="text" id="g-nom" name="g_nom" placeholder="Diallo" value="{{ old('g_nom') }}" class="{{ $errors->has('g_nom') ? 'err' : '' }}"/>
+        <span class="ferr" id="err-g-nom">{{ $errors->first('g_nom') }}</span>
       </div>
       <div class="field">
         <label class="fl" for="g-prenom">Prénom</label>
-        <input type="text" id="g-prenom" name="g_prenom" placeholder="Mamadou"/>
+        <input type="text" id="g-prenom" name="g_prenom" placeholder="Mamadou" value="{{ old('g_prenom') }}" class="{{ $errors->has('g_prenom') ? 'err' : '' }}"/>
+        <span class="ferr" id="err-g-prenom">{{ $errors->first('g_prenom') }}</span>
       </div>
       <div class="field">
         <label class="fl" for="g-tel">Téléphone</label>
-        <input type="tel" id="g-tel" name="g_tel" placeholder="+224 6XX XXX XXX"/>
+        <input type="tel" id="g-tel" name="g_tel" placeholder="+224 6XX XXX XXX" value="{{ old('g_tel') }}" class="{{ $errors->has('g_tel') ? 'err' : '' }}"/>
+        <span class="ferr" id="err-g-tel">{{ $errors->first('g_tel') }}</span>
       </div>
       <div class="field">
         <label class="fl" for="g-piece">Pièce d'identité</label>
-        <select id="g-piece" name="g_piece">
+        <select id="g-piece" name="g_piece" class="{{ $errors->has('g_piece') ? 'err' : '' }}">
           <option value="">— Sélectionner —</option>
-          <option>Carte Nationale d'Identité (CNI)</option>
-          <option>Passeport</option>
-          <option>Permis de conduire</option>
-          <option>Carte de séjour</option>
+          <option {{ old('g_piece') === 'Carte Nationale d\'Identité (CNI)' ? 'selected' : '' }}>Carte Nationale d'Identité (CNI)</option>
+          <option {{ old('g_piece') === 'Passeport' ? 'selected' : '' }}>Passeport</option>
+          <option {{ old('g_piece') === 'Permis de conduire' ? 'selected' : '' }}>Permis de conduire</option>
+          <option {{ old('g_piece') === 'Carte de séjour' ? 'selected' : '' }}>Carte de séjour</option>
         </select>
+        <span class="ferr" id="err-g-piece">{{ $errors->first('g_piece') }}</span>
       </div>
       <div class="field full">
         <label class="fl" for="g-adresse">Adresse personnelle</label>
-        <input type="text" id="g-adresse" name="g_adresse" placeholder="Quartier, commune, ville — ex : Kipé, Ratoma, Conakry"/>
+        <input type="text" id="g-adresse" name="g_adresse" placeholder="Quartier, commune, ville — ex : Kipé, Ratoma, Conakry" value="{{ old('g_adresse') }}" class="{{ $errors->has('g_adresse') ? 'err' : '' }}"/>
+        <span class="ferr" id="err-g-adresse">{{ $errors->first('g_adresse') }}</span>
       </div>
     </div>
     <div class="actions">
@@ -218,46 +223,54 @@ footer{background:#fff;border-top:1px solid var(--b);padding:64px 48px 40px}
     <div class="fields">
       <div class="field full">
         <label class="fl" for="e-raison">Raison sociale</label>
-        <input type="text" id="e-raison" name="e_raison" placeholder="Ex : Diallo & Frères SARL"/>
+        <input type="text" id="e-raison" name="e_raison" placeholder="Ex : Diallo & Frères SARL" value="{{ old('e_raison') }}" class="{{ $errors->has('e_raison') ? 'err' : '' }}"/>
+        <span class="ferr" id="err-e-raison">{{ $errors->first('e_raison') }}</span>
       </div>
       <div class="field">
         <label class="fl" for="e-email">Email de l'entreprise</label>
-        <input type="email" id="e-email" name="e_email" placeholder="contact@entreprise.com"/>
+        <input type="email" id="e-email" name="e_email" placeholder="contact@entreprise.com" value="{{ old('e_email') }}" class="{{ $errors->has('e_email') ? 'err' : '' }}"/>
+        <span class="ferr" id="err-e-email">{{ $errors->first('e_email') }}</span>
       </div>
       <div class="field">
         <label class="fl" for="e-tel">Téléphone de l'entreprise</label>
-        <input type="tel" id="e-tel" name="e_tel" placeholder="+224 6XX XXX XXX"/>
+        <input type="tel" id="e-tel" name="e_tel" placeholder="+224 6XX XXX XXX" value="{{ old('e_tel') }}" class="{{ $errors->has('e_tel') ? 'err' : '' }}"/>
+        <span class="ferr" id="err-e-tel">{{ $errors->first('e_tel') }}</span>
       </div>
       <div class="field">
         <label class="fl" for="e-registration">Numéro RCCM <span style="font-weight:400;color:var(--s)">(si disponible)</span></label>
-        <input type="text" id="e-registration" name="e_registration" placeholder="Ex : RC-CONAKRY-2024-B-001"/>
+        <input type="text" id="e-registration" name="e_registration" placeholder="Ex : RC-CONAKRY-2024-B-001" value="{{ old('e_registration') }}"/>
       </div>
       <div class="field">
         <label class="fl" for="e-date">Date de création</label>
-        <input type="date" id="e-date" name="e_date"/>
+        <input type="date" id="e-date" name="e_date" value="{{ old('e_date') }}" class="{{ $errors->has('e_date') ? 'err' : '' }}"/>
+        <span class="ferr" id="err-e-date">{{ $errors->first('e_date') }}</span>
       </div>
       <div class="field">
         <label class="fl" for="e-employes">Nombre d'employés</label>
-        <select id="e-employes" name="e_employes">
+        <select id="e-employes" name="e_employes" class="{{ $errors->has('e_employes') ? 'err' : '' }}">
           <option value="">— Sélectionner —</option>
-          <option>1 – 5</option>
-          <option>6 – 20</option>
-          <option>21 – 50</option>
-          <option>51 – 100</option>
-          <option>Plus de 100</option>
+          <option {{ old('e_employes') === '1 – 5' ? 'selected' : '' }}>1 – 5</option>
+          <option {{ old('e_employes') === '6 – 20' ? 'selected' : '' }}>6 – 20</option>
+          <option {{ old('e_employes') === '21 – 50' ? 'selected' : '' }}>21 – 50</option>
+          <option {{ old('e_employes') === '51 – 100' ? 'selected' : '' }}>51 – 100</option>
+          <option {{ old('e_employes') === 'Plus de 100' ? 'selected' : '' }}>Plus de 100</option>
         </select>
+        <span class="ferr" id="err-e-employes">{{ $errors->first('e_employes') }}</span>
       </div>
       <div class="field full">
         <label class="fl" for="e-adresse">Adresse de l'entreprise</label>
-        <input type="text" id="e-adresse" name="e_adresse" placeholder="Quartier, commune — ex : Almamya, Kaloum"/>
+        <input type="text" id="e-adresse" name="e_adresse" placeholder="Quartier, commune — ex : Almamya, Kaloum" value="{{ old('e_adresse') }}" class="{{ $errors->has('e_adresse') ? 'err' : '' }}"/>
+        <span class="ferr" id="err-e-adresse">{{ $errors->first('e_adresse') }}</span>
       </div>
       <div class="field">
         <label class="fl" for="e-ville">Ville</label>
-        <input type="text" id="e-ville" name="e_ville" placeholder="Conakry"/>
+        <input type="text" id="e-ville" name="e_ville" placeholder="Conakry" value="{{ old('e_ville') }}" class="{{ $errors->has('e_ville') ? 'err' : '' }}"/>
+        <span class="ferr" id="err-e-ville">{{ $errors->first('e_ville') }}</span>
       </div>
       <div class="field">
         <label class="fl" for="e-pays">Pays</label>
-        <input type="text" id="e-pays" name="e_pays" value="Guinée" placeholder="Guinée"/>
+        <input type="text" id="e-pays" name="e_pays" value="{{ old('e_pays', 'Guinée') }}" placeholder="Guinée" class="{{ $errors->has('e_pays') ? 'err' : '' }}"/>
+        <span class="ferr" id="err-e-pays">{{ $errors->first('e_pays') }}</span>
       </div>
     </div>
     <div class="actions">
@@ -288,6 +301,7 @@ footer{background:#fff;border-top:1px solid var(--b);padding:64px 48px 40px}
           <input type="file" id="f-rccm" name="doc_rccm" accept=".pdf,.jpg,.jpeg,.png" onchange="showFile(this,'fn-rccm')"/>
         </label>
         <div class="doc-filename" id="fn-rccm"></div>
+        <span class="ferr" id="doc-err-rccm">{{ $errors->first('doc_rccm') }}</span>
       </div>
 
       <div class="doc-item">
@@ -301,6 +315,7 @@ footer{background:#fff;border-top:1px solid var(--b);padding:64px 48px 40px}
           <input type="file" id="f-nif" name="doc_nif" accept=".pdf,.jpg,.jpeg,.png" onchange="showFile(this,'fn-nif')"/>
         </label>
         <div class="doc-filename" id="fn-nif"></div>
+        <span class="ferr" id="doc-err-nif">{{ $errors->first('doc_nif') }}</span>
       </div>
 
       <div class="doc-item">
@@ -314,6 +329,7 @@ footer{background:#fff;border-top:1px solid var(--b);padding:64px 48px 40px}
           <input type="file" id="f-statuts" name="doc_statuts" accept=".pdf,.jpg,.jpeg,.png" onchange="showFile(this,'fn-statuts')"/>
         </label>
         <div class="doc-filename" id="fn-statuts"></div>
+        <span class="ferr" id="doc-err-statuts">{{ $errors->first('doc_statuts') }}</span>
       </div>
 
       <div class="doc-item">
@@ -327,6 +343,7 @@ footer{background:#fff;border-top:1px solid var(--b);padding:64px 48px 40px}
           <input type="file" id="f-cni" name="doc_cni" accept=".pdf,.jpg,.jpeg,.png" onchange="showFile(this,'fn-cni')"/>
         </label>
         <div class="doc-filename" id="fn-cni"></div>
+        <span class="ferr" id="doc-err-cni">{{ $errors->first('doc_cni') }}</span>
       </div>
 
       <div class="doc-item">
@@ -462,38 +479,133 @@ footer{background:#fff;border-top:1px solid var(--b);padding:64px 48px 40px}
   document.getElementById('success-section').classList.add('show');
 @endif
 
+// Si erreurs serveur, naviguer vers la bonne étape
+@if($errors->any())
+  @if($errors->hasAny(['g_nom','g_prenom','g_tel','g_piece','g_adresse']))
+    navigateTo(1);
+  @elseif($errors->hasAny(['e_raison','e_email','e_tel','e_date','e_employes','e_adresse','e_ville','e_pays']))
+    navigateTo(2);
+  @elseif($errors->hasAny(['doc_rccm','doc_nif','doc_statuts','doc_cni','doc_patente','doc_domicile']))
+    navigateTo(3);
+  @endif
+@endif
+
 function v(id){ return (document.getElementById(id)?.value ?? '').trim(); }
 
-function goTo(step) {
-  if (step === 2) {
-    if (!v('g-nom') || !v('g-prenom') || !v('g-tel') || !v('g-piece') || !v('g-adresse')) {
-      alert('Veuillez remplir tous les champs du gérant.'); return;
-    }
+function setErr(id, msg) {
+  const input = document.getElementById(id);
+  const span  = document.getElementById('err-' + id);
+  if (msg) {
+    input?.classList.add('err');
+    if (span) span.textContent = msg;
+  } else {
+    input?.classList.remove('err');
+    if (span) span.textContent = '';
   }
-  if (step === 3) {
-    if (!v('e-raison') || !v('e-email') || !v('e-tel') || !v('e-date') || !v('e-employes') || !v('e-adresse') || !v('e-ville') || !v('e-pays')) {
-      alert('Veuillez remplir tous les champs obligatoires de l\'entreprise.'); return;
-    }
-  }
-  if (step === 4) {
-    const req = ['f-rccm','f-nif','f-statuts','f-cni'];
-    const missing = req.filter(id => !document.getElementById(id).files.length);
-    if (missing.length) {
-      alert('Veuillez joindre les documents obligatoires (RCCM, NIF, Statuts, Pièce d\'identité).'); return;
-    }
-    // Remplir le récap
-    document.getElementById('r-gerant').textContent   = v('g-prenom') + ' ' + v('g-nom');
-    document.getElementById('r-gtel').textContent     = v('g-tel');
-    document.getElementById('r-gpiece').textContent   = v('g-piece');
-    document.getElementById('r-gadresse').textContent = v('g-adresse');
-    document.getElementById('r-raison').textContent   = v('e-raison');
-    document.getElementById('r-eemail').textContent   = v('e-email');
-    document.getElementById('r-etel').textContent     = v('e-tel');
-    document.getElementById('r-edate').textContent    = document.getElementById('e-date').value;
-    document.getElementById('r-employes').textContent = v('e-employes');
-    document.getElementById('r-eadresse').textContent = v('e-adresse');
-    document.getElementById('r-evillepays').textContent = v('e-ville') + ', ' + v('e-pays');
+}
 
+// Helpers de validation
+const reName    = /^[a-zA-ZÀ-ÿ\s'\-]{2,}$/;
+const rePhone   = /^[\+\d][\d\s\-\(\)]{6,19}$/;
+const reEmail   = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+const reVille   = /^[a-zA-ZÀ-ÿ\s\-]{2,}$/;
+const reVowel   = /[aeiouyàâäéèêëîïôùûüæœ]/i;
+
+function check(id, val, rules) {
+  if (!val) return rules.required || 'Ce champ est requis.';
+  if (rules.min && val.length < rules.min) return `Minimum ${rules.min} caractères.`;
+  if (rules.regex && !rules.regex.test(val)) return rules.regexMsg || 'Format invalide.';
+  if (rules.vowel && !reVowel.test(val)) return 'Veuillez entrer un nom valide.';
+  return '';
+}
+
+function validateStep(step) {
+  let ok = true;
+  const fail = (id, msg) => { setErr(id, msg); ok = false; };
+  const pass = (id) => setErr(id, '');
+
+  if (step === 1) {
+    [
+      { id: 'g-nom',    rules: { required: 'Le nom est requis.',     min: 2, regex: reName, regexMsg: 'Lettres uniquement.', vowel: true } },
+      { id: 'g-prenom', rules: { required: 'Le prénom est requis.',  min: 2, regex: reName, regexMsg: 'Lettres uniquement.', vowel: true } },
+      { id: 'g-tel',    rules: { required: 'Le téléphone est requis.', min: 8, regex: rePhone, regexMsg: 'Numéro invalide (ex : +224 620 000 000).' } },
+      { id: 'g-piece',  rules: { required: 'Veuillez sélectionner une pièce d\'identité.' } },
+      { id: 'g-adresse',rules: { required: 'L\'adresse est requise.', min: 5 } },
+    ].forEach(({ id, rules }) => {
+      const msg = check(id, v(id), rules);
+      msg ? fail(id, msg) : pass(id);
+    });
+  }
+
+  if (step === 2) {
+    const email = v('e-email');
+    const date  = v('e-date');
+    [
+      { id: 'e-raison',   rules: { required: 'La raison sociale est requise.', min: 3 } },
+      { id: 'e-tel',      rules: { required: 'Le téléphone est requis.', min: 8, regex: rePhone, regexMsg: 'Numéro invalide (ex : +224 620 000 000).' } },
+      { id: 'e-date',     rules: { required: 'La date de création est requise.' } },
+      { id: 'e-employes', rules: { required: 'Veuillez sélectionner le nombre d\'employés.' } },
+      { id: 'e-adresse',  rules: { required: 'L\'adresse est requise.', min: 5 } },
+      { id: 'e-ville',    rules: { required: 'La ville est requise.', min: 2, regex: reVille, regexMsg: 'Lettres uniquement.' } },
+      { id: 'e-pays',     rules: { required: 'Le pays est requis.',   min: 2, regex: reVille, regexMsg: 'Lettres uniquement.' } },
+    ].forEach(({ id, rules }) => {
+      const msg = check(id, v(id), rules);
+      msg ? fail(id, msg) : pass(id);
+    });
+    // Email
+    if (!email) {
+      fail('e-email', 'L\'email est requis.');
+    } else if (!reEmail.test(email)) {
+      fail('e-email', 'Adresse email invalide.');
+    } else {
+      pass('e-email');
+    }
+    // Date dans le futur
+    if (date && new Date(date) > new Date()) {
+      fail('e-date', 'La date de création ne peut pas être dans le futur.');
+    }
+  }
+
+  if (step === 3) {
+    const required = [
+      { id: 'f-rccm',    errId: 'doc-err-rccm',    msg: 'Le RCCM est obligatoire.' },
+      { id: 'f-nif',     errId: 'doc-err-nif',     msg: 'Le NIF est obligatoire.' },
+      { id: 'f-statuts', errId: 'doc-err-statuts', msg: 'Les statuts sont obligatoires.' },
+      { id: 'f-cni',     errId: 'doc-err-cni',     msg: 'La pièce d\'identité est obligatoire.' },
+    ];
+    required.forEach(f => {
+      const el  = document.getElementById(f.id);
+      const span = document.getElementById(f.errId);
+      if (!el.files.length) {
+        if (span) span.textContent = f.msg;
+        el.closest('.doc-item').style.borderColor = '#ef4444';
+        ok = false;
+      } else {
+        if (span) span.textContent = '';
+        el.closest('.doc-item').style.borderColor = '';
+      }
+    });
+  }
+
+  return ok;
+}
+
+function goTo(step) {
+  const current = parseInt(document.querySelector('.step-section.active').id.replace('section-',''));
+  if (step > current && !validateStep(current)) return;
+
+  if (step === 4) {
+    document.getElementById('r-gerant').textContent    = v('g-prenom') + ' ' + v('g-nom');
+    document.getElementById('r-gtel').textContent      = v('g-tel');
+    document.getElementById('r-gpiece').textContent    = v('g-piece');
+    document.getElementById('r-gadresse').textContent  = v('g-adresse');
+    document.getElementById('r-raison').textContent    = v('e-raison');
+    document.getElementById('r-eemail').textContent    = v('e-email');
+    document.getElementById('r-etel').textContent      = v('e-tel');
+    document.getElementById('r-edate').textContent     = document.getElementById('e-date').value;
+    document.getElementById('r-employes').textContent  = v('e-employes');
+    document.getElementById('r-eadresse').textContent  = v('e-adresse');
+    document.getElementById('r-evillepays').textContent = v('e-ville') + ', ' + v('e-pays');
     const docs = [
       {id:'f-rccm',label:'RCCM'},{id:'f-nif',label:'NIF'},{id:'f-statuts',label:'Statuts'},
       {id:'f-cni',label:'Pièce d\'identité'},{id:'f-patente',label:'Patente'},
@@ -509,8 +621,12 @@ function goTo(step) {
     });
   }
 
+  navigateTo(step);
+}
+
+function navigateTo(step) {
   document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.step-tab').forEach(t => { t.classList.remove('active','done'); });
+  document.querySelectorAll('.step-tab').forEach(t => t.classList.remove('active','done'));
   for (let i = 1; i < step; i++) document.getElementById('tab-'+i).classList.add('done');
   document.getElementById('section-'+step).classList.add('active');
   document.getElementById('tab-'+step).classList.add('active');
@@ -523,6 +639,10 @@ function showFile(input, targetId) {
     el.textContent = '✓ ' + input.files[0].name;
     el.style.display = 'block';
     input.closest('.doc-item').querySelector('.doc-input span').textContent = 'Changer le fichier';
+    input.closest('.doc-item').style.borderColor = '';
+    const errId = 'doc-err-' + input.name.replace('doc_','');
+    const span = document.getElementById(errId);
+    if (span) span.textContent = '';
   }
 }
 </script>

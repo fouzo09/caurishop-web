@@ -30,27 +30,48 @@ Route::get('/', fn() => view('landing'))->name('home');
 
 Route::get('/demarrer', fn() => view('get-started'))->name('get-started');
 Route::post('/demarrer', function (\Illuminate\Http\Request $request, \App\Services\Admin\CompanyService $companyService) {
+    $nameRegex  = ['regex:/^[a-zA-ZÀ-ÿ\s\'\-]{2,}$/'];
+    $phoneRegex = ['regex:/^[\+\d][\d\s\-\(\)]{6,19}$/'];
+    $villeRegex = ['regex:/^[a-zA-ZÀ-ÿ\s\-]{2,}$/'];
+
     $request->validate([
-        'g_nom'           => 'required|string|max:100',
-        'g_prenom'        => 'required|string|max:100',
-        'g_tel'           => 'required|string|max:30',
-        'g_piece'         => 'required|string|max:100',
-        'g_adresse'       => 'required|string|max:255',
-        'e_raison'        => 'required|string|max:200',
-        'e_email'         => 'required|email|unique:companies,email',
-        'e_tel'           => 'required|string|max:30',
-        'e_registration'  => 'nullable|string|max:100',
-        'e_date'          => 'required|date',
-        'e_employes'      => 'required|string|max:50',
-        'e_adresse'       => 'required|string|max:255',
-        'e_ville'         => 'required|string|max:100',
-        'e_pays'          => 'required|string|max:100',
-        'doc_rccm'        => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
-        'doc_nif'         => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
-        'doc_statuts'     => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
-        'doc_cni'         => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
-        'doc_patente'     => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
-        'doc_domicile'    => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        'g_nom'           => array_merge(['required', 'string', 'min:2', 'max:100'], $nameRegex),
+        'g_prenom'        => array_merge(['required', 'string', 'min:2', 'max:100'], $nameRegex),
+        'g_tel'           => array_merge(['required', 'string', 'min:8', 'max:30'], $phoneRegex),
+        'g_piece'         => ['required', 'string', 'in:Carte Nationale d\'Identité (CNI),Passeport,Permis de conduire,Carte de séjour'],
+        'g_adresse'       => ['required', 'string', 'min:5', 'max:255'],
+        'e_raison'        => ['required', 'string', 'min:3', 'max:200'],
+        'e_email'         => ['required', 'email:rfc', 'unique:companies,email'],
+        'e_tel'           => array_merge(['required', 'string', 'min:8', 'max:30'], $phoneRegex),
+        'e_registration'  => ['nullable', 'string', 'max:100'],
+        'e_date'          => ['required', 'date', 'before:today'],
+        'e_employes'      => ['required', 'string', 'in:1 – 5,6 – 20,21 – 50,51 – 100,Plus de 100'],
+        'e_adresse'       => ['required', 'string', 'min:5', 'max:255'],
+        'e_ville'         => array_merge(['required', 'string', 'min:2', 'max:100'], $villeRegex),
+        'e_pays'          => array_merge(['required', 'string', 'min:2', 'max:100'], $villeRegex),
+        'doc_rccm'        => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+        'doc_nif'         => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+        'doc_statuts'     => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+        'doc_cni'         => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+        'doc_patente'     => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+        'doc_domicile'    => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+    ], [
+        'g_nom.regex'        => 'Le nom ne doit contenir que des lettres.',
+        'g_prenom.regex'     => 'Le prénom ne doit contenir que des lettres.',
+        'g_tel.regex'        => 'Numéro de téléphone invalide.',
+        'g_tel.min'          => 'Le numéro est trop court.',
+        'g_piece.in'         => 'Pièce d\'identité invalide.',
+        'g_adresse.min'      => 'L\'adresse est trop courte.',
+        'e_raison.min'       => 'La raison sociale est trop courte.',
+        'e_email.email'      => 'Adresse email invalide.',
+        'e_email.unique'     => 'Cette adresse email est déjà utilisée.',
+        'e_tel.regex'        => 'Numéro de téléphone invalide.',
+        'e_tel.min'          => 'Le numéro est trop court.',
+        'e_date.before'      => 'La date de création ne peut pas être dans le futur.',
+        'e_employes.in'      => 'Veuillez sélectionner une valeur valide.',
+        'e_adresse.min'      => 'L\'adresse est trop courte.',
+        'e_ville.regex'      => 'La ville ne doit contenir que des lettres.',
+        'e_pays.regex'       => 'Le pays ne doit contenir que des lettres.',
     ]);
 
     $data = [
