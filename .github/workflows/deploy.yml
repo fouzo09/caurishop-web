@@ -76,18 +76,8 @@ jobs:
     needs: build-push
 
     steps:
-      - name: Checkout (for compose file)
+      - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Copy compose file to VPS
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT || 22 }}
-          source: docker-compose.prod.yml
-          target: ${{ secrets.DEPLOY_PATH || '/opt/caurishop' }}
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -95,44 +85,46 @@ jobs:
           IMAGE_TAG: ${{ needs.build-push.outputs.image_tag }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           REGISTRY: ${{ env.REGISTRY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_SHA: ${{ github.sha }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT || 22 }}
-          envs: IMAGE_TAG,GITHUB_REPOSITORY,REGISTRY
+          port: ${{ secrets.VPS_PORT }}
+          envs: IMAGE_TAG,GITHUB_REPOSITORY,REGISTRY,GITHUB_TOKEN,GITHUB_ACTOR,GITHUB_SHA
           script: |
             set -e
-            DEPLOY_PATH="${{ secrets.DEPLOY_PATH || '/opt/caurishop' }}"
+            DEPLOY_PATH="/opt/caurishop"
+            mkdir -p "$DEPLOY_PATH"
             cd "$DEPLOY_PATH"
 
-            # Pull latest image
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io \
-              -u ${{ github.actor }} --password-stdin
+            # Télécharger le docker-compose.prod.yml depuis GitHub
+            curl -fsSL \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Accept: application/vnd.github.v3.raw" \
+              "https://api.github.com/repos/$GITHUB_REPOSITORY/contents/docker-compose.prod.yml?ref=$GITHUB_SHA" \
+              -o docker-compose.prod.yml
+
+            # Login au registry
+            echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
 
             export IMAGE_TAG="$IMAGE_TAG"
             export GITHUB_REPOSITORY="$GITHUB_REPOSITORY"
 
+            # Pull et redémarrage
             docker compose -f docker-compose.prod.yml pull app
-
-            # Rolling restart (zero-downtime via healthcheck)
             docker compose -f docker-compose.prod.yml up -d --no-deps app
 
-            # Run migrations
-            docker compose -f docker-compose.prod.yml exec -T app \
-              php artisan migrate --force
+            # Migrations et cache
+            docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force
+            docker compose -f docker-compose.prod.yml exec -T app php artisan config:cache
+            docker compose -f docker-compose.prod.yml exec -T app php artisan route:cache
+            docker compose -f docker-compose.prod.yml exec -T app php artisan view:cache
+            docker compose -f docker-compose.prod.yml exec -T app php artisan storage:link
 
-            # Clear and warm caches
-            docker compose -f docker-compose.prod.yml exec -T app \
-              php artisan config:cache
-            docker compose -f docker-compose.prod.yml exec -T app \
-              php artisan route:cache
-            docker compose -f docker-compose.prod.yml exec -T app \
-              php artisan view:cache
-            docker compose -f docker-compose.prod.yml exec -T app \
-              php artisan storage:link
-
-            # Remove dangling images
+            # Nettoyage
             docker image prune -f
 
-            echo "Deployment complete — image: ghcr.io/$GITHUB_REPOSITORY:$IMAGE_TAG"
+            echo "Déploiement terminé — image: ghcr.io/$GITHUB_REPOSITORY:$IMAGE_TAG"
