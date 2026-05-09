@@ -7,6 +7,11 @@ services:
     container_name: caurishop_app
     restart: unless-stopped
     env_file: .env
+    environment:
+      SESSION_DRIVER: database
+      QUEUE_CONNECTION: database
+      CACHE_STORE: database
+      REDIS_CLIENT: ""
     volumes:
       - storage_data:/var/www/html/storage/app/public
     ports:
