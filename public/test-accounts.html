@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CauriShop — Comptes de test</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #f0f4f8;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .page-header .badge {
+            display: inline-block;
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffc107;
+            border-radius: 20px;
+            padding: 0.3rem 1rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .password-global {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: #dbeafe;
+            border: 1px solid #93c5fd;
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            max-width: 380px;
+            margin: 0 auto 2.5rem;
+            font-size: 0.9rem;
+            color: #1e40af;
+        }
+
+        .password-global strong { font-size: 1rem; letter-spacing: 0.05em; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+            gap: 1.25rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            padding: 1.4rem 1.5rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            flex-shrink: 0;
+        }
+
+        .avatar.admin-platform { background: #fef3c7; color: #d97706; }
+        .avatar.company-admin  { background: #dbeafe; color: #2563eb; }
+        .avatar.employee       { background: #d1fae5; color: #059669; }
+
+        .card-title { font-weight: 600; font-size: 0.95rem; color: #1a202c; }
+
+        .role-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.15rem 0.6rem;
+            border-radius: 20px;
+            margin-top: 0.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .role-badge.admin-platform { background: #fef3c7; color: #92400e; }
+        .role-badge.company-admin  { background: #dbeafe; color: #1e40af; }
+        .role-badge.employee       { background: #d1fae5; color: #065f46; }
+
+        .card-body { display: flex; flex-direction: column; gap: 0.6rem; }
+
+        .field {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 0.55rem 0.8rem;
+        }
+
+        .field i {
+            color: #94a3b8;
+            width: 14px;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .field-label {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            min-width: 70px;
+        }
+
+        .field-value {
+            font-size: 0.88rem;
+            color: #334155;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .copy-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 0.2rem;
+            border-radius: 4px;
+            transition: color 0.15s;
+            font-size: 0.8rem;
+        }
+
+        .copy-btn:hover { color: #3b82f6; }
+        .copy-btn.copied { color: #10b981; }
+
+        .company-tag {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .company-tag i { color: #94a3b8; font-size: 0.7rem; }
+
+        .section-title {
+            max-width: 1100px;
+            margin: 0 auto 0.9rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #94a3b8;
+            padding-left: 0.25rem;
+        }
+
+        .section-title:not(:first-of-type) { margin-top: 2rem; }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 2.5rem auto 0;
+            background: #1a202c;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s;
+            display: flex;
+            width: fit-content;
+        }
+
+        .back-btn:hover { background: #2d3748; }
+
+        .footer-actions {
+            display: flex;
+            justify-content: center;
+            margin-top: 2.5rem;
+        }
+
+        @media (max-width: 480px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <div class="badge"><i class="fas fa-flask"></i> &nbsp;Environnement de démonstration</div>
+    <h1>Comptes de test CauriShop</h1>
+    <p>Utilisez ces identifiants pour explorer les différents rôles de la plateforme.</p>
+</div>
+
+<div class="password-global">
+    <i class="fas fa-key"></i>
+    Mot de passe universel :&nbsp;<strong>password</strong>
+</div>
+
+<!-- ── Super Admin ────────────────────────────────────── -->
+<div class="section-title"><i class="fas fa-shield-alt"></i> &nbsp;Administration plateforme</div>
+<div class="grid">
+    <div class="card">
+        <div class="card-header">
+            <div class="avatar admin-platform"><i class="fas fa-crown"></i></div>
+            <div>
+                <div class="card-title">CAURISHOP Admin</div>
+                <span class="role-badge admin-platform">Super Admin</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="field">
+                <i class="fas fa-envelope"></i>
+                <span class="field-label">Email</span>
+                <span class="field-value">admin@caurishop.test</span>
+                <button class="copy-btn" onclick="copy(this, 'admin@caurishop.test')"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="field">
+                <i class="fas fa-lock"></i>
+                <span class="field-label">Mot de passe</span>
+                <span class="field-value">password</span>
+                <button class="copy-btn" onclick="copy(this, 'password')"><i class="fas fa-copy"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Entreprise A ───────────────────────────────────── -->
+<div class="section-title"><i class="fas fa-building"></i> &nbsp;Entreprise A</div>
+<div class="grid">
+    <div class="card">
+        <div class="card-header">
+            <div class="avatar company-admin"><i class="fas fa-user-tie"></i></div>
+            <div>
+                <div class="card-title">Fatoumata Camara</div>
+                <span class="role-badge company-admin">Admin Entreprise</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="field">
+                <i class="fas fa-envelope"></i>
+                <span class="field-label">Email</span>
+                <span class="field-value">admin@entreprise-a.test</span>
+                <button class="copy-btn" onclick="copy(this, 'admin@entreprise-a.test')"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="field">
+                <i class="fas fa-lock"></i>
+                <span class="field-label">Mot de passe</span>
+                <span class="field-value">password</span>
+                <button class="copy-btn" onclick="copy(this, 'password')"><i class="fas fa-copy"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="avatar employee"><i class="fas fa-user"></i></div>
+            <div>
+                <div class="card-title">Ibrahima Bah</div>
+                <span class="role-badge employee">Employé</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="field">
+                <i class="fas fa-envelope"></i>
+                <span class="field-label">Email</span>
+                <span class="field-value">ibrahima@entreprise-a.test</span>
+                <button class="copy-btn" onclick="copy(this, 'ibrahima@entreprise-a.test')"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="field">
+                <i class="fas fa-lock"></i>
+                <span class="field-label">Mot de passe</span>
+                <span class="field-value">password</span>
+                <button class="copy-btn" onclick="copy(this, 'password')"><i class="fas fa-copy"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="avatar employee"><i class="fas fa-user"></i></div>
+            <div>
+                <div class="card-title">Mariama Sow</div>
+                <span class="role-badge employee">Employé</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="field">
+                <i class="fas fa-envelope"></i>
+                <span class="field-label">Email</span>
+                <span class="field-value">mariama@entreprise-a.test</span>
+                <button class="copy-btn" onclick="copy(this, 'mariama@entreprise-a.test')"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="field">
+                <i class="fas fa-lock"></i>
+                <span class="field-label">Mot de passe</span>
+                <span class="field-value">password</span>
+                <button class="copy-btn" onclick="copy(this, 'password')"><i class="fas fa-copy"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Entreprise B ───────────────────────────────────── -->
+<div class="section-title"><i class="fas fa-building"></i> &nbsp;Entreprise B</div>
+<div class="grid">
+    <div class="card">
+        <div class="card-header">
+            <div class="avatar company-admin"><i class="fas fa-user-tie"></i></div>
+            <div>
+                <div class="card-title">Oumar Diallo</div>
+                <span class="role-badge company-admin">Admin Entreprise</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="field">
+                <i class="fas fa-envelope"></i>
+                <span class="field-label">Email</span>
+                <span class="field-value">admin@entreprise-b.test</span>
+                <button class="copy-btn" onclick="copy(this, 'admin@entreprise-b.test')"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="field">
+                <i class="fas fa-lock"></i>
+                <span class="field-label">Mot de passe</span>
+                <span class="field-value">password</span>
+                <button class="copy-btn" onclick="copy(this, 'password')"><i class="fas fa-copy"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="avatar employee"><i class="fas fa-user"></i></div>
+            <div>
+                <div class="card-title">Aissatou Barry</div>
+                <span class="role-badge employee">Employé</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="field">
+                <i class="fas fa-envelope"></i>
+                <span class="field-label">Email</span>
+                <span class="field-value">aissatou@entreprise-b.test</span>
+                <button class="copy-btn" onclick="copy(this, 'aissatou@entreprise-b.test')"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="field">
+                <i class="fas fa-lock"></i>
+                <span class="field-label">Mot de passe</span>
+                <span class="field-value">password</span>
+                <button class="copy-btn" onclick="copy(this, 'password')"><i class="fas fa-copy"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="footer-actions">
+    <a href="/login" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Retour à la connexion
+    </a>
+</div>
+
+<script>
+    function copy(btn, text) {
+        navigator.clipboard.writeText(text).then(() => {
+            btn.classList.add('copied');
+            btn.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => {
+                btn.classList.remove('copied');
+                btn.innerHTML = '<i class="fas fa-copy"></i>';
+            }, 1500);
+        });
+    }
+</script>
+</body>
+</html>

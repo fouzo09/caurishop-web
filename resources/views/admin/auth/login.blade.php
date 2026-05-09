@@ -132,6 +132,38 @@
     </div>
 </div>
 
+{{-- ── Bouton flottant comptes test ─────────────────────────── --}}
+<a href="/test-accounts.html" target="_blank" class="btn-test-accounts">
+    <i class="fas fa-users"></i>
+    <span>Accès aux comptes tests</span>
+</a>
+
+<style>
+    .btn-test-accounts {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #1a202c;
+        color: #fff;
+        text-decoration: none;
+        padding: 0.65rem 1.1rem;
+        border-radius: 50px;
+        font-size: 0.82rem;
+        font-weight: 500;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+        transition: background 0.2s, transform 0.2s;
+        z-index: 999;
+    }
+    .btn-test-accounts:hover {
+        background: #2d3748;
+        transform: translateY(-2px);
+    }
+    .btn-test-accounts i { font-size: 0.85rem; }
+</style>
+
 <script>
     function togglePwd() {
         const input = document.getElementById('password');
