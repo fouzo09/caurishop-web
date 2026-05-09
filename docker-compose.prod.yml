@@ -2,48 +2,20 @@ name: caurishop
 
 services:
 
-  # ── Application ───────────────────────────────────────────────
   app:
     image: ghcr.io/${GITHUB_REPOSITORY:-fouzo09/caurishop}:${IMAGE_TAG:-latest}
     container_name: caurishop_app
     restart: unless-stopped
     env_file: .env
-    environment:
-      REDIS_HOST:       redis
-      QUEUE_CONNECTION: redis
-      CACHE_STORE:      redis
-      SESSION_DRIVER:   redis
     volumes:
       - storage_data:/var/www/html/storage/app/public
     ports:
       - "80:80"
       - "443:443"
-    depends_on:
-      redis:
-        condition: service_healthy
-    networks:
-      - caurishop
-
-  # ── Redis ─────────────────────────────────────────────────────
-  redis:
-    image: redis:7-alpine
-    container_name: caurishop_redis
-    restart: unless-stopped
-    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru --requirepass ${REDIS_PASSWORD:-}
-    volumes:
-      - redis_data:/data
-    ports:
-      - "127.0.0.1:6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-}", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 10
     networks:
       - caurishop
 
 volumes:
-  redis_data:
   storage_data:
 
 networks:
