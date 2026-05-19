@@ -116,6 +116,7 @@ jobs:
             export IMAGE_TAG="$IMAGE_TAG"
             export GITHUB_REPOSITORY="$GITHUB_REPOSITORY"
 
+            docker compose -f docker-compose.prod.yml up -d db
             docker compose -f docker-compose.prod.yml pull app
             docker compose -f docker-compose.prod.yml up -d --no-deps app
 
