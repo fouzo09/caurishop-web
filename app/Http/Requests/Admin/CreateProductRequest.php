@@ -31,6 +31,8 @@ class CreateProductRequest extends FormRequest
 
         $isService = $this->boolean('is_service');
 
+        $rules['supplier_price'] = 'nullable|numeric|min:0';
+
         if ($this->input('type') === Product::TYPE_SIMPLE && !$isService) {
             $rules['price']          = 'required|numeric|min:0';
             $rules['stock_quantity'] = 'required|integer|min:0';

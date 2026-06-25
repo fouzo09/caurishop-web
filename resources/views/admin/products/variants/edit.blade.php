@@ -53,8 +53,25 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Prix (GNF)</label>
-                        <input type="number" name="price" class="form-input" value="{{ old('price', $variant->price) }}" step="0.01" min="0" required>
+                        <label class="form-label">
+                            Prix fournisseur (GNF)
+                            <span style="font-weight:400;color:var(--gray);font-size:.8rem;">(optionnel)</span>
+                        </label>
+                        <input type="number" name="supplier_price" id="varSupplierPrice" class="form-input"
+                               value="{{ old('supplier_price', $variant->supplier_price) }}"
+                               step="0.01" min="0" oninput="previewVariantMarginEdit()">
+                        @error('supplier_price')
+                        <span style="color: var(--danger); font-size: 0.85rem;">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Prix client (GNF)</label>
+                        <input type="number" name="price" id="varSalePrice" class="form-input"
+                               value="{{ old('price', $variant->price) }}" step="0.01" min="0" required>
+                        <div id="varMarginHint" style="display:none;font-size:.78rem;color:var(--primary);margin-top:.3rem;">
+                            <i class="fas fa-magic"></i> <span id="varMarginHintText"></span>
+                        </div>
                         @error('price')
                         <span style="color: var(--danger); font-size: 0.85rem;">{{ $message }}</span>
                         @enderror
@@ -68,6 +85,34 @@
                         @enderror
                     </div>
                 </div>
+
+                @php
+                    $applicableMargin = app(\App\Services\Admin\MarginService::class)->findMarginForProduct($product->id);
+                @endphp
+                <script>
+                const VAR_MARGIN_TYPE  = '{{ $applicableMargin?->type ?? '' }}';
+                const VAR_MARGIN_VALUE = {{ $applicableMargin?->value ?? 0 }};
+
+                function previewVariantMarginEdit() {
+                    const sp    = parseFloat(document.getElementById('varSupplierPrice').value);
+                    const hint  = document.getElementById('varMarginHint');
+                    const htext = document.getElementById('varMarginHintText');
+
+                    if (!sp || sp <= 0 || !VAR_MARGIN_VALUE) { hint.style.display = 'none'; return; }
+
+                    let sale;
+                    if (VAR_MARGIN_TYPE === 'percentage') {
+                        sale = Math.round(sp * (1 + VAR_MARGIN_VALUE / 100));
+                    } else {
+                        sale = Math.round(sp + VAR_MARGIN_VALUE);
+                    }
+
+                    document.getElementById('varSalePrice').value = sale;
+                    const gain = sale - sp;
+                    htext.textContent = 'Marge appliquée → ' + new Intl.NumberFormat('fr-FR').format(gain) + ' GNF';
+                    hint.style.display = 'block';
+                }
+                </script>
 
                 {{-- Attributs --}}
                 <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">

@@ -6,6 +6,17 @@
         <h1 class="page-title">Mes paiements</h1>
     </div>
 
+    @if(session('success'))
+    <div style="margin-bottom:1.5rem;padding:.85rem 1.1rem;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:8px;color:#065f46;display:flex;align-items:center;gap:.6rem;">
+        <i class="fas fa-check-circle"></i> {{ session('success') }}
+    </div>
+    @endif
+    @if(session('error'))
+    <div style="margin-bottom:1.5rem;padding:.85rem 1.1rem;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:8px;color:#991b1b;display:flex;align-items:center;gap:.6rem;">
+        <i class="fas fa-exclamation-triangle"></i> {{ session('error') }}
+    </div>
+    @endif
+
     {{-- Stats --}}
     <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 1.5rem;">
         <div class="stat-card">
@@ -56,23 +67,31 @@
                     $is = $iMap[$inst->status] ?? ['label' => $inst->status, 'class' => 'badge-secondary'];
                     $isLate = $inst->status === 'late' || (\Carbon\Carbon::parse($inst->due_date)->isPast() && $inst->status === 'pending');
                 @endphp
-                <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 1.25rem; border-bottom: 1px solid var(--border);">
-                    <div>
-                        <div style="font-weight: 600; font-size: 0.9rem;">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.25rem;border-bottom:1px solid var(--border);gap:.75rem;">
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:600;font-size:.9rem;">
                             {{ $inst->creditPlan?->order?->order_number ?? '—' }}
-                            <span style="font-weight: normal; color: var(--gray);">#{{ $inst->installment_number }}</span>
+                            <span style="font-weight:normal;color:var(--gray);">#{{ $inst->installment_number }}</span>
                         </div>
-                        <div style="font-size: 0.8rem; color: {{ $isLate ? '#ef4444' : 'var(--gray)' }};">
+                        <div style="font-size:.8rem;color:{{ $isLate ? '#ef4444' : 'var(--gray)' }};">
                             <i class="fas fa-calendar{{ $isLate ? '-times' : '' }}"></i>
                             {{ \Carbon\Carbon::parse($inst->due_date)->format('d/m/Y') }}
                         </div>
                     </div>
-                    <div style="text-align: right;">
-                        <div style="font-weight: 700; color: {{ $isLate ? '#ef4444' : 'var(--dark)' }};">
+                    <div style="text-align:right;white-space:nowrap;">
+                        <div style="font-weight:700;color:{{ $isLate ? '#ef4444' : 'var(--dark)' }};">
                             {{ number_format($inst->amount_due - $inst->amount_paid, 0, ',', ' ') }} GNF
                         </div>
-                        <span class="badge {{ $is['class'] }}" style="font-size: 0.72rem;">{{ $is['label'] }}</span>
+                        <span class="badge {{ $is['class'] }}" style="font-size:.72rem;">{{ $is['label'] }}</span>
                     </div>
+                    @if($inst->status !== 'paid' && ($inst->amount_due - $inst->amount_paid) > 0)
+                    <form action="{{ route('portal.djomy.checkout.initiate', $inst) }}" method="POST" style="flex-shrink:0;">
+                        @csrf
+                        <button type="submit" class="btn btn-primary btn-sm" style="white-space:nowrap;">
+                            <i class="fas fa-credit-card"></i> Payer
+                        </button>
+                    </form>
+                    @endif
                 </div>
                 @empty
                 <div style="padding: 2rem; text-align: center; color: var(--gray);">

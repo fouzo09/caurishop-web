@@ -13,6 +13,7 @@ class Order extends Model
     public const TYPE_CASH = 'cash';
     public const TYPE_CREDIT = 'credit';
 
+    public const STATUS_PENDING_PAYMENT  = 'pending_payment';
     public const STATUS_PENDING_APPROVAL = 'pending_approval';
     public const STATUS_DRAFT = 'draft';
     public const STATUS_CONFIRMED = 'confirmed';

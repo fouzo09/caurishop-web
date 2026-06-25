@@ -4,17 +4,21 @@ namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\DjomyTransaction;
 use App\Models\Order;
 use App\Models\Product;
 use App\Services\Admin\OrderService;
+use App\Services\DjomyService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class OrderController extends Controller
 {
     public function __construct(
-        protected OrderService $orderService
+        protected OrderService  $orderService,
+        protected DjomyService  $djomyService,
     ) {}
 
     public function index(): View
@@ -66,9 +70,59 @@ class OrderController extends Controller
             $customer = $this->resolveCustomer();
 
             $data = $request->only(['items', 'order_type', 'down_payment', 'credit_installments_count']);
-            $data['customer_id']      = $customer->id;
-            $data['pending_approval'] = true; // force pending_approval
+            $data['customer_id'] = $customer->id;
 
+            if ($request->input('order_type') === 'cash') {
+                if (empty($customer->phone)) {
+                    return back()
+                        ->with('error', 'Renseignez votre numéro de téléphone dans votre profil avant de payer.')
+                        ->withInput();
+                }
+
+                $data['pending_payment'] = true;
+                $order     = $this->orderService->createOrder($data);
+                $amount    = (int) round((float) $order->total_amount);
+                $reference = 'ORD-' . $order->id . '-' . strtoupper(Str::random(6));
+
+                $djomyResp = $this->djomyService->createGatewayPayment([
+                    'amount'                   => $amount,
+                    'countryCode'              => config('djomy.country_code', 'GN'),
+                    'payerNumber'              => preg_replace('/[\s\-]/', '', $customer->phone),
+                    'description'              => "Paiement commande {$order->order_number}",
+                    'merchantPaymentReference' => $reference,
+                    'returnUrl'                => $this->callbackUrl('portal.djomy.return', ['ref' => $reference]),
+                    'cancelUrl'                => $this->callbackUrl('portal.djomy.cancel', ['ref' => $reference]),
+                    'metadata'                 => [
+                        'order_id'    => (string) $order->id,
+                        'customer_id' => (string) $customer->id,
+                    ],
+                ]);
+
+
+                $paymentUrl = $djomyResp['data']['redirectUrl'] ?? $djomyResp['data']['paymentUrl']
+                           ?? $djomyResp['redirectUrl']         ?? $djomyResp['paymentUrl']    ?? null;
+
+                DjomyTransaction::create([
+                    'installment_id'       => null,
+                    'order_id'             => $order->id,
+                    'customer_id'          => $customer->id,
+                    'djomy_transaction_id' => $djomyResp['data']['transactionId'] ?? $djomyResp['transactionId'] ?? null,
+                    'merchant_reference'   => $reference,
+                    'amount'               => $amount,
+                    'status'               => DjomyTransaction::STATUS_PENDING,
+                    'payer_identifier'     => $customer->phone,
+                    'djomy_response'       => $djomyResp,
+                ]);
+
+                if (!$paymentUrl) {
+                    return back()->with('error', 'Djomy n\'a pas retourné d\'URL de paiement.')->withInput();
+                }
+
+                return redirect()->away($paymentUrl);
+            }
+
+            // Crédit : soumission pour validation
+            $data['pending_approval'] = true;
             $order = $this->orderService->createOrder($data);
 
             return redirect()->route('portal.orders.show', $order->id)
@@ -79,6 +133,14 @@ class OrderController extends Controller
     }
 
     // ── Helpers ──────────────────────────────────────────────────────
+
+    private function callbackUrl(string $routeName, array $params = []): string
+    {
+        $base = rtrim(config('djomy.callback_url'), '/');
+        $path = route($routeName, $params, false);
+        $url  = $base . $path;
+        return preg_replace('#^http://#', 'https://', $url);
+    }
 
     private function getOrAbort(): Customer
     {

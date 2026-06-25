@@ -198,7 +198,7 @@
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <span style="font-size: 0.9rem; color: var(--gray);">Commande</span>
                             @php
-                                $sMap = ['draft'=>['Brouillon','warning'],'confirmed'=>['Confirmée','success'],'completed'=>['Livrée','success'],'cancelled'=>['Annulée','danger']];
+                                $sMap = ['pending_payment'=>['Paiement en attente','warning'],'pending_approval'=>['En attente valid.','warning'],'draft'=>['Brouillon','secondary'],'confirmed'=>['Confirmée','success'],'completed'=>['Livrée','success'],'cancelled'=>['Annulée','danger']];
                                 [$sl, $sc] = $sMap[$order->status] ?? [$order->status,''];
                             @endphp
                             <span class="badge {{ $sc }}">{{ $sl }}</span>

@@ -15,6 +15,7 @@ class ProductVariant extends Model
         'name',
         'attributes',
         'price',
+        'supplier_price',
         'stock_quantity',
         'is_active',
         'credit_enabled',
@@ -25,6 +26,7 @@ class ProductVariant extends Model
     protected $casts = [
         'attributes'               => 'array',
         'price'                    => 'decimal:2',
+        'supplier_price'           => 'decimal:2',
         'stock_quantity'           => 'integer',
         'is_active'                => 'boolean',
         'credit_enabled'           => 'boolean',

@@ -24,6 +24,7 @@
 
     @php
         $statusMap = [
+            'pending_payment'  => ['label' => 'Paiement en attente',    'class' => 'badge-warning',   'msg' => 'Votre commande est en attente de paiement.'],
             'draft'            => ['label' => 'Brouillon',              'class' => 'badge-secondary', 'msg' => null],
             'confirmed'        => ['label' => 'Confirmée',              'class' => 'badge-primary',   'msg' => null],
             'completed'        => ['label' => 'Livrée',                 'class' => 'badge-success',   'msg' => null],

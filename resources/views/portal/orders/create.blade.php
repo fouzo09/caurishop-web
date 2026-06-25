@@ -154,7 +154,7 @@
 /* ── Product grid (compact for wizard) ── */
 .w-product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
 }
 .w-product-card {
@@ -402,8 +402,8 @@
             </a>
             <div>
                 <h1 class="page-title">Nouvelle commande</h1>
-                <p style="color:var(--text-muted);font-size:13px;margin-top:2px;">
-                    La commande sera soumise pour validation à votre responsable.
+                <p style="color:var(--text-muted);font-size:13px;margin-top:2px;" id="pageSubtitle">
+                    Choisissez vos produits et le mode de règlement.
                 </p>
             </div>
         </div>
@@ -547,43 +547,6 @@
                     </div>
                 </div>
 
-                {{-- Cash: payment method cards --}}
-                <div id="cashSection" class="payment-section">
-                    <div class="payment-section-title">Moyen de paiement</div>
-                    <div class="pay-grid">
-
-                        {{-- Orange Money --}}
-                        <div class="pay-card selected" id="pay-om" onclick="selectPayMethod('om')">
-                            <div class="pay-card-check"><i class="fas fa-check"></i></div>
-                            <div class="pay-logo">
-                                <div class="pay-logo-om">OM<span>Orange Money</span></div>
-                            </div>
-                            <div class="pay-name">Orange Money</div>
-                            <div class="pay-sub">Paiement mobile</div>
-                        </div>
-
-                        {{-- MTN MoMo --}}
-                        <div class="pay-card" id="pay-momo" onclick="selectPayMethod('momo')">
-                            <div class="pay-card-check"><i class="fas fa-check"></i></div>
-                            <div class="pay-logo">
-                                <div class="pay-logo-momo">MoMo<span>MTN Mobile Money</span></div>
-                            </div>
-                            <div class="pay-name">MTN MoMo</div>
-                            <div class="pay-sub">Paiement mobile</div>
-                        </div>
-
-                        {{-- DJOMY --}}
-                        <div class="pay-card" id="pay-djomy" onclick="selectPayMethod('djomy')">
-                            <div class="pay-card-check"><i class="fas fa-check"></i></div>
-                            <div class="pay-logo">
-                                <div class="pay-logo-djomy">Djomy<span>Fintech Guinée</span></div>
-                            </div>
-                            <div class="pay-name">Djomy</div>
-                            <div class="pay-sub">Paiement digital</div>
-                        </div>
-                    </div>
-                </div>
-
                 {{-- Credit section --}}
                 <div id="creditSection" class="payment-section" style="display:none;">
                     <div class="payment-section-title">Options de crédit</div>
@@ -656,9 +619,9 @@
                     </div>
                 </div>
 
-                <div class="notice-box">
+                <div class="notice-box" id="noticeBox">
                     <i class="fas fa-info-circle" style="flex-shrink:0;margin-top:1px;"></i>
-                    <span>Votre commande sera soumise à votre responsable pour validation avant tout traitement.</span>
+                    <span id="noticeText">Votre commande sera soumise à votre responsable pour validation avant tout traitement.</span>
                 </div>
             </div>
         </div>
@@ -671,7 +634,7 @@
                 @csrf
                 <div id="formHiddenFields"></div>
                 <button type="submit" class="btn-submit-order" id="submitBtn">
-                    <i class="fas fa-paper-plane"></i> Soumettre la commande
+                    <i class="fas fa-paper-plane"></i> <span id="submitLabel">Soumettre la commande</span>
                 </button>
             </form>
         </div>
@@ -683,9 +646,8 @@
 /* ════════════════════════════════════════════════════════════
    State
    ════════════════════════════════════════════════════════════ */
-let cart   = [];           // [{productId, productName, variantId, variantName, price, qty}]
+let cart        = [];      // [{productId, productName, variantId, variantName, price, qty}]
 let orderType   = 'cash';  // 'cash' | 'credit'
-let payMethod   = 'om';    // 'om' | 'momo' | 'djomy'
 let currentStep = 1;
 
 /* Pre-select product from URL param */
@@ -797,15 +759,18 @@ function setOrderType(type) {
     orderType = type;
     document.getElementById('typeComptant').classList.toggle('active', type === 'cash');
     document.getElementById('typeCredit').classList.toggle('active',   type === 'credit');
-    document.getElementById('cashSection').style.display   = type === 'cash'   ? '' : 'none';
     document.getElementById('creditSection').style.display = type === 'credit' ? '' : 'none';
-}
 
-function selectPayMethod(method) {
-    payMethod = method;
-    ['om','momo','djomy'].forEach(m => {
-        document.getElementById('pay-' + m).classList.toggle('selected', m === method);
-    });
+    // Mettre à jour notice + bouton selon type
+    const isCash = type === 'cash';
+    document.getElementById('noticeText').textContent = isCash
+        ? 'Vous serez redirigé vers Djomy pour effectuer le paiement. La commande sera confirmée automatiquement.'
+        : 'Votre commande sera soumise à votre responsable pour validation avant tout traitement.';
+    document.getElementById('noticeBox').style.background = isCash ? '#f0fdfa' : '';
+    document.getElementById('noticeBox').style.borderColor = isCash ? '#99f6e4' : '';
+    document.getElementById('noticeBox').style.color = isCash ? '#065f46' : '';
+    document.getElementById('submitLabel').textContent = isCash ? 'Continuer vers le paiement' : 'Soumettre la commande';
+    document.getElementById('submitBtn').style.background = isCash ? '#00897B' : '';
 }
 
 function updateCreditPreview() {
@@ -864,21 +829,7 @@ function renderConfirmation() {
             </div>
         `;
     } else {
-        const logos = {
-            om:    { label: 'Orange Money', color: '#FF6600', bg: '#fff3ec', abbr: 'OM' },
-            momo:  { label: 'MTN MoMo',     color: '#b45309', bg: '#fefce8', abbr: 'MoMo' },
-            djomy: { label: 'Djomy',         color: '#00766C', bg: '#f0fdfa', abbr: 'Djomy' },
-        };
-        const m = logos[payMethod] || logos.om;
-        payEl.innerHTML = `
-            <div style="display:flex;align-items:center;gap:.75rem;">
-                <span style="background:${m.bg};color:${m.color};border-radius:6px;padding:5px 12px;font-weight:800;font-size:14px;">${m.abbr}</span>
-                <div>
-                    <div style="font-weight:600;font-size:13.5px;">${m.label}</div>
-                    <div style="font-size:12px;color:var(--text-muted);">Paiement comptant</div>
-                </div>
-            </div>
-        `;
+        payEl.innerHTML = `<span style="font-size:13.5px;">Comptant – paiement Djomy</span>`;
     }
 }
 

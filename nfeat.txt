@@ -1,0 +1,10 @@
+1. Analyse et mise en place de la marge de caurishop sur chaque produit
+2. Implementation d'un systeme qui permet de scraper les produits (nom, photo, prix, url) d'un site de vente (amazon, temu, ...)
+et mettre dans un fichier Json.
+2.1 Le script sera executer par les admins caurishop
+2.2 Le fichier sera genere dans et on verra la liste des fichiers et on peut voir le contenu de chacun
+2.3 On peut creer les produits pour un fournisseur donné depuis l'admin apartir de ce fichier.
+3.Integration paiement djomy
+3.1 Documentation: https://developers.djomy.africa/
+3.2 Crendential ClientID: djomy-client-1752782800873-6f11   ClientSecret: s3cr3t-MtCe1txkD_SDSpsnO9t6mEQgSYPtCsqg
+

@@ -6,6 +6,11 @@
         <h1 class="page-title">Mon Profil</h1>
     </div>
 
+    @if(session('error'))
+    <div style="margin-bottom:1.5rem;padding:0.85rem 1.1rem;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;color:#991b1b;display:flex;align-items:center;gap:0.6rem;">
+        <i class="fas fa-exclamation-triangle"></i> {{ session('error') }}
+    </div>
+    @endif
     @if(session('success'))
     <div id="alert-success" style="margin-bottom:1.5rem;padding:0.85rem 1.1rem;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;color:#065f46;display:flex;align-items:center;gap:0.6rem;">
         <i class="fas fa-check-circle"></i> {{ session('success') }}
@@ -94,6 +99,13 @@
                                     <input type="email" name="email" class="form-control"
                                            value="{{ old('email', $user->email) }}" required>
                                     @error('email')<span style="color:#ef4444;font-size:0.85rem;">{{ $message }}</span>@enderror
+                                </div>
+                                <div class="form-group" style="grid-column:1/-1;">
+                                    <label class="form-label">Numéro de téléphone <span style="font-size:.8rem;color:var(--gray);">(requis pour les paiements Djomy)</span></label>
+                                    <input type="tel" name="phone" class="form-control"
+                                           value="{{ old('phone', $customer?->phone) }}"
+                                           placeholder="Ex : 00224623707722">
+                                    @error('phone')<span style="color:#ef4444;font-size:0.85rem;">{{ $message }}</span>@enderror
                                 </div>
                             </div>
                         </div>

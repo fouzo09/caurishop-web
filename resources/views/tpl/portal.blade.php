@@ -25,7 +25,7 @@
 
         <div class="menu-section">
             <div class="menu-label">Catalogue</div>
-            <a href="{{ route('portal.products.index') }}" class="menu-item {{ request()->routeIs('portal.products.*') ? 'active' : '' }}">
+            <a href="{{ route('portal.orders.create') }}" class="menu-item {{ request()->routeIs('portal.orders.create') ? 'active' : '' }}">
                 <i class="fas fa-box"></i>
                 <span>Produits</span>
             </a>
@@ -33,7 +33,7 @@
 
         <div class="menu-section">
             <div class="menu-label">Mes achats</div>
-            <a href="{{ route('portal.orders.index') }}" class="menu-item {{ request()->routeIs('portal.orders.*') ? 'active' : '' }}">
+            <a href="{{ route('portal.orders.index') }}" class="menu-item {{ request()->routeIs('portal.orders.*') && !request()->routeIs('portal.orders.create') ? 'active' : '' }}">
                 <i class="fas fa-shopping-cart"></i>
                 <span>Mes Commandes</span>
             </a>

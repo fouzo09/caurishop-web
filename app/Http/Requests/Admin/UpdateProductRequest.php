@@ -32,6 +32,8 @@ class UpdateProductRequest extends FormRequest
             'credit_installments_count' => 'nullable|integer|min:1|max:12',
         ];
 
+        $rules['supplier_price'] = 'nullable|numeric|min:0';
+
         $isService = $this->boolean('is_service');
 
         if ($this->input('type') === Product::TYPE_SIMPLE && !$isService) {

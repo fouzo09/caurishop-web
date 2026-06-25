@@ -27,6 +27,8 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
+      DB_HOST: db
+      DB_PORT: "5432"
       SESSION_DRIVER: database
       QUEUE_CONNECTION: database
       CACHE_STORE: database

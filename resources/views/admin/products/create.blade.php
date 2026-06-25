@@ -116,8 +116,25 @@
                 <div id="simple-fields" style="display: {{ old('type', 'simple') === 'simple' ? 'block' : 'none' }};">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
                         <div class="form-group">
-                            <label class="form-label">Prix (GNF)</label>
-                            <input type="number" name="price" class="form-input" placeholder="4200000" value="{{ old('price') }}" step="0.01" min="0">
+                            <label class="form-label">
+                                Prix fournisseur (GNF)
+                                <span style="font-weight:400;color:var(--gray);font-size:.8rem;">(optionnel)</span>
+                            </label>
+                            <input type="number" name="supplier_price" id="supplierPrice" class="form-input"
+                                   placeholder="Ex: 3500000" value="{{ old('supplier_price') }}"
+                                   step="0.01" min="0" oninput="previewMarginCreate()">
+                            @error('supplier_price')
+                            <span style="color: var(--danger); font-size: 0.85rem;">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Prix client (GNF)</label>
+                            <input type="number" name="price" id="salePrice" class="form-input"
+                                   placeholder="4200000" value="{{ old('price') }}" step="0.01" min="0">
+                            <div id="marginHint" style="display:none;font-size:.78rem;color:var(--primary);margin-top:.3rem;">
+                                <i class="fas fa-magic"></i> <span id="marginHintText"></span>
+                            </div>
                             @error('price')
                             <span style="color: var(--danger); font-size: 0.85rem;">{{ $message }}</span>
                             @enderror
@@ -132,6 +149,34 @@
                         </div>
                     </div>
                 </div>
+
+                @php
+                    $globalMargin = \App\Models\PlatformMargin::where('scope','global')->where('is_active',true)->first();
+                @endphp
+                <script>
+                const MARGIN_TYPE  = '{{ $globalMargin?->type ?? '' }}';
+                const MARGIN_VALUE = {{ $globalMargin?->value ?? 0 }};
+
+                function previewMarginCreate() {
+                    const sp    = parseFloat(document.getElementById('supplierPrice').value);
+                    const hint  = document.getElementById('marginHint');
+                    const htext = document.getElementById('marginHintText');
+
+                    if (!sp || sp <= 0 || !MARGIN_VALUE) { hint.style.display = 'none'; return; }
+
+                    let sale;
+                    if (MARGIN_TYPE === 'percentage') {
+                        sale = Math.round(sp * (1 + MARGIN_VALUE / 100));
+                    } else {
+                        sale = Math.round(sp + MARGIN_VALUE);
+                    }
+
+                    document.getElementById('salePrice').value = sale;
+                    const gain = sale - sp;
+                    htext.textContent = 'Marge appliquée → ' + new Intl.NumberFormat('fr-FR').format(gain) + ' GNF';
+                    hint.style.display = 'block';
+                }
+                </script>
 
                 <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
                     <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Options de Crédit</h4>

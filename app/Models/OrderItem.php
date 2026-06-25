@@ -15,13 +15,17 @@ class OrderItem extends Model
         'variant_id',
         'quantity',
         'unit_price',
+        'supplier_unit_price',
         'line_total',
+        'margin_amount',
     ];
 
     protected $casts = [
-        'quantity' => 'integer',
-        'unit_price' => 'decimal:2',
-        'line_total' => 'decimal:2',
+        'quantity'            => 'integer',
+        'unit_price'          => 'decimal:2',
+        'supplier_unit_price' => 'decimal:2',
+        'line_total'          => 'decimal:2',
+        'margin_amount'       => 'decimal:2',
     ];
 
     public function order()

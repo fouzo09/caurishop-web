@@ -41,9 +41,13 @@
                 <i class="fas fa-users"></i>
                 <span>Clients</span>
             </a>
-            <a href="{{ route('admin.products.index') }}" class="menu-item">
+            <a href="{{ route('admin.products.index') }}" class="menu-item {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
                 <i class="fas fa-box"></i>
                 <span>Produits</span>
+            </a>
+            <a href="{{ route('admin.scraper.index') }}" class="menu-item {{ request()->routeIs('admin.scraper.*') ? 'active' : '' }}">
+                <i class="fas fa-spider"></i>
+                <span>Scraper</span>
             </a>
             <a href="{{ route('admin.orders.index') }}" class="menu-item">
                 <i class="fas fa-shopping-cart"></i>
@@ -60,6 +64,10 @@
             <a href="{{ route('admin.installments.index') }}" class="menu-item">
                 <i class="fas fa-file-invoice"></i>
                 <span>Échéanciers</span>
+            </a>
+            <a href="{{ route('admin.margins.index') }}" class="menu-item {{ request()->routeIs('admin.margins.*') ? 'active' : '' }}">
+                <i class="fas fa-percentage"></i>
+                <span>Marges</span>
             </a>
         </div>
 

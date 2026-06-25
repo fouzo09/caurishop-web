@@ -169,10 +169,12 @@
                         <td>
                             @php
                                 $statusMap = [
-                                    'draft'     => ['Brouillon', 'warning'],
-                                    'confirmed' => ['Confirmée', 'success'],
-                                    'completed' => ['Livrée',    'success'],
-                                    'cancelled' => ['Annulée',   'danger'],
+                                    'pending_payment'  => ['Paiement en attente', 'warning'],
+                                    'pending_approval' => ['En attente valid.',   'warning'],
+                                    'draft'            => ['Brouillon',           'secondary'],
+                                    'confirmed'        => ['Confirmée',           'success'],
+                                    'completed'        => ['Livrée',              'success'],
+                                    'cancelled'        => ['Annulée',             'danger'],
                                 ];
                                 [$label, $class] = $statusMap[$order->status] ?? [$order->status, ''];
                             @endphp

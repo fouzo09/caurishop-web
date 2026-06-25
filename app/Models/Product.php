@@ -19,6 +19,7 @@ class Product extends Model
         'description',
         'sku',
         'price',
+        'supplier_price',
         'stock_quantity',
         'low_stock_threshold',
         'is_published',
@@ -28,10 +29,12 @@ class Product extends Model
         'credit_installments_count',
         'is_service',
         'provider',
+        'supplier_id',
     ];
 
     protected $casts = [
         'price'                    => 'decimal:2',
+        'supplier_price'           => 'decimal:2',
         'stock_quantity'           => 'integer',
         'low_stock_threshold'      => 'integer',
         'is_published'             => 'boolean',
@@ -45,6 +48,11 @@ class Product extends Model
     protected $appends = ['display_price', 'stock_status', 'display_monthly_payment'];
 
     // Relations
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
+
     public function images()
     {
         return $this->hasMany(ProductImage::class)->orderBy('sort_order')->orderBy('id');

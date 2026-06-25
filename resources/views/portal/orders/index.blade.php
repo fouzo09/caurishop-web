@@ -33,11 +33,12 @@
                 @forelse($orders as $order)
                 @php
                     $statusMap = [
-                        'draft'            => ['label' => 'Brouillon',         'class' => 'badge-secondary'],
-                        'confirmed'        => ['label' => 'Confirmée',         'class' => 'badge-primary'],
-                        'completed'        => ['label' => 'Livrée',            'class' => 'badge-success'],
-                        'cancelled'        => ['label' => 'Annulée',           'class' => 'badge-danger'],
-                        'pending_approval' => ['label' => 'En attente valid.', 'class' => 'badge-warning'],
+                        'pending_payment'  => ['label' => 'Paiement en attente', 'class' => 'badge-warning'],
+                        'draft'            => ['label' => 'Brouillon',           'class' => 'badge-secondary'],
+                        'confirmed'        => ['label' => 'Confirmée',           'class' => 'badge-primary'],
+                        'completed'        => ['label' => 'Livrée',             'class' => 'badge-success'],
+                        'cancelled'        => ['label' => 'Annulée',            'class' => 'badge-danger'],
+                        'pending_approval' => ['label' => 'En attente valid.',  'class' => 'badge-warning'],
                     ];
                     $s = $statusMap[$order->status] ?? ['label' => $order->status, 'class' => 'badge-secondary'];
                 @endphp
@@ -54,10 +55,18 @@
                     <td>{{ number_format($order->total_amount, 0, ',', ' ') }} GNF</td>
                     <td><span class="badge {{ $s['class'] }}">{{ $s['label'] }}</span></td>
                     <td>{{ $order->created_at->format('d/m/Y') }}</td>
-                    <td>
+                    <td style="white-space:nowrap;">
                         <a href="{{ route('portal.orders.show', $order->id) }}" class="btn btn-sm btn-outline">
                             <i class="fas fa-eye"></i>
                         </a>
+                        @if($order->order_type === 'cash' && in_array($order->status, ['draft', 'pending_payment']))
+                        <form action="{{ route('portal.djomy.order.checkout.initiate', $order->id) }}" method="POST" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-primary" style="margin-left:.35rem;">
+                                <i class="fas fa-redo"></i> Relancer
+                            </button>
+                        </form>
+                        @endif
                     </td>
                 </tr>
                 @empty

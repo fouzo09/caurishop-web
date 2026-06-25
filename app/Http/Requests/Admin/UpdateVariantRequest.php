@@ -26,6 +26,7 @@ class UpdateVariantRequest extends FormRequest
             'name' => 'required|string|max:255',
             'attributes' => 'nullable|array',
             'price' => 'required|numeric|min:0',
+            'supplier_price' => 'nullable|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
             'is_active' => 'boolean',
             'credit_enabled' => 'nullable|boolean',

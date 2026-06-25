@@ -14,6 +14,9 @@ use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\SecurityController;
+use App\Http\Controllers\Admin\MarginController;
+use App\Http\Controllers\Admin\ScraperController;
+use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Company\DashboardController as CompanyDashboard;
 use App\Http\Controllers\Company\OrderController as CompanyOrderController;
 use App\Http\Controllers\Company\EmployeeController as CompanyEmployeeController;
@@ -23,6 +26,7 @@ use App\Http\Controllers\Portal\ProductController as PortalProductController;
 use App\Http\Controllers\Portal\OrderController as PortalOrderController;
 use App\Http\Controllers\Portal\PaymentController as PortalPaymentController;
 use App\Http\Controllers\Portal\ProfileController as PortalProfileController;
+use App\Http\Controllers\Portal\DjomyController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -222,6 +226,36 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [PermissionController::class, 'index'])->name('index');
         });
 
+        Route::prefix('scraper')->name('scraper.')->group(function () {
+            Route::get('/', [ScraperController::class, 'index'])->name('index');
+            Route::get('/image-proxy', [ScraperController::class, 'imageProxy'])->name('image-proxy');
+            Route::post('/run-html', [ScraperController::class, 'runHtml'])->name('run-html');
+            Route::get('/{filename}', [ScraperController::class, 'show'])->name('show');
+            Route::post('/{filename}/review', [ScraperController::class, 'review'])->name('review');
+            Route::post('/{filename}/create-products', [ScraperController::class, 'createProducts'])->name('create-products');
+            Route::delete('/{filename}', [ScraperController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('suppliers')->name('suppliers.')->group(function () {
+            Route::get('/', [SupplierController::class, 'index'])->name('index');
+            Route::get('/create', [SupplierController::class, 'create'])->name('create');
+            Route::post('/', [SupplierController::class, 'store'])->name('store');
+            Route::get('/{supplier}/edit', [SupplierController::class, 'edit'])->name('edit');
+            Route::put('/{supplier}', [SupplierController::class, 'update'])->name('update');
+            Route::delete('/{supplier}', [SupplierController::class, 'destroy'])->name('destroy');
+            Route::post('/{supplier}/toggle', [SupplierController::class, 'toggle'])->name('toggle');
+        });
+
+        Route::prefix('margins')->name('margins.')->group(function () {
+            Route::get('/', [MarginController::class, 'index'])->name('index');
+            Route::post('/global', [MarginController::class, 'storeGlobal'])->name('global.store');
+            Route::post('/product', [MarginController::class, 'storeProduct'])->name('product.store');
+            Route::put('/{margin}', [MarginController::class, 'update'])->name('update');
+            Route::delete('/{margin}', [MarginController::class, 'destroy'])->name('destroy');
+            Route::post('/{margin}/toggle', [MarginController::class, 'toggle'])->name('toggle');
+            Route::post('/recalculate', [MarginController::class, 'recalculate'])->name('recalculate');
+        });
+
         Route::prefix('settings')->name('settings.')->group(function () {
             Route::get('/', [SettingsController::class, 'index'])->name('index');
             Route::put('/{group}', [SettingsController::class, 'update'])->name('update');
@@ -282,12 +316,28 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [PortalPaymentController::class, 'index'])->name('index');
         });
 
+        Route::prefix('djomy')->name('djomy.')->group(function () {
+            // Paiement d'une échéance (commandes crédit)
+            Route::get('/checkout/{installment}',  [DjomyController::class, 'checkout'])->name('checkout');
+            Route::post('/checkout/{installment}', [DjomyController::class, 'initiateCheckout'])->name('checkout.initiate');
+            // Paiement d'une commande comptant
+            Route::get('/order-checkout/{order}',  [DjomyController::class, 'checkoutOrder'])->name('order.checkout');
+            Route::post('/order-checkout/{order}', [DjomyController::class, 'initiateOrderCheckout'])->name('order.checkout.initiate');
+            // Retour après paiement
+            Route::get('/return',        [DjomyController::class, 'return'])->name('return');
+            Route::get('/cancel',        [DjomyController::class, 'cancel'])->name('cancel');
+            Route::get('/check-status',  [DjomyController::class, 'checkStatus'])->name('check-status');
+        });
+
         Route::get('/profile', [PortalProfileController::class, 'show'])->name('profile');
         Route::put('/profile', [PortalProfileController::class, 'update'])->name('profile.update');
         Route::put('/profile/password', [PortalProfileController::class, 'changePassword'])->name('profile.password');
     });
 });
 
+
+// Djomy webhook — public, no auth required, CSRF excluded in bootstrap/app.php
+Route::post('/djomy/webhook', [DjomyController::class, 'webhook'])->name('djomy.webhook');
 
 //Tahoma - 400
 //

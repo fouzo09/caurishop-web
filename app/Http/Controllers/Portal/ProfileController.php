@@ -13,9 +13,10 @@ class ProfileController extends Controller
 {
     public function show(): View
     {
-        $user = auth()->user()->load('roles');
+        $user     = auth()->user()->load('roles', 'customer');
+        $customer = $user->customer;
 
-        return view('portal.profile.index', compact('user'));
+        return view('portal.profile.index', compact('user', 'customer'));
     }
 
     public function update(UpdateProfileRequest $request): RedirectResponse
@@ -27,7 +28,13 @@ class ProfileController extends Controller
             $data['email_verified_at'] = null;
         }
 
+        $phone = $data['phone'] ?? null;
+        unset($data['phone']);
         $user->update($data);
+
+        if ($phone !== null) {
+            $user->customer?->update(['phone' => $phone]);
+        }
 
         return redirect()->route('portal.profile')
             ->with('success', 'Profil mis à jour avec succès.');

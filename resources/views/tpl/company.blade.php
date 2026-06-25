@@ -24,8 +24,16 @@
         </div>
 
         <div class="menu-section">
+            <div class="menu-label">Catalogue</div>
+            <a href="{{ route('company.orders.create') }}" class="menu-item {{ request()->routeIs('company.orders.create') ? 'active' : '' }}">
+                <i class="fas fa-box"></i>
+                <span>Produits</span>
+            </a>
+        </div>
+
+        <div class="menu-section">
             <div class="menu-label">Gestion</div>
-            <a href="{{ route('company.orders.index') }}" class="menu-item {{ request()->routeIs('company.orders.*') ? 'active' : '' }}">
+            <a href="{{ route('company.orders.index') }}" class="menu-item {{ request()->routeIs('company.orders.*') && !request()->routeIs('company.orders.create') ? 'active' : '' }}">
                 <i class="fas fa-shopping-cart"></i>
                 <span>Commandes</span>
                 @php

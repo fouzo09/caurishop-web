@@ -6,6 +6,7 @@ use App\Repositories\Admin\ProductRepository;
 use App\Repositories\Admin\ProductVariantRepository;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Services\Admin\MarginService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
@@ -15,7 +16,8 @@ class ProductService
 {
     public function __construct(
         protected ProductRepository $productRepository,
-        protected ProductVariantRepository $variantRepository
+        protected ProductVariantRepository $variantRepository,
+        protected MarginService $marginService
     ) {}
 
     public function getPaginatedProducts(int $perPage = 15, array $filters = []): LengthAwarePaginator
@@ -47,7 +49,18 @@ class ProductService
             $data['is_published'] = $data['is_published'] ?? false;
             $data['credit_enabled'] = $data['credit_enabled'] ?? false;
 
+            // Calcul automatique du prix si supplier_price fourni (product ID pas encore connu, on utilisera la marge globale)
+            if (!empty($data['supplier_price'])) {
+                $data['price'] = $this->marginService->calculateSalePrice((float) $data['supplier_price']);
+            }
+
             $product = $this->productRepository->create($data);
+
+            // Re-calcul avec l'ID du produit maintenant connu (marge spécifique produit possible)
+            if ($product->supplier_price) {
+                $this->marginService->applyToProduct($product);
+                $product->refresh();
+            }
 
             // Si produit variable, créer les variantes
             if ($product->type === Product::TYPE_VARIABLE && !empty($data['variants'])) {
@@ -77,6 +90,12 @@ class ProductService
             }
 
             $this->productRepository->update($product, $data);
+
+            // Recalcul du prix si supplier_price présent
+            if (!empty($data['supplier_price'])) {
+                $product->refresh();
+                $this->marginService->applyToProduct($product);
+            }
 
             DB::commit();
 
@@ -171,12 +190,33 @@ class ProductService
         }
 
         $data['product_id'] = $product->id;
-        return $this->variantRepository->create($data);
+
+        if (!empty($data['supplier_price'])) {
+            $data['price'] = $this->marginService->calculateSalePrice(
+                (float) $data['supplier_price'],
+                $product->id
+            );
+        }
+
+        $variant = $this->variantRepository->create($data);
+
+        if ($variant->supplier_price) {
+            $this->marginService->applyToVariant($variant);
+            $variant->refresh();
+        }
+
+        return $variant;
     }
 
     public function updateVariant(ProductVariant $variant, array $data): ProductVariant
     {
         $this->variantRepository->update($variant, $data);
+
+        if (!empty($data['supplier_price'])) {
+            $variant->refresh();
+            $this->marginService->applyToVariant($variant);
+        }
+
         return $variant->fresh();
     }
 

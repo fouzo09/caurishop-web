@@ -43,18 +43,22 @@ class OrderService
                 $product = Product::findOrFail($item['product_id']);
                 $variant = isset($item['variant_id']) ? ProductVariant::find($item['variant_id']) : null;
 
-                $unitPrice = $variant ? (float) $variant->price : (float) $product->price;
-                $quantity  = (int) $item['quantity'];
-                $lineTotal = $unitPrice * $quantity;
+                $unitPrice     = $variant ? (float) $variant->price : (float) $product->price;
+                $supplierPrice = $variant ? (float) ($variant->supplier_price ?? 0) : (float) ($product->supplier_price ?? 0);
+                $quantity      = (int) $item['quantity'];
+                $lineTotal     = $unitPrice * $quantity;
+                $marginAmount  = $supplierPrice > 0 ? round(($unitPrice - $supplierPrice) * $quantity, 2) : null;
 
                 $totalAmount += $lineTotal;
 
                 $itemsData[] = [
-                    'product_id' => $product->id,
-                    'variant_id' => $variant?->id,
-                    'quantity'   => $quantity,
-                    'unit_price' => $unitPrice,
-                    'line_total' => $lineTotal,
+                    'product_id'          => $product->id,
+                    'variant_id'          => $variant?->id,
+                    'quantity'            => $quantity,
+                    'unit_price'          => $unitPrice,
+                    'supplier_unit_price' => $supplierPrice > 0 ? $supplierPrice : null,
+                    'line_total'          => $lineTotal,
+                    'margin_amount'       => $marginAmount,
                 ];
             }
 
@@ -72,11 +76,14 @@ class OrderService
                 }
             }
 
-            // Statut initial selon le contexte
-            // - pending_approval = soumis par un employé (doit être validé par l'admin entreprise)
-            // - draft            = créé par admin plateforme ou admin entreprise (bypass direct)
+            // Statut initial selon le contexte :
+            // - pending_payment  = cash portal (en attente de paiement Djomy)
+            // - pending_approval = crédit portal (doit être validé par l'admin entreprise)
+            // - draft            = créé par admin plateforme ou admin entreprise
             if (!empty($data['pending_approval'])) {
                 $initialStatus = Order::STATUS_PENDING_APPROVAL;
+            } elseif (!empty($data['pending_payment'])) {
+                $initialStatus = Order::STATUS_PENDING_PAYMENT;
             } else {
                 $initialStatus = Order::STATUS_DRAFT;
             }
@@ -118,8 +125,8 @@ class OrderService
 
     public function confirmOrder(Order $order): Order
     {
-        if ($order->status !== Order::STATUS_DRAFT) {
-            throw new \Exception('Seules les commandes en brouillon peuvent être confirmées.');
+        if (!in_array($order->status, [Order::STATUS_DRAFT, Order::STATUS_PENDING_APPROVAL])) {
+            throw new \Exception('Seules les commandes en brouillon ou en attente de validation peuvent être confirmées.');
         }
 
         DB::beginTransaction();
