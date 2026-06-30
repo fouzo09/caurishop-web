@@ -20,7 +20,7 @@ services:
       - caurishop
 
   app:
-    image: ghcr.io/fouzo09/caurishop:latest
+    image: ghcr.io/fouzo09/caurishop-web:latest
     container_name: caurishop_app
     restart: unless-stopped
     env_file: .env
