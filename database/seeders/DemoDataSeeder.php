@@ -12,7 +12,7 @@ class DemoDataSeeder extends Seeder
     {
         // ----- Companies
         $companyAId = DB::table('companies')->insertGetId([
-            'name' => 'CAURISHOP Entreprise A',
+            'raison_sociale' => 'CAURISHOP Entreprise A',
             'registration_number' => 'RCCM-0001',
             'email' => 'contactA@company.test',
             'phone' => '+224 000 000 001',
@@ -26,7 +26,7 @@ class DemoDataSeeder extends Seeder
         ]);
 
         $companyBId = DB::table('companies')->insertGetId([
-            'name' => 'CAURISHOP Entreprise B',
+            'raison_sociale' => 'CAURISHOP Entreprise B',
             'registration_number' => 'RCCM-0002',
             'email' => 'contactB@company.test',
             'phone' => '+224 000 000 002',
