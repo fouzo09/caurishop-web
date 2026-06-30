@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan de test — CauriShop</title>
+<style>
+  :root {
+    --primary: #0066ff;
+    --success: #16a34a;
+    --danger: #dc2626;
+    --warning: #d97706;
+    --gray: #6b7280;
+    --border: #e5e7eb;
+    --light: #f9fafb;
+    --dark: #111827;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: var(--dark); background: #f3f4f6; font-size: 14px; }
+  .cover { background: linear-gradient(135deg, #0066ff, #0040cc); color: #fff; padding: 3rem 2rem; text-align: center; }
+  .cover h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: .5rem; }
+  .cover p { opacity: .8; font-size: 1rem; }
+  .cover .meta { display: flex; justify-content: center; gap: 2.5rem; margin-top: 1.5rem; font-size: .85rem; opacity: .75; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1rem; }
+
+  /* TOC */
+  .toc { background: #fff; border-radius: 10px; border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 2rem; }
+  .toc h2 { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; color: var(--gray); text-transform: uppercase; letter-spacing: .06em; }
+  .toc ol { padding-left: 1.4rem; }
+  .toc li { margin-bottom: .35rem; }
+  .toc a { color: var(--primary); text-decoration: none; font-size: .9rem; }
+  .toc a:hover { text-decoration: underline; }
+
+  /* Data box */
+  .data-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 2rem; }
+  .data-box h3 { font-size: .85rem; font-weight: 700; color: #1d4ed8; margin-bottom: .6rem; text-transform: uppercase; letter-spacing: .05em; }
+  .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: .4rem .8rem; }
+  .data-item { font-size: .85rem; }
+  .data-item span { font-weight: 600; }
+
+  /* Module */
+  .module { margin-bottom: 2.5rem; }
+  .module-header { display: flex; align-items: center; gap: .75rem; margin-bottom: 1rem; }
+  .module-header h2 { font-size: 1.1rem; font-weight: 700; }
+  .module-badge { font-size: .7rem; font-weight: 700; padding: .2rem .6rem; border-radius: 999px; background: var(--primary); color: #fff; }
+
+  /* Test card */
+  .tc { background: #fff; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 1rem; overflow: hidden; }
+  .tc-head { display: flex; align-items: center; gap: .75rem; padding: .75rem 1rem; background: var(--light); border-bottom: 1px solid var(--border); }
+  .tc-id { font-size: .7rem; font-weight: 800; color: var(--primary); background: #eff6ff; padding: .2rem .5rem; border-radius: 4px; white-space: nowrap; }
+  .tc-title { font-weight: 600; font-size: .95rem; flex: 1; }
+  .tc-priority { font-size: .7rem; font-weight: 700; padding: .15rem .5rem; border-radius: 999px; }
+  .prio-high { background: #fee2e2; color: #b91c1c; }
+  .prio-med { background: #fef3c7; color: #92400e; }
+  .prio-low { background: #dcfce7; color: #166534; }
+
+  .tc-body { padding: 1rem; }
+  .section-label { font-size: .7rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: .07em; margin-bottom: .4rem; margin-top: .75rem; }
+  .section-label:first-child { margin-top: 0; }
+
+  .precond { font-size: .85rem; color: #374151; background: #fef9c3; border: 1px solid #fde68a; border-radius: 6px; padding: .4rem .75rem; margin-bottom: .5rem; }
+  .url-tag { font-family: 'Courier New', monospace; background: #1e293b; color: #7dd3fc; padding: .2rem .6rem; border-radius: 4px; font-size: .8rem; word-break: break-all; }
+
+  /* Steps table */
+  .steps-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+  .steps-table th { background: var(--light); font-weight: 600; text-align: left; padding: .45rem .7rem; border: 1px solid var(--border); font-size: .78rem; color: var(--gray); text-transform: uppercase; letter-spacing: .04em; }
+  .steps-table td { padding: .45rem .7rem; border: 1px solid var(--border); vertical-align: top; }
+  .steps-table tr:nth-child(even) td { background: #fafafa; }
+  .steps-table .num { text-align: center; font-weight: 700; color: var(--gray); width: 32px; }
+  .steps-table .action { width: 40%; }
+  .steps-table .expected { width: 35%; }
+  .steps-table .result { width: 12%; text-align: center; }
+  .steps-table .notes { width: 13%; }
+
+  .chk { display: flex; align-items: center; justify-content: center; gap: .3rem; }
+  .chk input[type=checkbox] { width: 15px; height: 15px; cursor: pointer; }
+  label.pass { color: var(--success); font-size: .75rem; font-weight: 600; cursor: pointer; }
+  label.fail { color: var(--danger); font-size: .75rem; font-weight: 600; cursor: pointer; }
+
+  .notes-input { width: 100%; border: 1px solid var(--border); border-radius: 4px; padding: .25rem .4rem; font-size: .78rem; font-family: inherit; resize: none; min-height: 36px; }
+
+  .expected-tag { display: inline-block; background: #dcfce7; color: #166534; font-size: .75rem; padding: .1rem .4rem; border-radius: 4px; font-weight: 600; }
+  .data-inline { font-family: 'Courier New', monospace; background: #f1f5f9; padding: .05rem .3rem; border-radius: 3px; font-size: .82rem; }
+
+  .tc-result { display: flex; align-items: center; gap: 1rem; padding: .6rem 1rem; background: #f8fafc; border-top: 1px solid var(--border); font-size: .82rem; }
+  .tc-result strong { color: var(--gray); }
+  .verdict { display: flex; align-items: center; gap: .3rem; }
+  .verdict input { width: 16px; height: 16px; cursor: pointer; }
+  label.verdict-pass { color: var(--success); font-weight: 700; cursor: pointer; }
+  label.verdict-fail { color: var(--danger); font-weight: 700; cursor: pointer; }
+  .bug-input { flex: 1; border: 1px solid var(--border); border-radius: 4px; padding: .25rem .5rem; font-size: .8rem; font-family: inherit; max-width: 300px; }
+
+  /* Print */
+  @media print {
+    body { background: #fff; }
+    .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .tc { break-inside: avoid; }
+    .module { break-before: page; }
+    .module:first-of-type { break-before: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Plan de test — CauriShop</h1>
+  <p>Tests de bout en bout · Données réelles · Version 1.0</p>
+  <div class="meta">
+    <span>Date : 2026-06-06</span>
+    <span>Environnement : localhost:8000</span>
+    <span>Testeur : _______________</span>
+    <span>Version : main @ HEAD</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Données de référence -->
+  <div class="data-box" style="margin-top:1.5rem;">
+    <h3>Données de test de référence</h3>
+    <div class="data-grid">
+      <div class="data-item">App URL : <span>http://localhost:8000</span></div>
+      <div class="data-item">Admin : <span>admin@caurishop.com</span></div>
+      <div class="data-item">Mot de passe admin : <span>password</span></div>
+      <div class="data-item">Entreprise : <span>SOGUIEZ SARL</span></div>
+      <div class="data-item">Email entreprise : <span>contact@soguiez.gn</span></div>
+      <div class="data-item">Tel entreprise : <span>+224 620 000 001</span></div>
+      <div class="data-item">Gérant : <span>Ibrahima Sow</span></div>
+      <div class="data-item">Tel gérant : <span>+224 622 111 222</span></div>
+      <div class="data-item">Employé portail : <span>acamara@soguiez.gn</span></div>
+      <div class="data-item">Produit simple : <span>Samsung Galaxy A55 5G</span></div>
+      <div class="data-item">Prix fournisseur : <span>1 200 000 GNF</span></div>
+      <div class="data-item">Produit variable : <span>Chemise Oxford Homme</span></div>
+      <div class="data-item">Variantes : <span>Blanc/Bleu × S/M/L/XL</span></div>
+      <div class="data-item">Fournisseur scraper : <span>Guangzhou Electronics Co.</span></div>
+      <div class="data-item">Djomy ClientID : <span>djomy-client-1752782800873-6f11</span></div>
+      <div class="data-item">Djomy Sandbox : <span>sandbox-api.djomy.africa</span></div>
+    </div>
+  </div>
+
+  <!-- Table des matières -->
+  <div class="toc">
+    <h2>Table des matières</h2>
+    <ol>
+      <li><a href="#m001">Module 001 — Inscription entreprise (/demarrer)</a></li>
+      <li><a href="#m010">Module 010 — Authentification admin</a></li>
+      <li><a href="#m020">Module 020 — Traitement des demandes d'inscription</a></li>
+      <li><a href="#m030">Module 030 — Produits simples (admin)</a></li>
+      <li><a href="#m040">Module 040 — Produits variables avec déclinaisons (admin)</a></li>
+      <li><a href="#m050">Module 050 — Scraper produits</a></li>
+      <li><a href="#m060">Module 060 — Gestion fournisseurs</a></li>
+      <li><a href="#m070">Module 070 — Marges plateforme</a></li>
+      <li><a href="#m080">Module 080 — Clients (admin)</a></li>
+      <li><a href="#m090">Module 090 — Commandes (admin)</a></li>
+      <li><a href="#m100">Module 100 — Paiements et échéances (admin)</a></li>
+      <li><a href="#m110">Module 110 — Portail client — Passer une commande</a></li>
+      <li><a href="#m120">Module 120 — Portail client — Paiement Djomy</a></li>
+      <li><a href="#m130">Module 130 — Sécurité et logs</a></li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- MODULE 001 — Inscription -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="module" id="m001">
+    <div class="module-header">
+      <span class="module-badge">001</span>
+      <h2>Inscription entreprise — /demarrer</h2>
+    </div>
+
+    <!-- TC-001-01 -->
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-001-01</span>
+        <span class="tc-title">Affichage de la page d'inscription multi-étapes</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">URL</div>
+        <div class="url-tag">GET http://localhost:8000/demarrer</div>
+        <div class="section-label">Étapes</div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Ouvrir la page en mode non connecté</td><td>Formulaire 4 étapes affiché, étape 1 active</td><td class="result"><div class="chk"><input type="checkbox" id="c001-01-1"><label class="pass" for="c001-01-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Vérifier que les 4 onglets sont visibles : Gérant, Entreprise, Documents, Confirmation</td><td>4 onglets / étapes affichés en haut</td><td class="result"><div class="chk"><input type="checkbox" id="c001-01-2"><label class="pass" for="c001-01-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">3</td><td>Vérifier la mise en page sur mobile (viewport 375px)</td><td>Formulaire lisible, pas de débordement horizontal</td><td class="result"><div class="chk"><input type="checkbox" id="c001-01-3"><label class="pass" for="c001-01-3">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v001-01-p"><label class="verdict-pass" for="v001-01-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v001-01-f"><label class="verdict-fail" for="v001-01-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+
+    <!-- TC-001-02 -->
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-001-02</span>
+        <span class="tc-title">Soumission complète d'une demande (cas nominal)</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">URL</div>
+        <div class="url-tag">POST http://localhost:8000/demarrer</div>
+        <div class="section-label">Données</div>
+        <div class="precond">
+          Gérant : <span class="data-inline">Ibrahima</span> / <span class="data-inline">Sow</span> / <span class="data-inline">+224 622 111 222</span> / <span class="data-inline">CNI 1234567</span> / <span class="data-inline">Kaloum, Conakry</span><br>
+          Entreprise : <span class="data-inline">SOGUIEZ SARL</span> / <span class="data-inline">contact@soguiez.gn</span> / <span class="data-inline">+224 620 000 001</span> / <span class="data-inline">Date création : 2020-01-15</span> / <span class="data-inline">12 employés</span><br>
+          Documents : PDF valides pour RCCM, NIF, Statuts, CNI, Patente, Domicile
+        </div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Remplir étape 1 (gérant) avec les données ci-dessus, cliquer Suivant</td><td>Passage à l'étape 2 sans erreur</td><td class="result"><div class="chk"><input type="checkbox" id="c001-02-1"><label class="pass" for="c001-02-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Remplir étape 2 (entreprise), cliquer Suivant</td><td>Passage à l'étape 3</td><td class="result"><div class="chk"><input type="checkbox" id="c001-02-2"><label class="pass" for="c001-02-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">3</td><td>Uploader les 6 documents PDF (max 5 Mo chacun), cliquer Suivant</td><td>Passage à l'étape 4 (récap)</td><td class="result"><div class="chk"><input type="checkbox" id="c001-02-3"><label class="pass" for="c001-02-3">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">4</td><td>Vérifier le récapitulatif, cliquer Soumettre</td><td>Redirection vers page de confirmation "Demande reçue"</td><td class="result"><div class="chk"><input type="checkbox" id="c001-02-4"><label class="pass" for="c001-02-4">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">5</td><td>Vérifier en base : <span class="data-inline">SELECT * FROM companies WHERE raison_sociale='SOGUIEZ SARL'</span></td><td>1 ligne avec status=<span class="data-inline">pending</span>, is_active=0</td><td class="result"><div class="chk"><input type="checkbox" id="c001-02-5"><label class="pass" for="c001-02-5">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">6</td><td>Vérifier stockage fichiers : <span class="data-inline">storage/app/public/companies/{id}/</span></td><td>6 fichiers PDF présents</td><td class="result"><div class="chk"><input type="checkbox" id="c001-02-6"><label class="pass" for="c001-02-6">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v001-02-p"><label class="verdict-pass" for="v001-02-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v001-02-f"><label class="verdict-fail" for="v001-02-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+
+    <!-- TC-001-03 -->
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-001-03</span>
+        <span class="tc-title">Validation — champs obligatoires manquants</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Soumettre le formulaire étape 1 sans remplir aucun champ</td><td>Messages d'erreur sous chaque champ obligatoire</td><td class="result"><div class="chk"><input type="checkbox" id="c001-03-1"><label class="pass" for="c001-03-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Uploader un fichier .exe à la place d'un PDF</td><td>Erreur de validation : "Le fichier doit être un PDF"</td><td class="result"><div class="chk"><input type="checkbox" id="c001-03-2"><label class="pass" for="c001-03-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">3</td><td>Uploader un PDF de 12 Mo (dépasse la limite)</td><td>Erreur : taille maximale dépassée</td><td class="result"><div class="chk"><input type="checkbox" id="c001-03-3"><label class="pass" for="c001-03-3">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v001-03-p"><label class="verdict-pass" for="v001-03-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v001-03-f"><label class="verdict-fail" for="v001-03-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+  </div><!-- /module 001 -->
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- MODULE 010 — Auth admin -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="module" id="m010">
+    <div class="module-header">
+      <span class="module-badge">010</span>
+      <h2>Authentification admin</h2>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-010-01</span>
+        <span class="tc-title">Connexion admin avec identifiants valides</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">URL</div>
+        <div class="url-tag">GET/POST http://localhost:8000/login</div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Aller sur <span class="data-inline">/login</span>, saisir <span class="data-inline">admin@caurishop.com</span> / <span class="data-inline">password</span></td><td>Redirection vers /admin/dashboard</td><td class="result"><div class="chk"><input type="checkbox" id="c010-01-1"><label class="pass" for="c010-01-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Vérifier que le menu admin est affiché</td><td>Sidebar avec toutes les rubriques admin</td><td class="result"><div class="chk"><input type="checkbox" id="c010-01-2"><label class="pass" for="c010-01-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">3</td><td>Accéder à <span class="data-inline">/admin/orders</span> sans être connecté (nouvel onglet privé)</td><td>Redirection vers /login</td><td class="result"><div class="chk"><input type="checkbox" id="c010-01-3"><label class="pass" for="c010-01-3">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v010-01-p"><label class="verdict-pass" for="v010-01-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v010-01-f"><label class="verdict-fail" for="v010-01-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-010-02</span>
+        <span class="tc-title">Connexion avec mauvais mot de passe</span>
+        <span class="tc-priority prio-med">Moyenne</span>
+      </div>
+      <div class="tc-body">
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Saisir <span class="data-inline">admin@caurishop.com</span> / <span class="data-inline">mauvais123</span> et soumettre</td><td>Message "Ces identifiants ne correspondent pas", pas de redirection</td><td class="result"><div class="chk"><input type="checkbox" id="c010-02-1"><label class="pass" for="c010-02-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Tenter 5 fois de suite avec un mauvais mot de passe</td><td>Throttling activé, message "Trop de tentatives"</td><td class="result"><div class="chk"><input type="checkbox" id="c010-02-2"><label class="pass" for="c010-02-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v010-02-p"><label class="verdict-pass" for="v010-02-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v010-02-f"><label class="verdict-fail" for="v010-02-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+  </div><!-- /module 010 -->
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- MODULE 020 — Demandes inscription -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="module" id="m020">
+    <div class="module-header">
+      <span class="module-badge">020</span>
+      <h2>Traitement des demandes d'inscription (admin)</h2>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-020-01</span>
+        <span class="tc-title">Voir la liste des demandes en attente</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">Prérequis</div>
+        <div class="precond">TC-001-02 exécuté avec succès (SOGUIEZ SARL en statut pending)</div>
+        <div class="section-label">URL</div>
+        <div class="url-tag">GET http://localhost:8000/admin/companies?status=pending</div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Naviguer vers /admin/companies, filtrer par "En attente"</td><td>SOGUIEZ SARL apparaît avec badge "En attente"</td><td class="result"><div class="chk"><input type="checkbox" id="c020-01-1"><label class="pass" for="c020-01-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Vérifier que le compteur de demandes en attente est visible dans le menu</td><td>Badge rouge avec le nombre de demandes pending</td><td class="result"><div class="chk"><input type="checkbox" id="c020-01-2"><label class="pass" for="c020-01-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v020-01-p"><label class="verdict-pass" for="v020-01-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v020-01-f"><label class="verdict-fail" for="v020-01-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-020-02</span>
+        <span class="tc-title">Approuver une demande et créer le compte</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">URL</div>
+        <div class="url-tag">POST http://localhost:8000/admin/companies/{id}/approve</div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Ouvrir la fiche SOGUIEZ SARL, cliquer "Approuver"</td><td>Modal de confirmation avec champ limite de crédit</td><td class="result"><div class="chk"><input type="checkbox" id="c020-02-1"><label class="pass" for="c020-02-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Saisir limite de crédit <span class="data-inline">5 000 000 GNF</span>, confirmer</td><td>Statut passe à "Approuvée", is_active=1</td><td class="result"><div class="chk"><input type="checkbox" id="c020-02-2"><label class="pass" for="c020-02-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">3</td><td>Vérifier en base : <span class="data-inline">SELECT status, is_active, credit_limit FROM companies</span></td><td>status=approved, is_active=1, credit_limit=5000000</td><td class="result"><div class="chk"><input type="checkbox" id="c020-02-3"><label class="pass" for="c020-02-3">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">4</td><td>Vérifier qu'une notification a été envoyée (logs ou email)</td><td>Entrée dans la table notifications ou email reçu</td><td class="result"><div class="chk"><input type="checkbox" id="c020-02-4"><label class="pass" for="c020-02-4">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v020-02-p"><label class="verdict-pass" for="v020-02-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v020-02-f"><label class="verdict-fail" for="v020-02-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-020-03</span>
+        <span class="tc-title">Rejeter une demande avec motif</span>
+        <span class="tc-priority prio-med">Moyenne</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">URL</div>
+        <div class="url-tag">POST http://localhost:8000/admin/companies/{id}/reject</div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Créer une 2e demande (entreprise test "ALPHA SAS"), accéder à sa fiche</td><td>Fiche affichée avec statut pending</td><td class="result"><div class="chk"><input type="checkbox" id="c020-03-1"><label class="pass" for="c020-03-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Cliquer "Rejeter", saisir motif "Documents illisibles", confirmer</td><td>Statut passe à "Rejetée"</td><td class="result"><div class="chk"><input type="checkbox" id="c020-03-2"><label class="pass" for="c020-03-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">3</td><td>Vérifier que is_active reste 0</td><td><span class="data-inline">is_active = 0</span> en base</td><td class="result"><div class="chk"><input type="checkbox" id="c020-03-3"><label class="pass" for="c020-03-3">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v020-03-p"><label class="verdict-pass" for="v020-03-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v020-03-f"><label class="verdict-fail" for="v020-03-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+  </div><!-- /module 020 -->
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- MODULE 030 — Produits simples -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="module" id="m030">
+    <div class="module-header">
+      <span class="module-badge">030</span>
+      <h2>Produits simples (admin)</h2>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-030-01</span>
+        <span class="tc-title">Créer un produit simple (Samsung Galaxy A55 5G)</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">Prérequis</div>
+        <div class="precond">Un fournisseur "Guangzhou Electronics Co." existe. Une catégorie "Smartphones" existe.</div>
+        <div class="section-label">URL</div>
+        <div class="url-tag">GET http://localhost:8000/admin/products/create</div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Remplir : Nom = <span class="data-inline">Samsung Galaxy A55 5G</span>, Catégorie = Smartphones, Fournisseur = Guangzhou Electronics</td><td>Champs remplis sans erreur</td><td class="result"><div class="chk"><input type="checkbox" id="c030-01-1"><label class="pass" for="c030-01-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Prix fournisseur = <span class="data-inline">1 200 000</span>, vérifier que le prix de vente calculé s'affiche</td><td>Prix de vente = prix fournisseur × (1 + marge%)</td><td class="result"><div class="chk"><input type="checkbox" id="c030-01-2"><label class="pass" for="c030-01-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">3</td><td>Uploader une image JPG (< 2 Mo), soumettre le formulaire</td><td>Redirection vers liste produits avec message "Produit créé"</td><td class="result"><div class="chk"><input type="checkbox" id="c030-01-3"><label class="pass" for="c030-01-3">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">4</td><td>Vérifier en base : <span class="data-inline">SELECT name, supplier_price, price FROM products WHERE name LIKE '%Galaxy A55%'</span></td><td>1 ligne avec supplier_price=1200000</td><td class="result"><div class="chk"><input type="checkbox" id="c030-01-4"><label class="pass" for="c030-01-4">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v030-01-p"><label class="verdict-pass" for="v030-01-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v030-01-f"><label class="verdict-fail" for="v030-01-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-030-02</span>
+        <span class="tc-title">Modifier un produit — changer le prix fournisseur</span>
+        <span class="tc-priority prio-med">Moyenne</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">Prérequis</div>
+        <div class="precond">TC-030-01 exécuté (Galaxy A55 existe)</div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Ouvrir la fiche du Galaxy A55, cliquer Modifier</td><td>Formulaire d'édition pré-rempli</td><td class="result"><div class="chk"><input type="checkbox" id="c030-02-1"><label class="pass" for="c030-02-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Changer prix fournisseur à <span class="data-inline">1 100 000</span>, enregistrer</td><td>Flash "Produit mis à jour", nouveau prix affiché</td><td class="result"><div class="chk"><input type="checkbox" id="c030-02-2"><label class="pass" for="c030-02-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v030-02-p"><label class="verdict-pass" for="v030-02-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v030-02-f"><label class="verdict-fail" for="v030-02-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+  </div><!-- /module 030 -->
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- MODULE 040 — Produits variables -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="module" id="m040">
+    <div class="module-header">
+      <span class="module-badge">040</span>
+      <h2>Produits variables avec déclinaisons (admin)</h2>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-040-01</span>
+        <span class="tc-title">Créer un produit variable "Chemise Oxford Homme"</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">Données</div>
+        <div class="precond">
+          Produit : <span class="data-inline">Chemise Oxford Homme</span>, Type : Variable<br>
+          Déclinaisons : Blanc-S, Blanc-M, Blanc-L, Blanc-XL, Bleu-S, Bleu-M, Bleu-L, Bleu-XL<br>
+          Prix fournisseur variant : <span class="data-inline">85 000 GNF</span> chacun
+        </div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Créer le produit parent "Chemise Oxford Homme", type=variable</td><td>Produit créé, section déclinaisons visible</td><td class="result"><div class="chk"><input type="checkbox" id="c040-01-1"><label class="pass" for="c040-01-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Ajouter variant "Blanc / S" avec prix fournisseur 85 000</td><td>Variant enregistré, prix de vente calculé</td><td class="result"><div class="chk"><input type="checkbox" id="c040-01-2"><label class="pass" for="c040-01-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">3</td><td>Répéter pour les 7 autres combinaisons couleur × taille</td><td>8 variants créés au total</td><td class="result"><div class="chk"><input type="checkbox" id="c040-01-3"><label class="pass" for="c040-01-3">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">4</td><td>Vérifier en base : <span class="data-inline">SELECT COUNT(*) FROM product_variants WHERE product_id=?</span></td><td>COUNT = 8</td><td class="result"><div class="chk"><input type="checkbox" id="c040-01-4"><label class="pass" for="c040-01-4">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v040-01-p"><label class="verdict-pass" for="v040-01-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v040-01-f"><label class="verdict-fail" for="v040-01-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+  </div><!-- /module 040 -->
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- MODULE 050 — Scraper -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="module" id="m050">
+    <div class="module-header">
+      <span class="module-badge">050</span>
+      <h2>Scraper produits</h2>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-050-01</span>
+        <span class="tc-title">Scraper via HTML collé — extraction produits basique</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">Prérequis</div>
+        <div class="precond">Fournisseur "Guangzhou Electronics Co." existe et est actif. Clé API Anthropic configurée dans .env</div>
+        <div class="section-label">URL</div>
+        <div class="url-tag">POST http://localhost:8000/admin/scraper/run-html</div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Naviguer vers /admin/scraper, coller le HTML d'une page produit Shein (copier-coller depuis navigateur), soumettre</td><td>Redirection vers /admin/scraper/results/{filename}</td><td class="result"><div class="chk"><input type="checkbox" id="c050-01-1"><label class="pass" for="c050-01-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Vérifier que ≥ 1 produit est affiché avec nom, prix et image</td><td>Carte produit avec données extraites</td><td class="result"><div class="chk"><input type="checkbox" id="c050-01-2"><label class="pass" for="c050-01-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">3</td><td>Vérifier que les images se chargent (proxy imageProxy)</td><td>Images visibles, pas d'icône brisée</td><td class="result"><div class="chk"><input type="checkbox" id="c050-01-3"><label class="pass" for="c050-01-3">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v050-01-p"><label class="verdict-pass" for="v050-01-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v050-01-f"><label class="verdict-fail" for="v050-01-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-050-02</span>
+        <span class="tc-title">Scraper — extraction des déclinaisons (produit variable)</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">Prérequis</div>
+        <div class="precond">Utiliser un HTML de page produit Shopify contenant des variantes couleur/taille (ex: boutique Fashion Nova ou similaire Shopify)</div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Coller le HTML d'un produit Shopify avec déclinaisons, scraper</td><td>Produits extraits, au moins 1 groupe avec variantes</td><td class="result"><div class="chk"><input type="checkbox" id="c050-02-1"><label class="pass" for="c050-02-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Cocher ce produit, choisir fournisseur "Guangzhou Electronics", cliquer "Réviser"</td><td>Page review affichée avec tableau de variants (Couleur / Taille)</td><td class="result"><div class="chk"><input type="checkbox" id="c050-02-2"><label class="pass" for="c050-02-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">3</td><td>Vérifier que les colonnes Couleur et Taille sont pré-remplies (pas vides)</td><td>Champs Couleur et Taille remplis avec les valeurs du scraper</td><td class="result"><div class="chk"><input type="checkbox" id="c050-02-3"><label class="pass" for="c050-02-3">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">4</td><td>Cliquer "Importer", confirmer</td><td>Flash "N produit(s) créé(s)", redirection vers /admin/products</td><td class="result"><div class="chk"><input type="checkbox" id="c050-02-4"><label class="pass" for="c050-02-4">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">5</td><td>Ouvrir le produit importé, vérifier onglet Déclinaisons</td><td>Toutes les déclinaisons présentes avec attributs Couleur/Taille</td><td class="result"><div class="chk"><input type="checkbox" id="c050-02-5"><label class="pass" for="c050-02-5">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">6</td><td>Vérifier que les images de chaque variante sont stockées séparément</td><td>Chaque image a un nom de fichier unique (scraped_{id}_{index})</td><td class="result"><div class="chk"><input type="checkbox" id="c050-02-6"><label class="pass" for="c050-02-6">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v050-02-p"><label class="verdict-pass" for="v050-02-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v050-02-f"><label class="verdict-fail" for="v050-02-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-050-03</span>
+        <span class="tc-title">Scraper — fournisseur obligatoire</span>
+        <span class="tc-priority prio-med">Moyenne</span>
+      </div>
+      <div class="tc-body">
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Cocher des produits, NE PAS choisir de fournisseur, cliquer "Réviser"</td><td>Erreur "Sélectionnez un fournisseur"</td><td class="result"><div class="chk"><input type="checkbox" id="c050-03-1"><label class="pass" for="c050-03-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Choisir un fournisseur, NE PAS cocher de produit, cliquer "Réviser"</td><td>Erreur "Sélectionnez au moins un produit"</td><td class="result"><div class="chk"><input type="checkbox" id="c050-03-2"><label class="pass" for="c050-03-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v050-03-p"><label class="verdict-pass" for="v050-03-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v050-03-f"><label class="verdict-fail" for="v050-03-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+  </div><!-- /module 050 -->
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- MODULE 060 — Fournisseurs -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="module" id="m060">
+    <div class="module-header">
+      <span class="module-badge">060</span>
+      <h2>Gestion fournisseurs</h2>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-060-01</span>
+        <span class="tc-title">Créer un fournisseur</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">URL</div>
+        <div class="url-tag">GET http://localhost:8000/admin/suppliers/create</div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Remplir : Nom = <span class="data-inline">Guangzhou Electronics Co.</span>, Pays = Chine, Actif = Oui</td><td>Fournisseur créé</td><td class="result"><div class="chk"><input type="checkbox" id="c060-01-1"><label class="pass" for="c060-01-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Vérifier que ce fournisseur apparaît dans le select du scraper</td><td>Option visible dans le <select> /admin/scraper/*</td><td class="result"><div class="chk"><input type="checkbox" id="c060-01-2"><label class="pass" for="c060-01-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">3</td><td>Désactiver le fournisseur (is_active = false)</td><td>Fournisseur n'apparaît plus dans le select du scraper</td><td class="result"><div class="chk"><input type="checkbox" id="c060-01-3"><label class="pass" for="c060-01-3">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v060-01-p"><label class="verdict-pass" for="v060-01-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v060-01-f"><label class="verdict-fail" for="v060-01-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+  </div><!-- /module 060 -->
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- MODULE 070 — Marges -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="module" id="m070">
+    <div class="module-header">
+      <span class="module-badge">070</span>
+      <h2>Marges plateforme</h2>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-070-01</span>
+        <span class="tc-title">Configurer une marge et vérifier l'impact sur les prix</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">URL</div>
+        <div class="url-tag">GET http://localhost:8000/admin/margins</div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Définir marge globale = <span class="data-inline">30%</span></td><td>Marge enregistrée</td><td class="result"><div class="chk"><input type="checkbox" id="c070-01-1"><label class="pass" for="c070-01-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Vérifier le prix de vente du Galaxy A55 (prix fournisseur 1 200 000)</td><td>Prix de vente = 1 200 000 × 1.30 = <span class="data-inline">1 560 000 GNF</span></td><td class="result"><div class="chk"><input type="checkbox" id="c070-01-2"><label class="pass" for="c070-01-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">3</td><td>Définir une marge spécifique à la catégorie "Smartphones" = <span class="data-inline">25%</span></td><td>Marge catégorie prime sur la marge globale</td><td class="result"><div class="chk"><input type="checkbox" id="c070-01-3"><label class="pass" for="c070-01-3">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">4</td><td>Re-vérifier le prix du Galaxy A55</td><td>Prix = 1 200 000 × 1.25 = <span class="data-inline">1 500 000 GNF</span></td><td class="result"><div class="chk"><input type="checkbox" id="c070-01-4"><label class="pass" for="c070-01-4">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v070-01-p"><label class="verdict-pass" for="v070-01-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v070-01-f"><label class="verdict-fail" for="v070-01-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+  </div><!-- /module 070 -->
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- MODULE 080 — Clients -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="module" id="m080">
+    <div class="module-header">
+      <span class="module-badge">080</span>
+      <h2>Clients (admin)</h2>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-080-01</span>
+        <span class="tc-title">Créer un utilisateur portail pour SOGUIEZ SARL</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">Prérequis</div>
+        <div class="precond">TC-020-02 exécuté (SOGUIEZ SARL approuvée)</div>
+        <div class="section-label">URL</div>
+        <div class="url-tag">GET http://localhost:8000/admin/customers/create</div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Créer utilisateur : Prénom = <span class="data-inline">Aïssatou</span>, Nom = <span class="data-inline">Camara</span>, Email = <span class="data-inline">acamara@soguiez.gn</span>, Entreprise = SOGUIEZ SARL</td><td>Utilisateur créé, email de bienvenue envoyé</td><td class="result"><div class="chk"><input type="checkbox" id="c080-01-1"><label class="pass" for="c080-01-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Vérifier que l'utilisateur peut se connecter sur /portal/login</td><td>Accès au portail client (dashboard)</td><td class="result"><div class="chk"><input type="checkbox" id="c080-01-2"><label class="pass" for="c080-01-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v080-01-p"><label class="verdict-pass" for="v080-01-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v080-01-f"><label class="verdict-fail" for="v080-01-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+  </div><!-- /module 080 -->
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- MODULE 090 — Commandes admin -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="module" id="m090">
+    <div class="module-header">
+      <span class="module-badge">090</span>
+      <h2>Commandes (admin)</h2>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-090-01</span>
+        <span class="tc-title">Voir et filtrer les commandes</span>
+        <span class="tc-priority prio-med">Moyenne</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">Prérequis</div>
+        <div class="precond">TC-110-01 exécuté (au moins une commande passée depuis le portail)</div>
+        <div class="section-label">URL</div>
+        <div class="url-tag">GET http://localhost:8000/admin/orders</div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Filtrer par statut <span class="data-inline">pending_approval</span></td><td>Seules les commandes en attente d'approbation listées</td><td class="result"><div class="chk"><input type="checkbox" id="c090-01-1"><label class="pass" for="c090-01-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Ouvrir une commande, vérifier les lignes de commande (produits + quantités)</td><td>Détail correct avec totaux</td><td class="result"><div class="chk"><input type="checkbox" id="c090-01-2"><label class="pass" for="c090-01-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v090-01-p"><label class="verdict-pass" for="v090-01-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v090-01-f"><label class="verdict-fail" for="v090-01-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-090-02</span>
+        <span class="tc-title">Approuver une commande — transition de statut</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Ouvrir une commande <span class="data-inline">pending_approval</span>, cliquer "Confirmer"</td><td>Statut → <span class="data-inline">confirmed</span>, flash succès</td><td class="result"><div class="chk"><input type="checkbox" id="c090-02-1"><label class="pass" for="c090-02-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Passer la commande en <span class="data-inline">completed</span></td><td>Statut mis à jour, visible sur le portail client</td><td class="result"><div class="chk"><input type="checkbox" id="c090-02-2"><label class="pass" for="c090-02-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">3</td><td>Tenter d'annuler une commande <span class="data-inline">completed</span></td><td>Action refusée ou avertissement (commande déjà terminée)</td><td class="result"><div class="chk"><input type="checkbox" id="c090-02-3"><label class="pass" for="c090-02-3">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v090-02-p"><label class="verdict-pass" for="v090-02-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v090-02-f"><label class="verdict-fail" for="v090-02-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+  </div><!-- /module 090 -->
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- MODULE 100 — Paiements & échéances -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="module" id="m100">
+    <div class="module-header">
+      <span class="module-badge">100</span>
+      <h2>Paiements et échéances (admin)</h2>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-100-01</span>
+        <span class="tc-title">Enregistrer un paiement manuel (virement)</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">Prérequis</div>
+        <div class="precond">Commande confirmée avec une échéance en statut <span class="data-inline">pending</span></div>
+        <div class="section-label">URL</div>
+        <div class="url-tag">POST http://localhost:8000/admin/payments</div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Naviguer sur la fiche de l'échéance, cliquer "Enregistrer paiement"</td><td>Modal ou page de saisie paiement</td><td class="result"><div class="chk"><input type="checkbox" id="c100-01-1"><label class="pass" for="c100-01-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Saisir montant = <span class="data-inline">500 000 GNF</span>, méthode = <span class="data-inline">transfer</span>, référence = <span class="data-inline">VIR-20260606-001</span></td><td>Paiement enregistré</td><td class="result"><div class="chk"><input type="checkbox" id="c100-01-2"><label class="pass" for="c100-01-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">3</td><td>Vérifier que le statut de l'échéance passe à <span class="data-inline">partial</span> ou <span class="data-inline">paid</span> selon le montant</td><td>Statut correct, solde restant mis à jour</td><td class="result"><div class="chk"><input type="checkbox" id="c100-01-3"><label class="pass" for="c100-01-3">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v100-01-p"><label class="verdict-pass" for="v100-01-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v100-01-f"><label class="verdict-fail" for="v100-01-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+  </div><!-- /module 100 -->
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- MODULE 110 — Portail client — Commande -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="module" id="m110">
+    <div class="module-header">
+      <span class="module-badge">110</span>
+      <h2>Portail client — Passer une commande</h2>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-110-01</span>
+        <span class="tc-title">Passer une commande simple (Galaxy A55 5G)</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">Prérequis</div>
+        <div class="precond">TC-080-01 exécuté — connecté en tant que Aïssatou Camara (acamara@soguiez.gn)</div>
+        <div class="section-label">URL</div>
+        <div class="url-tag">GET http://localhost:8000/portal/orders/create</div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Naviguer vers /portal/orders/create, chercher "Samsung Galaxy A55"</td><td>Produit trouvé dans la liste</td><td class="result"><div class="chk"><input type="checkbox" id="c110-01-1"><label class="pass" for="c110-01-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Ajouter 2 unités au panier, vérifier le total = 2 × prix de vente</td><td>Total correct en GNF</td><td class="result"><div class="chk"><input type="checkbox" id="c110-01-2"><label class="pass" for="c110-01-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">3</td><td>Choisir mode de paiement = <span class="data-inline">cash</span>, soumettre la commande</td><td>Commande créée, statut = <span class="data-inline">pending_approval</span></td><td class="result"><div class="chk"><input type="checkbox" id="c110-01-3"><label class="pass" for="c110-01-3">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">4</td><td>Vérifier dans /portal/orders que la commande apparaît</td><td>Ligne avec numéro de commande, montant, statut</td><td class="result"><div class="chk"><input type="checkbox" id="c110-01-4"><label class="pass" for="c110-01-4">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v110-01-p"><label class="verdict-pass" for="v110-01-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v110-01-f"><label class="verdict-fail" for="v110-01-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-110-02</span>
+        <span class="tc-title">Commande avec déclinaison (Chemise Oxford — Blanc / L)</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">Prérequis</div>
+        <div class="precond">TC-040-01 exécuté (Chemise Oxford avec 8 variants)</div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Chercher "Chemise Oxford" dans le formulaire de commande</td><td>Produit variable trouvé, sélecteur de déclinaison visible</td><td class="result"><div class="chk"><input type="checkbox" id="c110-02-1"><label class="pass" for="c110-02-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Sélectionner déclinaison <span class="data-inline">Blanc / L</span>, quantité = 5</td><td>Prix × 5 calculé avec la marge</td><td class="result"><div class="chk"><input type="checkbox" id="c110-02-2"><label class="pass" for="c110-02-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">3</td><td>Vérifier en base : <span class="data-inline">SELECT * FROM order_items WHERE product_variant_id IS NOT NULL</span></td><td>Ligne avec product_variant_id renseigné</td><td class="result"><div class="chk"><input type="checkbox" id="c110-02-3"><label class="pass" for="c110-02-3">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v110-02-p"><label class="verdict-pass" for="v110-02-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v110-02-f"><label class="verdict-fail" for="v110-02-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-110-03</span>
+        <span class="tc-title">Portail — Voir le détail d'une commande et l'historique</span>
+        <span class="tc-priority prio-med">Moyenne</span>
+      </div>
+      <div class="tc-body">
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Cliquer sur la commande dans /portal/orders</td><td>Page détail : lignes produit, statut, total, échéances</td><td class="result"><div class="chk"><input type="checkbox" id="c110-03-1"><label class="pass" for="c110-03-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Vérifier que les commandes d'une autre entreprise ne sont PAS visibles</td><td>Pas de fuite de données inter-entreprise</td><td class="result"><div class="chk"><input type="checkbox" id="c110-03-2"><label class="pass" for="c110-03-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v110-03-p"><label class="verdict-pass" for="v110-03-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v110-03-f"><label class="verdict-fail" for="v110-03-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+  </div><!-- /module 110 -->
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- MODULE 120 — Djomy payment -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="module" id="m120">
+    <div class="module-header">
+      <span class="module-badge">120</span>
+      <h2>Portail client — Paiement Djomy Mobile Money</h2>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-120-01</span>
+        <span class="tc-title">Initier un paiement d'échéance via Djomy (sandbox)</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">Prérequis</div>
+        <div class="precond">
+          Commande confirmée avec une échéance en attente.<br>
+          .env : <span class="data-inline">DJOMY_ENV=sandbox</span>, <span class="data-inline">DJOMY_CLIENT_ID=djomy-client-1752782800873-6f11</span>, <span class="data-inline">DJOMY_SECRET_KEY</span> configuré
+        </div>
+        <div class="section-label">URL</div>
+        <div class="url-tag">POST http://localhost:8000/portal/djomy/checkout/{installment}</div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Sur la page de l'échéance, cliquer "Payer via Djomy"</td><td>Redirection vers l'URL de paiement Djomy sandbox</td><td class="result"><div class="chk"><input type="checkbox" id="c120-01-1"><label class="pass" for="c120-01-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Compléter le paiement sur la page Djomy sandbox</td><td>Retour sur /portal/djomy/return/{transaction}</td><td class="result"><div class="chk"><input type="checkbox" id="c120-01-2"><label class="pass" for="c120-01-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">3</td><td>Vérifier que la page de retour affiche "Paiement en cours de vérification"</td><td>Spinner / message d'attente, puis confirmation</td><td class="result"><div class="chk"><input type="checkbox" id="c120-01-3"><label class="pass" for="c120-01-3">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">4</td><td>Vérifier en base : <span class="data-inline">SELECT status FROM djomy_transactions WHERE id=?</span></td><td>status = <span class="data-inline">success</span></td><td class="result"><div class="chk"><input type="checkbox" id="c120-01-4"><label class="pass" for="c120-01-4">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">5</td><td>Vérifier que le statut de l'échéance est passé à <span class="data-inline">paid</span></td><td>Echéance marquée payée</td><td class="result"><div class="chk"><input type="checkbox" id="c120-01-5"><label class="pass" for="c120-01-5">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v120-01-p"><label class="verdict-pass" for="v120-01-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v120-01-f"><label class="verdict-fail" for="v120-01-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-120-02</span>
+        <span class="tc-title">Webhook Djomy — paiement réussi</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">URL</div>
+        <div class="url-tag">POST http://localhost:8000/portal/djomy/webhook</div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Simuler un POST webhook avec signature HMAC-SHA256 valide, event = <span class="data-inline">payment.success</span></td><td>HTTP 200, paiement traité</td><td class="result"><div class="chk"><input type="checkbox" id="c120-02-1"><label class="pass" for="c120-02-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Simuler le même webhook avec une signature invalide</td><td>HTTP 403, webhook rejeté</td><td class="result"><div class="chk"><input type="checkbox" id="c120-02-2"><label class="pass" for="c120-02-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">3</td><td>Simuler un webhook <span class="data-inline">payment.failed</span></td><td>Transaction marquée <span class="data-inline">failed</span>, échéance reste <span class="data-inline">pending</span></td><td class="result"><div class="chk"><input type="checkbox" id="c120-02-3"><label class="pass" for="c120-02-3">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v120-02-p"><label class="verdict-pass" for="v120-02-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v120-02-f"><label class="verdict-fail" for="v120-02-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-120-03</span>
+        <span class="tc-title">Paiement d'une commande complète (cash via Djomy)</span>
+        <span class="tc-priority prio-med">Moyenne</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">URL</div>
+        <div class="url-tag">POST http://localhost:8000/portal/djomy/checkout-order/{order}</div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Initier le paiement d'une commande entière via Djomy</td><td>Redirection vers Djomy sandbox</td><td class="result"><div class="chk"><input type="checkbox" id="c120-03-1"><label class="pass" for="c120-03-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Après paiement réussi, vérifier que la commande passe à <span class="data-inline">confirmed</span></td><td>Statut commande = confirmed</td><td class="result"><div class="chk"><input type="checkbox" id="c120-03-2"><label class="pass" for="c120-03-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v120-03-p"><label class="verdict-pass" for="v120-03-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v120-03-f"><label class="verdict-fail" for="v120-03-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+  </div><!-- /module 120 -->
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- MODULE 130 — Sécurité -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="module" id="m130">
+    <div class="module-header">
+      <span class="module-badge">130</span>
+      <h2>Sécurité et contrôle d'accès</h2>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-130-01</span>
+        <span class="tc-title">Isolation des données inter-entreprise (portail)</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <div class="section-label">Prérequis</div>
+        <div class="precond">Deux comptes portail actifs : acamara@soguiez.gn (SOGUIEZ) et test2@autre.gn (autre entreprise)</div>
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Connecté en tant que Camara, noter l'ID d'une commande de l'autre entreprise (ex: /portal/orders/42)</td><td>Accès refusé — 403 ou 404</td><td class="result"><div class="chk"><input type="checkbox" id="c130-01-1"><label class="pass" for="c130-01-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Tenter d'accéder à /portal/payments d'une autre entreprise via URL directe</td><td>Accès refusé</td><td class="result"><div class="chk"><input type="checkbox" id="c130-01-2"><label class="pass" for="c130-01-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v130-01-p"><label class="verdict-pass" for="v130-01-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v130-01-f"><label class="verdict-fail" for="v130-01-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-130-02</span>
+        <span class="tc-title">Portail inaccessible aux comptes d'entreprise non-approuvée</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Créer un utilisateur lié à une entreprise en statut <span class="data-inline">pending</span>, tenter de se connecter au portail</td><td>Accès refusé ou message "Votre compte est en attente d'approbation"</td><td class="result"><div class="chk"><input type="checkbox" id="c130-02-1"><label class="pass" for="c130-02-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Faire de même avec une entreprise <span class="data-inline">rejected</span></td><td>Accès refusé avec message approprié</td><td class="result"><div class="chk"><input type="checkbox" id="c130-02-2"><label class="pass" for="c130-02-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v130-02-p"><label class="verdict-pass" for="v130-02-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v130-02-f"><label class="verdict-fail" for="v130-02-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-130-03</span>
+        <span class="tc-title">Accès admin interdit aux utilisateurs portail</span>
+        <span class="tc-priority prio-high">Haute</span>
+      </div>
+      <div class="tc-body">
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Connecté en tant que Camara (portail), accéder à <span class="data-inline">/admin/products</span></td><td>403 Forbidden ou redirection /login</td><td class="result"><div class="chk"><input type="checkbox" id="c130-03-1"><label class="pass" for="c130-03-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+            <tr><td class="num">2</td><td>Accéder à <span class="data-inline">/admin/users</span> de même</td><td>Accès refusé</td><td class="result"><div class="chk"><input type="checkbox" id="c130-03-2"><label class="pass" for="c130-03-2">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v130-03-p"><label class="verdict-pass" for="v130-03-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v130-03-f"><label class="verdict-fail" for="v130-03-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="tc-head">
+        <span class="tc-id">TC-130-04</span>
+        <span class="tc-title">CSRF — requêtes POST sans token refusées</span>
+        <span class="tc-priority prio-med">Moyenne</span>
+      </div>
+      <div class="tc-body">
+        <table class="steps-table">
+          <thead><tr><th class="num">#</th><th class="action">Action</th><th class="expected">Résultat attendu</th><th class="result">OK/KO</th><th class="notes">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Envoyer un POST à <span class="data-inline">/admin/products</span> via curl sans token CSRF</td><td>HTTP 419 (Token mismatch)</td><td class="result"><div class="chk"><input type="checkbox" id="c130-04-1"><label class="pass" for="c130-04-1">OK</label></div></td><td><textarea class="notes-input"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tc-result">
+        <strong>Verdict global :</strong>
+        <div class="verdict"><input type="checkbox" id="v130-04-p"><label class="verdict-pass" for="v130-04-p">✓ PASS</label></div>
+        <div class="verdict"><input type="checkbox" id="v130-04-f"><label class="verdict-fail" for="v130-04-f">✗ FAIL</label></div>
+        <input class="bug-input" type="text" placeholder="Référence bug si FAIL…">
+      </div>
+    </div>
+  </div><!-- /module 130 -->
+
+  <!-- Récap final -->
+  <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin-top:2rem;">
+    <h2 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;">Récapitulatif de la session de test</h2>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;text-align:center;">
+      <div style="background:var(--light);border-radius:8px;padding:1rem;">
+        <div style="font-size:2rem;font-weight:800;color:var(--dark);">27</div>
+        <div style="font-size:.8rem;color:var(--gray);">Cas de test</div>
+      </div>
+      <div style="background:#dcfce7;border-radius:8px;padding:1rem;">
+        <div style="font-size:2rem;font-weight:800;color:var(--success);" id="total-pass">—</div>
+        <div style="font-size:.8rem;color:var(--success);">PASS</div>
+      </div>
+      <div style="background:#fee2e2;border-radius:8px;padding:1rem;">
+        <div style="font-size:2rem;font-weight:800;color:var(--danger);" id="total-fail">—</div>
+        <div style="font-size:.8rem;color:var(--danger);">FAIL</div>
+      </div>
+      <div style="background:#fef3c7;border-radius:8px;padding:1rem;">
+        <div style="font-size:2rem;font-weight:800;color:var(--warning);" id="total-pct">—</div>
+        <div style="font-size:.8rem;color:var(--warning);">Taux de succès</div>
+      </div>
+    </div>
+    <div style="margin-top:1rem;">
+      <label style="font-size:.85rem;color:var(--gray);">Observations générales :</label>
+      <textarea style="width:100%;margin-top:.4rem;border:1px solid var(--border);border-radius:6px;padding:.6rem .8rem;font-family:inherit;font-size:.85rem;min-height:80px;resize:vertical;" placeholder="Environnement, version testée, remarques…"></textarea>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+// Compte les verdicts PASS / FAIL automatiquement
+function updateSummary() {
+  const passes = document.querySelectorAll('input[id^="v"][id$="-p"]:checked').length;
+  const fails   = document.querySelectorAll('input[id^="v"][id$="-f"]:checked').length;
+  const total   = passes + fails;
+  document.getElementById('total-pass').textContent = passes;
+  document.getElementById('total-fail').textContent = fails;
+  document.getElementById('total-pct').textContent  = total ? Math.round(passes / total * 100) + '%' : '—';
+}
+document.querySelectorAll('input[id^="v"]').forEach(cb => cb.addEventListener('change', updateSummary));
+updateSummary();
+</script>
+</body>
+</html>
