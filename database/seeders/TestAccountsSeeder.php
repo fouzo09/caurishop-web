@@ -11,8 +11,8 @@ class TestAccountsSeeder extends Seeder
 {
     public function run(): void
     {
-        $companyA = Company::where('name', 'LIKE', '%Entreprise A%')->firstOrFail();
-        $companyB = Company::where('name', 'LIKE', '%Entreprise B%')->firstOrFail();
+        $companyA = Company::where('raison_sociale', 'LIKE', '%Entreprise A%')->firstOrFail();
+        $companyB = Company::where('raison_sociale', 'LIKE', '%Entreprise B%')->firstOrFail();
 
         $accounts = [
             // ── Super Admin plateforme ──────────────────────────────────
