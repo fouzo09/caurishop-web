@@ -18,15 +18,15 @@
       <div class="d-flex align-items-center gap-4 flex-shrink-0 header-actions">
         @auth
           <a href="{{ route('shop.account.index') }}" class="header-action d-flex align-items-center gap-2">
-            <span class="fs-5">👤</span><span class="header-action__label">Mon compte</span>
+            <i class="bi bi-person fs-5"></i><span class="header-action__label">Mon compte</span>
           </a>
         @else
           <a href="{{ route('shop.login') }}" class="header-action d-flex align-items-center gap-2">
-            <span class="fs-5">👤</span><span class="header-action__label">Mon compte</span>
+            <i class="bi bi-person fs-5"></i><span class="header-action__label">Mon compte</span>
           </a>
         @endauth
         <a href="{{ route('shop.cart.index') }}" class="header-action d-flex align-items-center gap-2">
-          <span class="cart-icon">🛒@if ($shopCartCount > 0)<span class="cart-badge">{{ $shopCartCount }}</span>@endif</span>
+          <span class="cart-icon"><i class="bi bi-cart fs-5"></i>@if ($shopCartCount > 0)<span class="cart-badge">{{ $shopCartCount }}</span>@endif</span>
           <span class="header-action__label">Panier</span>
         </a>
       </div>
