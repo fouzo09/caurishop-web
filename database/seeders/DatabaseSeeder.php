@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             SettingsSeeder::class,
             DemoDataSeeder::class,
             TestAccountsSeeder::class,
+            ShopCategoriesSeeder::class,
         ]);
     }
 }

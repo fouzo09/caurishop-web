@@ -74,6 +74,11 @@ class User extends Authenticatable
         return $this->hasRole('company_employee');
     }
 
+    public function isCustomer(): bool
+    {
+        return $this->hasRole('customer');
+    }
+
     /**
      * Retourne le portail d'accueil selon le rôle.
      */
@@ -82,6 +87,7 @@ class User extends Authenticatable
         if ($this->isSuperAdmin())     return route('admin.dashboard');
         if ($this->isCompanyAdmin())   return route('company.dashboard');
         if ($this->isCompanyEmployee()) return route('portal.dashboard');
+        if ($this->isCustomer())        return route('shop.account.index');
         return route('login');
     }
 }

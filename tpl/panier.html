@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mon panier — CAURISHOP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+<header class="site-header sticky-top bg-white">
+  <div class="topstrip border-bottom">
+    <div class="container-xl d-flex align-items-center justify-content-between flex-wrap gap-2 py-2">
+      <div class="d-flex align-items-center gap-3">
+        <a href="contact.html">Vendez sur CAURISHOP</a>
+        <a href="boutique.html">Boutiques</a>
+        <a href="contact.html">Aide</a>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <span>GNF · Français</span>
+        <a href="contact.html">Suivi de commande</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="border-bottom">
+    <div class="container-xl d-flex align-items-center gap-4 py-3 flex-wrap">
+      <a href="index.html" class="logo d-flex align-items-center gap-2 flex-shrink-0">
+        <span class="logo__mark">C</span>
+        <span class="logo__name">CAURISHOP</span>
+      </a>
+      <div class="search d-flex flex-grow-1">
+        <select class="search__select" aria-label="Catégorie de recherche">
+          <option>Toutes catégories</option>
+          <option>Mode &amp; Wax</option>
+          <option>Électronique</option>
+          <option>Cosmétiques</option>
+          <option>Artisanat</option>
+          <option>Maison</option>
+        </select>
+        <input class="search__input" placeholder="Rechercher un produit…" aria-label="Recherche">
+        <button class="search__btn" type="button">Rechercher</button>
+      </div>
+      <div class="d-flex align-items-center gap-4 flex-shrink-0 header-actions">
+        <a href="compte.html" class="header-action d-flex align-items-center gap-2">
+          <span class="fs-5">👤</span><span class="header-action__label">Mon compte</span>
+        </a>
+        <a href="panier.html" class="header-action d-flex align-items-center gap-2">
+          <span class="cart-icon">🛒<span class="cart-badge">3</span></span>
+          <span class="header-action__label">Panier</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <nav class="border-bottom">
+    <div class="container-xl catnav d-flex align-items-center flex-wrap">
+      <a href="boutique.html" class="catnav__all">☰ Toutes les catégories</a>
+      <a href="boutique.html" class="catnav__link">Mode &amp; Wax</a><a href="boutique.html" class="catnav__link">Électronique</a><a href="boutique.html" class="catnav__link">Cosmétiques</a><a href="boutique.html" class="catnav__link">Artisanat</a><a href="boutique.html" class="catnav__link">Maison</a><a href="boutique.html" class="catnav__link">Promotions</a>
+      <span class="catnav__note ms-auto d-none d-lg-block">Livraison offerte dès 500 000 GNF</span>
+    </div>
+  </nav>
+</header>
+<div class="page-banner border-bottom">
+  <div class="container-xl py-4">
+    <div class="crumbs mb-2"><a href="index.html">Accueil</a> › <span class="crumb-current">Panier</span></div>
+    <span class="title-tick"></span>
+    <h1 class="page-title mb-0">Mon panier</h1>
+  </div>
+</div>
+
+<div class="container-xl py-4">
+  <div class="row g-4">
+
+    <div class="col-lg-8">
+      <div class="panel">
+        <div class="cart-head row g-3 d-none d-md-flex">
+          <div class="col-md-5">Produit</div>
+          <div class="col-md-2">Prix</div>
+          <div class="col-md-2 text-center">Quantité</div>
+          <div class="col-md-2 text-end">Total</div>
+          <div class="col-md-1"></div>
+        </div>
+        <div class="cart-row row g-3 align-items-center" data-price="450000">
+  <div class="col-12 col-md-5 d-flex align-items-center gap-3">
+    <span class="cart-thumb"><span>👗</span><img class="mini__img" src="https://images.unsplash.com/photo-1590735213920-68192a487bc2?q=80&w=200&h=200&fit=crop&auto=format" alt="Produit" loading="lazy" onerror="this.remove()"></span>
+    <div><div class="fw-bold text-ink">Ensemble en pagne wax premium</div><div class="small text-muted">Bleu royal · Taille M</div></div>
+  </div>
+  <div class="col-4 col-md-2 small cart-price-label">450 000 GNF</div>
+  <div class="col-4 col-md-2 d-flex justify-content-md-center">
+    <div class="qty-stepper qty-stepper--sm">
+      <button type="button" data-step="-1">−</button>
+      <span class="qty-value">1</span>
+      <button type="button" data-step="1">+</button>
+    </div>
+  </div>
+  <div class="col-3 col-md-2 text-end fw-bold text-brand cart-line-total"></div>
+  <div class="col-1 text-end"><button type="button" class="cart-remove" aria-label="Retirer l'article">✕</button></div>
+</div><div class="cart-row row g-3 align-items-center" data-price="1250000">
+  <div class="col-12 col-md-5 d-flex align-items-center gap-3">
+    <span class="cart-thumb"><span>📱</span><img class="mini__img" src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=200&h=200&fit=crop&auto=format" alt="Produit" loading="lazy" onerror="this.remove()"></span>
+    <div><div class="fw-bold text-ink">Smartphone Tecno Spark 20</div><div class="small text-muted">128 Go · Noir</div></div>
+  </div>
+  <div class="col-4 col-md-2 small cart-price-label">1 250 000 GNF</div>
+  <div class="col-4 col-md-2 d-flex justify-content-md-center">
+    <div class="qty-stepper qty-stepper--sm">
+      <button type="button" data-step="-1">−</button>
+      <span class="qty-value">1</span>
+      <button type="button" data-step="1">+</button>
+    </div>
+  </div>
+  <div class="col-3 col-md-2 text-end fw-bold text-brand cart-line-total"></div>
+  <div class="col-1 text-end"><button type="button" class="cart-remove" aria-label="Retirer l'article">✕</button></div>
+</div><div class="cart-row row g-3 align-items-center" data-price="75000">
+  <div class="col-12 col-md-5 d-flex align-items-center gap-3">
+    <span class="cart-thumb"><span>🧴</span><img class="mini__img" src="https://images.unsplash.com/photo-1571781926291-c477ebfd024b?q=80&w=200&h=200&fit=crop&auto=format" alt="Produit" loading="lazy" onerror="this.remove()"></span>
+    <div><div class="fw-bold text-ink">Beurre de karité pur 500g</div><div class="small text-muted">Lot de 1</div></div>
+  </div>
+  <div class="col-4 col-md-2 small cart-price-label">75 000 GNF</div>
+  <div class="col-4 col-md-2 d-flex justify-content-md-center">
+    <div class="qty-stepper qty-stepper--sm">
+      <button type="button" data-step="-1">−</button>
+      <span class="qty-value">2</span>
+      <button type="button" data-step="1">+</button>
+    </div>
+  </div>
+  <div class="col-3 col-md-2 text-end fw-bold text-brand cart-line-total"></div>
+  <div class="col-1 text-end"><button type="button" class="cart-remove" aria-label="Retirer l'article">✕</button></div>
+</div>
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 p-3">
+          <a href="boutique.html" class="fw-bold text-brand small">← Continuer mes achats</a>
+          <div class="d-flex gap-2">
+            <input class="form-control form-control-sm promo-input" placeholder="Code promo">
+            <button class="btn btn-soft btn-sm px-3" type="button">Appliquer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="col-lg-4">
+      <div class="panel p-4 sticky-lg-top summary-sticky">
+        <div class="fs-5 fw-bold text-ink mb-3">Récapitulatif</div>
+        <div class="d-flex justify-content-between small mb-2"><span class="text-muted">Sous-total</span><span class="fw-semibold" id="cart-subtotal">—</span></div>
+        <div class="d-flex justify-content-between small mb-2"><span class="text-muted">Livraison (Conakry)</span><span class="fw-semibold text-success">Offerte</span></div>
+        <div class="d-flex justify-content-between small mb-3"><span class="text-muted">Remise (KARITE25)</span><span class="fw-semibold text-brand">− <span id="cart-discount">—</span></span></div>
+        <div class="summary-total d-flex justify-content-between align-items-baseline mb-3">
+          <span class="fw-bold">Total</span>
+          <span class="total-amount" id="cart-total">—</span>
+        </div>
+        <a href="checkout.html" class="btn btn-brand w-100 btn-lg">Passer la commande →</a>
+        <div class="d-flex gap-2 flex-wrap justify-content-center mt-3">
+          <span class="mini-chip">🟠 Orange Money</span>
+          <span class="mini-chip">🟡 MTN MoMo</span>
+          <span class="mini-chip">💳 Visa</span>
+        </div>
+      </div>
+      <div class="secure-note mt-3"><span class="fs-5">🔒</span> Paiement 100% sécurisé. Vos informations sont protégées.</div>
+    </aside>
+  </div>
+</div>
+<footer class="site-footer border-top mt-5">
+  <div class="border-bottom">
+    <div class="container-xl py-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div>
+        <div class="fw-bold fs-5 text-ink">Restez informé des bons plans</div>
+        <div class="text-muted small mt-1">-25% sur votre première commande et nos nouveautés.</div>
+      </div>
+      <div class="d-flex gap-2 flex-wrap">
+        <input class="form-control newsletter-input" placeholder="Votre adresse e-mail" aria-label="E-mail newsletter">
+        <button class="btn btn-brand px-4" type="button">S'abonner</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-xl py-5">
+    <div class="row g-4">
+      <div class="col-12 col-md-6 col-lg-4">
+        <a href="index.html" class="d-flex align-items-center gap-2 mb-3">
+          <span class="logo__mark logo__mark--sm">C</span>
+          <span class="logo__name fs-5">CAURISHOP</span>
+        </a>
+        <p class="text-muted small lh-lg mb-3" style="max-width:320px;">Le marché en ligne de la Guinée. Livraison à Conakry et dans toutes les régions.</p>
+        <div class="d-flex flex-column gap-2 text-muted small">
+          <span>📍 Kaloum, Conakry — Guinée</span>
+          <span>📞 +224 620 00 00 00</span>
+          <span>✉️ bonjour@caurishop.gn</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <div class="footer-title">Boutique</div>
+        <a href="boutique.html" class="footer-link">Mode &amp; Wax</a>
+        <a href="boutique.html" class="footer-link">Électronique</a>
+        <a href="boutique.html" class="footer-link">Cosmétiques</a>
+        <a href="boutique.html" class="footer-link">Artisanat</a>
+        <a href="boutique.html" class="footer-link">Maison &amp; Déco</a>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <div class="footer-title">Aide</div>
+        <a href="contact.html" class="footer-link">Suivi de commande</a>
+        <a href="contact.html" class="footer-link">Livraison &amp; délais</a>
+        <a href="contact.html" class="footer-link">Retours</a>
+        <a href="contact.html" class="footer-link">Nous contacter</a>
+        <a href="contact.html" class="footer-link">FAQ</a>
+      </div>
+      <div class="col-12 col-lg-4">
+        <div class="footer-title">Paiement</div>
+        <div class="d-flex flex-wrap gap-2">
+          <span class="pay-badge">Orange Money</span>
+          <span class="pay-badge">MTN MoMo</span>
+          <span class="pay-badge">Visa / Paycard</span>
+          <span class="pay-badge">Virement</span>
+        </div>
+        <div class="footer-title mt-4">Suivez-nous</div>
+        <div class="d-flex gap-2">
+          <span class="social">📘</span><span class="social">📸</span><span class="social">▶️</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="border-top">
+    <div class="container-xl py-3 d-flex align-items-center justify-content-between flex-wrap gap-2 footer-bottom">
+      <span>© 2026 CAURISHOP — Tous droits réservés.</span>
+      <span class="d-flex gap-3">
+        <a href="contact.html">Conditions</a>
+        <a href="contact.html">Confidentialité</a>
+        <a href="contact.html">Retours</a>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

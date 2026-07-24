@@ -21,6 +21,9 @@ class RolesAndAdminSeeder extends Seeder
         Role::firstOrCreate(['name' => 'company_admin']);
         Role::firstOrCreate(['name' => 'company_employee']);
 
+        // Client public (parcours e-commerce grand public) — aucune permission admin
+        Role::firstOrCreate(['name' => 'customer']);
+
         // Super Admin CauriShop
         $admin = User::firstOrCreate(
             ['email' => 'admin@caurishop.test'],

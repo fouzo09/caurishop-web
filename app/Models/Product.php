@@ -16,6 +16,7 @@ class Product extends Model
         'type',
         'name',
         'slug',
+        'category_id',
         'description',
         'sku',
         'price',
@@ -51,6 +52,11 @@ class Product extends Model
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 
     public function images()
