@@ -34,26 +34,26 @@
 3. `carts` (user_id) + `cart_items` (cart_id, product_id, variant_id, quantity).
 4. Seeder additif : rôle Spatie `customer` + catégories de départ.
 
-## Étapes d'exécution
+## Étapes d'exécution — ✅ TOUTES RÉALISÉES (branche `feature/shop-public`)
 
-- [ ] **E1. Fondations** — branche, migrations additives, modèle `Category`, relations,
+- [x] **E1. Fondations** — branche, migrations additives, modèle `Category`, relations,
   rôle `customer`, `User::homeRoute()` (+ branche additive), seeders.
-- [ ] **E2. Layout & accueil** — `shop/layouts/app` + partials header/footer depuis `tpl/`,
+- [x] **E2. Layout & accueil** — `shop/layouts/app` + partials header/footer depuis `tpl/`,
   assets dans `public/`, helper prix GNF, `HomeController` (catégories, meilleures ventes,
   nouveautés) → `shop/home`.
-- [ ] **E3. Catalogue** — `Shop\ProductController@index` (filtres catégorie/prix, tri,
+- [x] **E3. Catalogue** — `Shop\ProductController@index` (filtres catégorie/prix, tri,
   pagination) → `boutique.html` ; `@show` (galerie, variantes) → `produit.html`.
-- [ ] **E4. Auth publique** — `/inscription` + `/connexion` (email ou téléphone), crée
+- [x] **E4. Auth publique** — `/inscription` + `/connexion` (email ou téléphone), crée
   `User`+`Customer`+rôle `customer`. `AuthController` admin intact.
-- [ ] **E5. Panier** — `Shop\CartController` (add/update/remove), session (invités) +
+- [x] **E5. Panier** — `Shop\CartController` (add/update/remove), session (invités) +
   `carts`/`cart_items` (connectés), fusion à la connexion → `panier.html`.
-- [ ] **E6. Checkout** — `Shop\CheckoutController` (adresse, livraison, paiement), création
+- [x] **E6. Checkout** — `Shop\CheckoutController` (adresse, livraison, paiement), création
   commande via `OrderService::createOrder()` → `checkout.html`.
-- [ ] **E7. Paiement** — interface `PaymentProvider` + `SimulatedProvider` + registre
+- [x] **E7. Paiement** — interface `PaymentProvider` + `SimulatedProvider` + registre
   extensible ; page confirmation → `confirmation.html`.
-- [ ] **E8. Espace client** — `/mon-compte` : commandes, profil, adresses.
-- [ ] **E9. Contact** — `Shop\ContactController` → `contact.html`.
-- [ ] **E10. Tests & non-régression** — feature tests Pest du parcours complet ; vérifier que
+- [x] **E8. Espace client** — `/mon-compte` : commandes, profil, adresses.
+- [x] **E9. Contact** — `Shop\ContactController` → `contact.html`.
+- [x] **E10. Tests & non-régression** — feature tests Pest du parcours complet ; vérifier que
   les tests existants et les flows admin/company/portal passent inchangés.
 
 ## Non-régression (à re-vérifier en fin de parcours)
