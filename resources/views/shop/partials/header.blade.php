@@ -1,18 +1,4 @@
 <header class="site-header sticky-top bg-white">
-  <div class="topstrip border-bottom">
-    <div class="container-xl d-flex align-items-center justify-content-between flex-wrap gap-2 py-2">
-      <div class="d-flex align-items-center gap-3">
-        <a href="{{ route('get-started') }}">Vendez sur CAURISHOP</a>
-        <a href="{{ route('shop.products.index') }}">Boutiques</a>
-        <a href="{{ route('shop.contact') }}">Aide</a>
-      </div>
-      <div class="d-flex align-items-center gap-3">
-        <span>GNF · Français</span>
-        <a href="{{ route('shop.contact') }}">Suivi de commande</a>
-      </div>
-    </div>
-  </div>
-
   <div class="border-bottom">
     <div class="container-xl d-flex align-items-center gap-4 py-3 flex-wrap">
       <a href="{{ route('home') }}" class="logo d-flex align-items-center gap-2 flex-shrink-0">
