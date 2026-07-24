@@ -8,7 +8,7 @@
 @endphp
 <a href="{{ route('shop.products.show', $product->id) }}" class="pcard d-flex flex-column h-100">
   <div class="pcard__media">
-    @if ($product->isOutOfStock())
+    @if (! $product->isService() && $product->stock_status === 'rupture')
       <span class="pcard__badge">Rupture</span>
     @endif
     <span class="pcard__emoji">🛍️</span>

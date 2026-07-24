@@ -8,6 +8,7 @@
     $cover  = $product->coverUrl();
     $isVariable = $product->isVariable();
     $basePrice = $isVariable ? (float) ($product->variants->min('price') ?? 0) : (float) $product->price;
+    $soldOut = ! $product->isService() && $product->stock_status === 'rupture';
 @endphp
 
 <div class="container-xl pt-4">
@@ -51,10 +52,10 @@
       @endif
       <h1 class="product-title">{{ $product->name }}</h1>
       <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
-        @if ($product->isOutOfStock())
+        @if ($soldOut)
           <span class="small fw-semibold text-danger">● Rupture de stock</span>
         @else
-          <span class="small fw-semibold stock-ok">● En stock</span>
+          <span class="small fw-semibold stock-ok">● Disponible</span>
         @endif
       </div>
       <div class="d-flex align-items-baseline gap-3 mb-3 flex-wrap">
@@ -88,7 +89,7 @@
             <input type="number" name="quantity" value="1" min="1" class="form-control border-0 text-center" style="width:64px" aria-label="Quantité">
             <button type="button" class="btn" onclick="const i=this.parentNode.querySelector('input'); i.value=parseInt(i.value||1)+1">+</button>
           </div>
-          <button type="submit" class="btn btn-brand btn-lg flex-grow-1" @disabled($product->isOutOfStock())>🛒 Ajouter au panier</button>
+          <button type="submit" class="btn btn-brand btn-lg flex-grow-1" @disabled($soldOut)>🛒 Ajouter au panier</button>
         </div>
       </form>
 
