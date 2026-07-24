@@ -72,6 +72,8 @@ Route::name('shop.')->group(function () {
 
     // Checkout + espace client (connexion requise)
     Route::middleware('auth')->group(function () {
+        Route::post('/deconnexion', [ShopLoginController::class, 'destroy'])->name('logout');
+
         Route::get('/checkout', [ShopCheckoutController::class, 'index'])->name('checkout.index');
         Route::post('/checkout', [ShopCheckoutController::class, 'store'])->name('checkout.store');
         Route::get('/commande/{order}/confirmation', [ShopCheckoutController::class, 'confirmation'])->name('checkout.confirmation');
