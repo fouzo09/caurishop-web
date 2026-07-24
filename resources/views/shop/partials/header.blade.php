@@ -26,7 +26,7 @@
           </a>
         @endauth
         <a href="{{ route('shop.cart.index') }}" class="header-action d-flex align-items-center gap-2">
-          <span class="cart-icon"><i class="bi bi-cart fs-5"></i>@if ($shopCartCount > 0)<span class="cart-badge">{{ $shopCartCount }}</span>@endif</span>
+          <span class="cart-icon"><i class="bi bi-bag fs-5"></i>@if ($shopCartCount > 0)<span class="cart-badge">{{ $shopCartCount }}</span>@endif</span>
           <span class="header-action__label">Panier</span>
         </a>
       </div>
