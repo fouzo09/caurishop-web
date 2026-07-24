@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..800&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-<link href="{{ asset('shop/css/style.css') }}" rel="stylesheet">
+<link href="{{ asset('shop/css/style.css') }}?v={{ @filemtime(public_path('shop/css/style.css')) ?: '1' }}" rel="stylesheet">
 @stack('styles')
 </head>
 <body>
@@ -23,7 +23,7 @@
 @include('shop.partials.footer')
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{{ asset('shop/js/main.js') }}"></script>
+<script src="{{ asset('shop/js/main.js') }}?v={{ @filemtime(public_path('shop/js/main.js')) ?: '1' }}"></script>
 @stack('scripts')
 </body>
 </html>
