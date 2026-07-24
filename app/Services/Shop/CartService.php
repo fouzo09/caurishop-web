@@ -17,6 +17,67 @@ use Illuminate\Support\Facades\Auth;
 class CartService
 {
     public const SESSION_KEY = 'cart';
+    public const PROMO_KEY = 'cart_promo';
+
+    /**
+     * Codes promo disponibles (taux de remise). Extensible en Phase 2.
+     *
+     * @return array<string, float>
+     */
+    public function promoCodes(): array
+    {
+        return [
+            'KARITE25' => 0.05, // -5%
+            'BIENVENUE' => 0.10, // -10%
+        ];
+    }
+
+    /**
+     * Applique un code promo (retourne true si valide).
+     */
+    public function applyPromo(string $code): bool
+    {
+        $code = strtoupper(trim($code));
+        if (! array_key_exists($code, $this->promoCodes())) {
+            return false;
+        }
+
+        session([self::PROMO_KEY => $code]);
+        return true;
+    }
+
+    public function clearPromo(): void
+    {
+        session()->forget(self::PROMO_KEY);
+    }
+
+    public function promoCode(): ?string
+    {
+        $code = session(self::PROMO_KEY);
+        return $code && array_key_exists($code, $this->promoCodes()) ? $code : null;
+    }
+
+    /**
+     * Récapitulatif complet avec remise éventuelle.
+     *
+     * @return array{items: array, subtotal: float, promo: ?string, discount: float, total: float, count: int}
+     */
+    public function summary(): array
+    {
+        $detailed = $this->detailed();
+        $promo    = $this->promoCode();
+        $rate     = $promo ? $this->promoCodes()[$promo] : 0.0;
+        $discount = round($detailed['subtotal'] * $rate);
+
+        return [
+            'items'    => $detailed['items'],
+            'subtotal' => $detailed['subtotal'],
+            'promo'    => $promo,
+            'discount' => $discount,
+            'total'    => max(0, $detailed['subtotal'] - $discount),
+            'count'    => $detailed['count'],
+        ];
+    }
 
     /**
      * Clé unique d'une ligne (produit + variante).

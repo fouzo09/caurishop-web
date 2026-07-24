@@ -57,6 +57,7 @@ Route::name('shop.')->group(function () {
     Route::post('/panier/ajouter', [ShopCartController::class, 'add'])->name('cart.add');
     Route::post('/panier/mettre-a-jour', [ShopCartController::class, 'update'])->name('cart.update');
     Route::post('/panier/supprimer', [ShopCartController::class, 'remove'])->name('cart.remove');
+    Route::post('/panier/code-promo', [ShopCartController::class, 'applyPromo'])->name('cart.promo');
 
     // Contact
     Route::get('/contact', [ShopContactController::class, 'index'])->name('contact');

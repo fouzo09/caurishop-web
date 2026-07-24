@@ -15,6 +15,8 @@
 <body>
 @include('shop.partials.header')
 
+@include('shop.partials.flash')
+
 @yield('content')
 
 @include('shop.partials.footer')
