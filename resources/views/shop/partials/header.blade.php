@@ -49,9 +49,16 @@
 
   <nav class="border-bottom">
     <div class="container-xl catnav d-flex align-items-center flex-wrap">
+      @php
+        // Catégorie active : filtre courant, sinon celle du produit consulté (fiche produit).
+        $currentCategory = request('category');
+        if (! $currentCategory && ($p = request()->route('product')) instanceof \App\Models\Product) {
+            $currentCategory = $p->category?->slug;
+        }
+      @endphp
       <a href="{{ route('shop.products.index') }}" class="catnav__all">☰ Toutes les catégories</a>
       @foreach ($shopCategories as $cat)
-        <a href="{{ route('shop.products.index', ['category' => $cat->slug]) }}" class="catnav__link">{{ $cat->name }}</a>
+        <a href="{{ route('shop.products.index', ['category' => $cat->slug]) }}" class="catnav__link{{ $currentCategory === $cat->slug ? ' catnav__link--active' : '' }}">{{ $cat->name }}</a>
       @endforeach
       <span class="catnav__note ms-auto d-none d-lg-block">Livraison offerte dès @gnf(500000)</span>
     </div>
