@@ -13,39 +13,39 @@
     </div>
     <div class="carousel-inner">
 
-      <div class="carousel-item active promo promo--blue" data-bs-interval="5000">
+      <div class="carousel-item active promo promo--blue" data-bs-interval="6000">
         <div class="container-xl promo__inner">
           <div>
-            <span class="promo__eyebrow">Offre du moment</span>
-            <h1 class="promo__title">Vos achats,<br>livrés partout en Guinée.</h1>
-            <p class="promo__sub">Des milliers de produits à petits prix, payables en toute simplicité par mobile money ou à la livraison.</p>
+            <span class="promo__eyebrow">Le marché en ligne de la Guinée</span>
+            <h1 class="promo__title">Tout ce qu'il vous faut,<br>livré près de chez vous.</h1>
+            <p class="promo__sub">Des milliers de produits à petits prix, payables par Orange Money, MTN MoMo ou à la livraison.</p>
+            <a href="{{ route('shop.products.index') }}" class="promo__cta">Découvrir la boutique</a>
+          </div>
+          <span class="promo__figure" aria-hidden="true">C</span>
+        </div>
+      </div>
+
+      <div class="carousel-item promo promo--dark" data-bs-interval="6000">
+        <div class="container-xl promo__inner">
+          <div>
+            <span class="promo__eyebrow">Couverture nationale</span>
+            <h2 class="promo__title">Présents dans les<br>33 préfectures.</h2>
+            <p class="promo__sub">Livraison via nos partenaires logistiques à Conakry et dans toutes les régions, suivi de commande inclus.</p>
             <a href="{{ route('shop.products.index') }}" class="promo__cta">Commander maintenant</a>
           </div>
-          <span class="promo__figure" aria-hidden="true">🛍️</span>
+          <span class="promo__figure" aria-hidden="true">33</span>
         </div>
       </div>
 
-      <div class="carousel-item promo promo--dark" data-bs-interval="5000">
-        <div class="container-xl promo__inner">
-          <div>
-            <span class="promo__eyebrow">Livraison</span>
-            <h2 class="promo__title">Livraison offerte<br>dès @gnf(500000).</h2>
-            <p class="promo__sub">Dans les 33 préfectures de Guinée, via nos partenaires logistiques. Suivi de commande inclus.</p>
-            <a href="{{ route('shop.products.index') }}" class="promo__cta">Voir la boutique</a>
-          </div>
-          <span class="promo__figure" aria-hidden="true">🚚</span>
-        </div>
-      </div>
-
-      <div class="carousel-item promo promo--light" data-bs-interval="5000">
+      <div class="carousel-item promo promo--light" data-bs-interval="6000">
         <div class="container-xl promo__inner">
           <div>
             <span class="promo__eyebrow">Nouveau client</span>
             <h2 class="promo__title">Créez votre compte<br>en une minute.</h2>
-            <p class="promo__sub">Inscrivez-vous gratuitement et retrouvez vos commandes, adresses et suivis au même endroit.</p>
+            <p class="promo__sub">Inscrivez-vous gratuitement et retrouvez vos commandes, vos adresses et vos suivis au même endroit.</p>
             <a href="{{ route('shop.register') }}" class="promo__cta">Créer un compte</a>
           </div>
-          <span class="promo__figure" aria-hidden="true">👋</span>
+          <span class="promo__figure" aria-hidden="true">1 min</span>
         </div>
       </div>
     </div>

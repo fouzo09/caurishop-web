@@ -116,12 +116,12 @@ a:hover{color:var(--brand);}
 .promo__cta:hover{opacity:.92;}
 .promo__figure{font-weight:700;font-size:150px;line-height:1;letter-spacing:-.04em;flex-shrink:0;user-select:none;white-space:nowrap;}
 
-.promo--blue{background:var(--brand);color:#fff;}
+.promo--blue{background:linear-gradient(120deg,var(--brand) 0%,var(--brand-dark) 100%);color:#fff;}
 .promo--blue .promo__cta{background:#fff;color:var(--brand);}
 .promo--blue .promo__cta:hover{color:var(--brand);}
 .promo--blue .promo__figure{color:rgba(255,255,255,.20);}
 
-.promo--dark{background:var(--ink);color:#fff;}
+.promo--dark{background:linear-gradient(120deg,var(--ink) 0%,#243049 100%);color:#fff;}
 .promo--dark .promo__cta{background:#fff;color:var(--ink);}
 .promo--dark .promo__cta:hover{color:var(--ink);}
 .promo--dark .promo__figure{color:rgba(255,255,255,.14);}
