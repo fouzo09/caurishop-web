@@ -28,7 +28,8 @@ class ProductController extends Controller
 
         if ($request->filled('q')) {
             $term = $request->string('q')->value();
-            $query->where('name', 'ilike', '%' . $term . '%');
+            // Recherche insensible à la casse, portable (PostgreSQL + SQLite).
+            $query->whereRaw('LOWER(name) LIKE LOWER(?)', ['%' . $term . '%']);
         }
 
         if ($request->filled('max_price')) {

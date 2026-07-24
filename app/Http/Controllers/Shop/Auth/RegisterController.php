@@ -36,7 +36,8 @@ class RegisterController extends Controller
 
         // Un e-mail est requis par l'auth Laravel. Si le client n'en fournit pas,
         // on synthétise un identifiant technique à partir du téléphone.
-        $loginEmail = $data['email']
+        $email      = $data['email'] ?? null;
+        $loginEmail = $email
             ?: preg_replace('/\D+/', '', $data['phone']) . '_' . Str::lower(Str::random(4)) . '@phone.caurishop.local';
 
         $user = User::create([
@@ -54,7 +55,7 @@ class RegisterController extends Controller
             'company_id' => null,
             'first_name' => $data['first_name'],
             'last_name'  => $data['last_name'],
-            'email'      => $data['email'],
+            'email'      => $email,
             'phone'      => $data['phone'],
             'is_active'  => true,
         ]);
