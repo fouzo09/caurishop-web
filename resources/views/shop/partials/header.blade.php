@@ -47,7 +47,6 @@
       @foreach ($shopCategories as $cat)
         <a href="{{ route('shop.products.index', ['category' => $cat->slug]) }}" class="catnav__link{{ $currentCategory === $cat->slug ? ' catnav__link--active' : '' }}">{{ $cat->name }}</a>
       @endforeach
-      <span class="catnav__note ms-auto d-none d-lg-block">Livraison offerte dès @gnf(500000)</span>
     </div>
   </nav>
 </header>
