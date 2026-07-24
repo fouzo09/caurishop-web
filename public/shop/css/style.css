@@ -102,50 +102,53 @@ a:hover{color:var(--brand);}
 .catnav__link--active{font-weight:700;color:var(--brand);border-bottom-color:var(--brand);}
 .catnav__note{font-size:13px;color:var(--gray);padding:13px 0;}
 
-/* ===================== HERO MARKETPLACE ===================== */
-.mkt-hero{padding:20px 0 8px;}
-.mkt-hero .row{min-height:380px;}
+/* ===================== BARRE CATÉGORIES (bleue) ===================== */
+.catbar{background:var(--brand);}
+.catbar__inner{gap:4px;overflow-x:auto;}
+.catbar__all,.catbar__link{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;color:#fff;text-decoration:none;font-size:13.5px;font-weight:600;padding:13px 16px;border-bottom:3px solid transparent;text-transform:uppercase;letter-spacing:.02em;}
+.catbar__all i,.catbar__link i{font-size:15px;opacity:.9;}
+.catbar__all:hover,.catbar__link:hover{color:#fff;background:rgba(255,255,255,.12);}
+.catbar__link--active{background:rgba(255,255,255,.15);border-bottom-color:#fff;color:#fff;}
 
-/* Rail catégories */
-.mkt-rail{background:#fff;border:1px solid var(--border);border-radius:16px;padding:8px 0;height:380px;overflow-y:auto;}
-.mkt-rail__title{font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray);padding:10px 18px 6px;}
-.mkt-rail a{display:flex;align-items:center;gap:11px;padding:10px 18px;color:var(--ink);text-decoration:none;font-size:14px;font-weight:500;transition:background .12s,color .12s;}
-.mkt-rail a i:first-child{color:var(--brand);font-size:15px;}
-.mkt-rail a:hover{background:var(--brand-light);color:var(--brand);}
-.mkt-rail a .chev{margin-left:auto;font-size:12px;opacity:.4;}
+/* ===================== HERO (bannière claire, image produit) ===================== */
+.mf-hero{position:relative;background:#f3f4f6;border-bottom:1px solid var(--border);}
+.mf-slide__inner{display:flex;align-items:center;justify-content:space-between;gap:30px;min-height:440px;padding:30px 0;}
+.mf-slide__text{flex:1 1 50%;max-width:52%;}
+.mf-eyebrow{color:var(--brand);font-weight:600;font-size:17px;}
+.mf-title{font-size:48px;font-weight:700;line-height:1.08;color:var(--ink);margin:12px 0 14px;}
+.mf-sub{font-size:16px;color:var(--gray);margin-bottom:24px;max-width:440px;}
+.mf-price{font-size:26px;color:var(--ink);margin-bottom:24px;}
+.mf-price .hl,.mf-title .hl{color:#5FA83B;font-weight:700;}
+.mf-btn{display:inline-block;background:var(--brand);color:#fff;font-weight:700;padding:14px 34px;border-radius:6px;text-decoration:none;transition:background .15s;}
+.mf-btn:hover{background:var(--brand-dark);color:#fff;}
+.mf-slide__media{flex:1 1 44%;display:flex;align-items:center;justify-content:center;min-height:380px;}
+.mf-slide__media img{max-height:380px;max-width:100%;object-fit:contain;filter:drop-shadow(0 20px 34px rgba(0,0,0,.14));}
+.mf-dots{margin-bottom:16px;}
+.mf-dots [data-bs-target]{width:10px;height:10px;border-radius:50%;border:0;background:rgba(0,0,0,.22);}
+.mf-dots .active{width:24px;border-radius:6px;background:var(--brand);}
+.mf-arrow{width:auto;opacity:0;transition:opacity .2s;}
+.mf-hero:hover .mf-arrow{opacity:.7;}
+.mf-arrow .carousel-control-prev-icon,.mf-arrow .carousel-control-next-icon{background-color:rgba(0,0,0,.4);border-radius:50%;padding:16px;background-size:50%;}
 
-/* Slides */
-.mkt-slide{position:relative;height:380px;display:flex;align-items:center;overflow:hidden;}
-.mkt-slide__text{padding:0 40px;max-width:56%;z-index:2;}
-.mkt-slide__eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.85;}
-.mkt-slide__title{font-weight:800;font-size:34px;line-height:1.1;letter-spacing:-.02em;margin:10px 0 12px;}
-.mkt-slide__sub{font-size:15px;line-height:1.5;opacity:.92;margin-bottom:22px;}
-.mkt-slide__cta{display:inline-block;background:#fff;color:var(--brand);font-weight:700;padding:12px 26px;border-radius:10px;text-decoration:none;transition:transform .12s;}
-.mkt-slide__cta:hover{transform:translateY(-1px);}
-.mkt-slide__media{position:absolute;right:0;top:0;bottom:0;width:46%;display:flex;align-items:center;justify-content:center;}
-.mkt-slide__media img{max-height:80%;max-width:88%;object-fit:contain;border-radius:12px;filter:drop-shadow(0 18px 34px rgba(0,0,0,.30));}
-.mkt-slide--blue{background:linear-gradient(120deg,var(--brand),var(--brand-dark));color:#fff;}
-.mkt-slide--dark{background:linear-gradient(120deg,var(--ink),#243049);color:#fff;}
-.mkt-slide--amber{background:linear-gradient(120deg,#F59E0B,#D97706);color:#fff;}
-.mkt-slide--dark .mkt-slide__cta,.mkt-slide--amber .mkt-slide__cta{background:#fff;color:var(--ink);}
-.mkt-dots{margin-bottom:12px;}
-.mkt-dots [data-bs-target]{width:9px;height:9px;border-radius:50%;border:0;background:rgba(255,255,255,.55);}
-.mkt-dots .active{width:22px;border-radius:6px;background:#fff;}
-
-/* Cartes services */
-.mkt-promo__card{flex:1;border:1px solid var(--border);border-radius:16px;background:#fff;padding:18px 20px;display:flex;flex-direction:column;justify-content:center;gap:5px;}
-.mkt-promo__card .ic{font-size:26px;}
-.mkt-promo__card .t{font-weight:700;color:var(--ink);}
-.mkt-promo__card .s{font-size:13px;color:var(--gray);line-height:1.4;}
+/* ===================== SERVICES ===================== */
+.mf-services{background:#fff;}
+.mf-service{display:flex;align-items:center;gap:14px;padding:22px 20px;border-right:1px solid var(--border);}
+.mf-service:last-child{border-right:0;}
+.mf-service i{font-size:30px;color:var(--brand);}
+.mf-service__t{font-weight:700;color:var(--ink);font-size:15px;}
+.mf-service__s{font-size:13px;color:var(--gray);}
 
 @media(max-width:991px){
-  .mkt-slide{height:300px;}
-  .mkt-slide__text{max-width:100%;padding:0 26px;}
-  .mkt-slide__media{display:none;}
-  .mkt-slide__title{font-size:26px;}
+  .mf-slide__inner{flex-direction:column;text-align:center;min-height:auto;gap:16px;}
+  .mf-slide__text{max-width:100%;}
+  .mf-title{font-size:32px;}
+  .mf-sub{margin-left:auto;margin-right:auto;}
+  .mf-slide__media{min-height:auto;}
+  .mf-slide__media img{max-height:240px;}
+  .mf-service{border-right:0;border-bottom:1px solid var(--border);}
 }
 
-/* ============================ HERO ============================ */
+/* ============================ HERO (legacy, inutilisé) ============================ */
 .promo{height:380px;display:flex;align-items:center;}
 .promo__inner{display:flex;align-items:center;justify-content:space-between;gap:48px;padding-left:84px;padding-right:84px;}
 .promo__eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.8;}

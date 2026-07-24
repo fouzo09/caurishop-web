@@ -33,19 +33,30 @@
     </div>
   </div>
 
-  <nav class="border-bottom">
-    <div class="container-xl catnav d-flex align-items-center flex-wrap">
-      @php
-        // Catégorie active : filtre courant, sinon celle du produit consulté (fiche produit).
-        $currentCategory = request('category');
-        if (! $currentCategory && ($p = request()->route('product')) instanceof \App\Models\Product) {
-            $currentCategory = $p->category?->slug;
-        }
-      @endphp
-      @php $allActive = request()->routeIs('shop.products.index') && ! $currentCategory; @endphp
-      <a href="{{ route('shop.products.index') }}" class="catnav__all{{ $allActive ? ' catnav__all--active' : '' }}">☰ Toutes les catégories</a>
+  @php
+    // Catégorie active : filtre courant, sinon celle du produit consulté (fiche produit).
+    $currentCategory = request('category');
+    if (! $currentCategory && ($p = request()->route('product')) instanceof \App\Models\Product) {
+        $currentCategory = $p->category?->slug;
+    }
+    $allActive = request()->routeIs('shop.products.index') && ! $currentCategory;
+    // Icône Bootstrap par catégorie (fallback bi-tag).
+    $catIcons = [
+        'electronique'   => 'bi-phone',
+        'mode-vetements' => 'bi-bag',
+        'maison-cuisine' => 'bi-house-door',
+        'beaute-sante'   => 'bi-heart',
+        'informatique'   => 'bi-laptop',
+        'accessoires'    => 'bi-smartwatch',
+    ];
+  @endphp
+  <nav class="catbar">
+    <div class="container-xl catbar__inner d-flex align-items-center">
+      <a href="{{ route('shop.products.index') }}" class="catbar__all{{ $allActive ? ' catbar__link--active' : '' }}"><i class="bi bi-grid-3x3-gap-fill"></i> Toutes</a>
       @foreach ($shopCategories as $cat)
-        <a href="{{ route('shop.products.index', ['category' => $cat->slug]) }}" class="catnav__link{{ $currentCategory === $cat->slug ? ' catnav__link--active' : '' }}">{{ $cat->name }}</a>
+        <a href="{{ route('shop.products.index', ['category' => $cat->slug]) }}" class="catbar__link{{ $currentCategory === $cat->slug ? ' catbar__link--active' : '' }}">
+          <i class="bi {{ $catIcons[$cat->slug] ?? 'bi-tag' }}"></i> {{ $cat->name }}
+        </a>
       @endforeach
     </div>
   </nav>
