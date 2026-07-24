@@ -3,55 +3,101 @@
 @section('title', 'Accueil — CAURISHOP')
 
 @section('content')
-<!-- HERO : carrousel Bootstrap pleine largeur -->
-<section class="hero border-bottom">
-  <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
-    <div class="carousel-indicators hero-dots">
-      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Livraison offerte"></button>
-      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Paiements sécurisés"></button>
-      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Bienvenue"></button>
+<!-- HERO marketplace : rail catégories + carrousel + services -->
+@php
+    $slides = [
+        [
+            'mod' => 'blue', 'eyebrow' => 'Le marché en ligne de la Guinée',
+            'title' => "Tout ce qu'il vous faut,<br>livré près de chez vous.",
+            'sub' => 'Des milliers de produits à petits prix, payables par mobile money ou à la livraison.',
+            'cta' => 'Découvrir la boutique', 'url' => route('shop.products.index'),
+            'product' => $bestSellers->get(0),
+        ],
+        [
+            'mod' => 'dark', 'eyebrow' => 'Meilleures ventes',
+            'title' => 'Les produits<br>préférés des Guinéens.',
+            'sub' => 'Sélection des articles les plus commandés du moment, prêts à être livrés.',
+            'cta' => 'Voir les meilleures ventes', 'url' => route('shop.products.index', ['sort' => 'popularity']),
+            'product' => $bestSellers->get(1) ?? $bestSellers->get(0),
+        ],
+        [
+            'mod' => 'amber', 'eyebrow' => 'Nouveautés',
+            'title' => 'Les dernières<br>arrivées en boutique.',
+            'sub' => 'Découvrez les nouveaux produits ajoutés cette semaine par nos vendeurs.',
+            'cta' => 'Voir les nouveautés', 'url' => route('shop.products.index', ['sort' => 'newest']),
+            'product' => $newArrivals->get(0),
+        ],
+    ];
+@endphp
+<section class="mkt-hero">
+  <div class="container-xl">
+    <div class="row g-3">
+
+      <!-- Rail catégories -->
+      <aside class="col-lg-3 d-none d-lg-block">
+        <nav class="mkt-rail">
+          <div class="mkt-rail__title">Catégories</div>
+          @foreach ($categories as $cat)
+            <a href="{{ route('shop.products.index', ['category' => $cat->slug]) }}">
+              <i class="bi {{ $cat->icon ? 'bi-tag' : 'bi-tag' }}"></i>
+              <span>{{ $cat->name }}</span>
+              <i class="bi bi-chevron-right chev"></i>
+            </a>
+          @endforeach
+        </nav>
+      </aside>
+
+      <!-- Carrousel central -->
+      <div class="col-lg-6">
+        <div id="heroCarousel" class="carousel slide carousel-fade h-100" data-bs-ride="carousel">
+          <div class="carousel-inner h-100 rounded-4 overflow-hidden">
+            @foreach ($slides as $i => $s)
+              <div class="carousel-item h-100 {{ $i === 0 ? 'active' : '' }}" data-bs-interval="6000">
+                <div class="mkt-slide mkt-slide--{{ $s['mod'] }}">
+                  <div class="mkt-slide__text">
+                    <span class="mkt-slide__eyebrow">{{ $s['eyebrow'] }}</span>
+                    <h{{ $i === 0 ? '1' : '2' }} class="mkt-slide__title">{!! $s['title'] !!}</h{{ $i === 0 ? '1' : '2' }}>
+                    <p class="mkt-slide__sub">{{ $s['sub'] }}</p>
+                    <a href="{{ $s['url'] }}" class="mkt-slide__cta">{{ $s['cta'] }}</a>
+                  </div>
+                  @if ($s['product'] && $s['product']->coverUrl())
+                    <a href="{{ route('shop.products.show', $s['product']->id) }}" class="mkt-slide__media">
+                      <img src="{{ $s['product']->coverUrl() }}" alt="{{ $s['product']->name }}" loading="lazy" onerror="this.closest('.mkt-slide__media').remove()">
+                    </a>
+                  @endif
+                </div>
+              </div>
+            @endforeach
+          </div>
+          <div class="carousel-indicators mkt-dots">
+            @foreach ($slides as $i => $s)
+              <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $i }}" class="{{ $i === 0 ? 'active' : '' }}" aria-label="Slide {{ $i + 1 }}"></button>
+            @endforeach
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span><span class="visually-hidden">Précédent</span></button>
+          <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next"><span class="carousel-control-next-icon"></span><span class="visually-hidden">Suivant</span></button>
+        </div>
+      </div>
+
+      <!-- Cartes services -->
+      <div class="col-lg-3 d-none d-lg-flex flex-column gap-3">
+        <div class="mkt-promo__card">
+          <span class="ic">🚚</span>
+          <span class="t">Livraison nationale</span>
+          <span class="s">Dans les 33 préfectures, suivi inclus.</span>
+        </div>
+        <div class="mkt-promo__card">
+          <span class="ic">📱</span>
+          <span class="t">Paiement mobile money</span>
+          <span class="s">Orange Money, MTN MoMo ou à la livraison.</span>
+        </div>
+        <div class="mkt-promo__card">
+          <span class="ic">🔒</span>
+          <span class="t">Achat protégé</span>
+          <span class="s">Vos paiements et données sécurisés.</span>
+        </div>
+      </div>
     </div>
-    <div class="carousel-inner">
-
-      <div class="carousel-item active promo promo--blue" data-bs-interval="6000">
-        <div class="container-xl promo__inner">
-          <div>
-            <span class="promo__eyebrow">Le marché en ligne de la Guinée</span>
-            <h1 class="promo__title">Tout ce qu'il vous faut,<br>livré près de chez vous.</h1>
-            <p class="promo__sub">Des milliers de produits à petits prix, payables par Orange Money, MTN MoMo ou à la livraison.</p>
-            <a href="{{ route('shop.products.index') }}" class="promo__cta">Découvrir la boutique</a>
-          </div>
-          <span class="promo__figure" aria-hidden="true">C</span>
-        </div>
-      </div>
-
-      <div class="carousel-item promo promo--dark" data-bs-interval="6000">
-        <div class="container-xl promo__inner">
-          <div>
-            <span class="promo__eyebrow">Couverture nationale</span>
-            <h2 class="promo__title">Présents dans les<br>33 préfectures.</h2>
-            <p class="promo__sub">Livraison via nos partenaires logistiques à Conakry et dans toutes les régions, suivi de commande inclus.</p>
-            <a href="{{ route('shop.products.index') }}" class="promo__cta">Commander maintenant</a>
-          </div>
-          <span class="promo__figure" aria-hidden="true">33</span>
-        </div>
-      </div>
-
-      <div class="carousel-item promo promo--light" data-bs-interval="6000">
-        <div class="container-xl promo__inner">
-          <div>
-            <span class="promo__eyebrow">Nouveau client</span>
-            <h2 class="promo__title">Créez votre compte<br>en une minute.</h2>
-            <p class="promo__sub">Inscrivez-vous gratuitement et retrouvez vos commandes, vos adresses et vos suivis au même endroit.</p>
-            <a href="{{ route('shop.register') }}" class="promo__cta">Créer un compte</a>
-          </div>
-          <span class="promo__figure" aria-hidden="true">1 min</span>
-        </div>
-      </div>
-    </div>
-
-    <button class="carousel-control-prev hero-arrow hero-arrow--prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">‹<span class="visually-hidden">Précédent</span></button>
-    <button class="carousel-control-next hero-arrow hero-arrow--next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">›<span class="visually-hidden">Suivant</span></button>
   </div>
 </section>
 

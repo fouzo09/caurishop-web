@@ -102,6 +102,49 @@ a:hover{color:var(--brand);}
 .catnav__link--active{font-weight:700;color:var(--brand);border-bottom-color:var(--brand);}
 .catnav__note{font-size:13px;color:var(--gray);padding:13px 0;}
 
+/* ===================== HERO MARKETPLACE ===================== */
+.mkt-hero{padding:20px 0 8px;}
+.mkt-hero .row{min-height:380px;}
+
+/* Rail catégories */
+.mkt-rail{background:#fff;border:1px solid var(--border);border-radius:16px;padding:8px 0;height:380px;overflow-y:auto;}
+.mkt-rail__title{font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray);padding:10px 18px 6px;}
+.mkt-rail a{display:flex;align-items:center;gap:11px;padding:10px 18px;color:var(--ink);text-decoration:none;font-size:14px;font-weight:500;transition:background .12s,color .12s;}
+.mkt-rail a i:first-child{color:var(--brand);font-size:15px;}
+.mkt-rail a:hover{background:var(--brand-light);color:var(--brand);}
+.mkt-rail a .chev{margin-left:auto;font-size:12px;opacity:.4;}
+
+/* Slides */
+.mkt-slide{position:relative;height:380px;display:flex;align-items:center;overflow:hidden;}
+.mkt-slide__text{padding:0 40px;max-width:56%;z-index:2;}
+.mkt-slide__eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.85;}
+.mkt-slide__title{font-weight:800;font-size:34px;line-height:1.1;letter-spacing:-.02em;margin:10px 0 12px;}
+.mkt-slide__sub{font-size:15px;line-height:1.5;opacity:.92;margin-bottom:22px;}
+.mkt-slide__cta{display:inline-block;background:#fff;color:var(--brand);font-weight:700;padding:12px 26px;border-radius:10px;text-decoration:none;transition:transform .12s;}
+.mkt-slide__cta:hover{transform:translateY(-1px);}
+.mkt-slide__media{position:absolute;right:0;top:0;bottom:0;width:46%;display:flex;align-items:center;justify-content:center;}
+.mkt-slide__media img{max-height:80%;max-width:88%;object-fit:contain;border-radius:12px;filter:drop-shadow(0 18px 34px rgba(0,0,0,.30));}
+.mkt-slide--blue{background:linear-gradient(120deg,var(--brand),var(--brand-dark));color:#fff;}
+.mkt-slide--dark{background:linear-gradient(120deg,var(--ink),#243049);color:#fff;}
+.mkt-slide--amber{background:linear-gradient(120deg,#F59E0B,#D97706);color:#fff;}
+.mkt-slide--dark .mkt-slide__cta,.mkt-slide--amber .mkt-slide__cta{background:#fff;color:var(--ink);}
+.mkt-dots{margin-bottom:12px;}
+.mkt-dots [data-bs-target]{width:9px;height:9px;border-radius:50%;border:0;background:rgba(255,255,255,.55);}
+.mkt-dots .active{width:22px;border-radius:6px;background:#fff;}
+
+/* Cartes services */
+.mkt-promo__card{flex:1;border:1px solid var(--border);border-radius:16px;background:#fff;padding:18px 20px;display:flex;flex-direction:column;justify-content:center;gap:5px;}
+.mkt-promo__card .ic{font-size:26px;}
+.mkt-promo__card .t{font-weight:700;color:var(--ink);}
+.mkt-promo__card .s{font-size:13px;color:var(--gray);line-height:1.4;}
+
+@media(max-width:991px){
+  .mkt-slide{height:300px;}
+  .mkt-slide__text{max-width:100%;padding:0 26px;}
+  .mkt-slide__media{display:none;}
+  .mkt-slide__title{font-size:26px;}
+}
+
 /* ============================ HERO ============================ */
 .promo{height:380px;display:flex;align-items:center;}
 .promo__inner{display:flex;align-items:center;justify-content:space-between;gap:48px;padding-left:84px;padding-right:84px;}
