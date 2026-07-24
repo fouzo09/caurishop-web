@@ -6,7 +6,7 @@
         : (float) $product->price;
     $prefix = $product->isVariable() ? 'À partir de ' : '';
 @endphp
-<a href="{{ route('shop.products.show', $product->slug ?? $product->id) }}" class="pcard d-flex flex-column h-100">
+<a href="{{ route('shop.products.show', $product->id) }}" class="pcard d-flex flex-column h-100">
   <div class="pcard__media">
     @if ($product->isOutOfStock())
       <span class="pcard__badge">Rupture</span>
