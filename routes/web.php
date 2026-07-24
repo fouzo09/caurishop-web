@@ -28,9 +28,64 @@ use App\Http\Controllers\Portal\PaymentController as PortalPaymentController;
 use App\Http\Controllers\Portal\ProfileController as PortalProfileController;
 use App\Http\Controllers\Portal\DjomyController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Shop\HomeController as ShopHomeController;
+use App\Http\Controllers\Shop\ProductController as ShopProductController;
+use App\Http\Controllers\Shop\CartController as ShopCartController;
+use App\Http\Controllers\Shop\CheckoutController as ShopCheckoutController;
+use App\Http\Controllers\Shop\AccountController as ShopAccountController;
+use App\Http\Controllers\Shop\ContactController as ShopContactController;
+use App\Http\Controllers\Shop\Auth\RegisterController as ShopRegisterController;
+use App\Http\Controllers\Shop\Auth\LoginController as ShopLoginController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn() => view('landing'))->name('home');
+/*
+|--------------------------------------------------------------------------
+| Parcours e-commerce public (shop) — à la racine, ouvert à tous
+|--------------------------------------------------------------------------
+| Vit à côté des espaces /admin, /company, /portal (inchangés).
+*/
+// Accueil boutique — conserve le nom "home" pour compat. des liens existants
+Route::get('/', [ShopHomeController::class, 'index'])->name('home');
+
+Route::name('shop.')->group(function () {
+    // Catalogue public
+    Route::get('/produits', [ShopProductController::class, 'index'])->name('products.index');
+    Route::get('/produits/{product}', [ShopProductController::class, 'show'])->name('products.show');
+
+    // Panier (invités = session, connectés = base)
+    Route::get('/panier', [ShopCartController::class, 'index'])->name('cart.index');
+    Route::post('/panier/ajouter', [ShopCartController::class, 'add'])->name('cart.add');
+    Route::post('/panier/mettre-a-jour', [ShopCartController::class, 'update'])->name('cart.update');
+    Route::post('/panier/supprimer', [ShopCartController::class, 'remove'])->name('cart.remove');
+
+    // Contact
+    Route::get('/contact', [ShopContactController::class, 'index'])->name('contact');
+    Route::post('/contact', [ShopContactController::class, 'send'])->name('contact.send');
+
+    // Inscription / connexion publiques (invités uniquement)
+    Route::middleware('guest')->group(function () {
+        Route::get('/inscription', [ShopRegisterController::class, 'create'])->name('register');
+        Route::post('/inscription', [ShopRegisterController::class, 'store'])->name('register.store');
+        Route::get('/connexion', [ShopLoginController::class, 'create'])->name('login');
+        Route::post('/connexion', [ShopLoginController::class, 'store'])->name('login.store');
+    });
+
+    // Checkout + espace client (connexion requise)
+    Route::middleware('auth')->group(function () {
+        Route::get('/checkout', [ShopCheckoutController::class, 'index'])->name('checkout.index');
+        Route::post('/checkout', [ShopCheckoutController::class, 'store'])->name('checkout.store');
+        Route::get('/commande/{order}/confirmation', [ShopCheckoutController::class, 'confirmation'])->name('checkout.confirmation');
+
+        Route::prefix('mon-compte')->name('account.')->group(function () {
+            Route::get('/', [ShopAccountController::class, 'index'])->name('index');
+            Route::get('/commandes', [ShopAccountController::class, 'orders'])->name('orders');
+            Route::get('/commandes/{order}', [ShopAccountController::class, 'showOrder'])->name('orders.show');
+            Route::get('/profil', [ShopAccountController::class, 'profile'])->name('profile');
+            Route::put('/profil', [ShopAccountController::class, 'updateProfile'])->name('profile.update');
+        });
+    });
+});
+
 
 Route::get('/demarrer', fn() => view('get-started'))->name('get-started');
 Route::post('/demarrer', function (\Illuminate\Http\Request $request, \App\Services\Admin\CompanyService $companyService) {
@@ -50,7 +105,7 @@ Route::post('/demarrer', function (\Illuminate\Http\Request $request, \App\Servi
         'e_registration'  => ['nullable', 'string', 'max:100'],
         'e_date'          => ['required', 'date', 'before:today'],
         'e_employes'      => ['required', 'string', 'in:1 – 5,6 – 20,21 – 50,51 – 100,Plus de 100'],
-        'e_adresse'       => ['required', 'string', 'min:5', 'max:255'],
+        'e_adresse'       => ['required', 'string', 'min:2', 'max:20'],
         'e_ville'         => array_merge(['required', 'string', 'min:2', 'max:100'], $villeRegex),
         'e_pays'          => array_merge(['required', 'string', 'min:2', 'max:100'], $villeRegex),
         'doc_rccm'        => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
