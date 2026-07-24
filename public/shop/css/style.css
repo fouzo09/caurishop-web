@@ -91,7 +91,9 @@ a:hover{color:var(--brand);}
 }
 
 .catnav{gap:2px;}
-.catnav__all{color:var(--brand);padding:13px 16px 13px 0;font-weight:600;font-size:14px;}
+.catnav__all{color:var(--ink);padding:13px 16px 13px 0;font-weight:600;font-size:14px;border-bottom:2px solid transparent;}
+.catnav__all:hover{color:var(--brand);}
+.catnav__all--active{color:var(--brand);border-bottom-color:var(--brand);}
 .catnav__link{
   padding:13px 13px;font-size:14px;font-weight:500;color:var(--ink);
   border-bottom:2px solid transparent;

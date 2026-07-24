@@ -42,7 +42,8 @@
             $currentCategory = $p->category?->slug;
         }
       @endphp
-      <a href="{{ route('shop.products.index') }}" class="catnav__all">☰ Toutes les catégories</a>
+      @php $allActive = request()->routeIs('shop.products.index') && ! $currentCategory; @endphp
+      <a href="{{ route('shop.products.index') }}" class="catnav__all{{ $allActive ? ' catnav__all--active' : '' }}">☰ Toutes les catégories</a>
       @foreach ($shopCategories as $cat)
         <a href="{{ route('shop.products.index', ['category' => $cat->slug]) }}" class="catnav__link{{ $currentCategory === $cat->slug ? ' catnav__link--active' : '' }}">{{ $cat->name }}</a>
       @endforeach
