@@ -114,7 +114,12 @@ a:hover{color:var(--brand);}
 .mf-hero{position:relative;background:#ebeef2;border-bottom:1px solid var(--border);overflow:hidden;}
 .mf-slide__inner{display:flex;align-items:center;justify-content:space-between;gap:40px;min-height:480px;padding:36px 0;}
 .mf-slide__media{flex:1 1 46%;display:flex;align-items:center;justify-content:center;margin:0;}
-.mf-slide__media img{max-height:400px;max-width:100%;object-fit:contain;filter:drop-shadow(0 24px 30px rgba(0,0,0,.18));}
+.mf-slide__media img{
+  max-height:420px;max-width:100%;width:auto;height:auto;display:block;
+  /* Bords adoucis : la photo se fond dans le fond clair et semble flotter (pas de cadre) */
+  -webkit-mask-image:radial-gradient(ellipse 68% 70% at 50% 50%,#000 40%,transparent 96%);
+          mask-image:radial-gradient(ellipse 68% 70% at 50% 50%,#000 40%,transparent 96%);
+}
 .mf-slide__content{flex:1 1 46%;}
 .mf-subtitle{font-size:22px;font-weight:400;color:#3a3a3a;letter-spacing:.02em;margin:0 0 6px;}
 .mf-subtitle .hl{color:var(--brand);font-weight:600;}
