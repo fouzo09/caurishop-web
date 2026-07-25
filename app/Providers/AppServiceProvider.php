@@ -36,7 +36,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         View::composer('shop.partials.header', function ($view) {
-            $view->with('shopCartCount', app(CartService::class)->count());
+            $view->with('shopCartCount', app(CartService::class)->lineCount());
         });
     }
 }

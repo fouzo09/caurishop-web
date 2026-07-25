@@ -119,6 +119,14 @@ class CartService
     }
 
     /**
+     * Nombre de produits distincts dans le panier (nombre de lignes).
+     */
+    public function lineCount(): int
+    {
+        return count($this->rawLines());
+    }
+
+    /**
      * Ajoute (ou incrémente) une ligne au panier.
      */
     public function add(int $productId, ?int $variantId, int $quantity = 1): void
