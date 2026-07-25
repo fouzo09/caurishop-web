@@ -3,8 +3,9 @@
     $isVariable = $product->isVariable();
     $displayPrice = $isVariable ? (float) ($product->variants->min('price') ?? 0) : (float) $product->price;
     $prefix = $isVariable ? 'À partir de ' : '';
-    $soldOut = ! $product->isService() && $product->stock_status === 'rupture';
-    $canQuickAdd = ! $isVariable && ! $soldOut;
+    $isService = $product->isService();
+    $soldOut = ! $isService && $product->stock_status === 'rupture';
+    $canQuickAdd = ! $isVariable && ! $isService && ! $soldOut;
     $url = route('shop.products.show', $product->id);
 @endphp
 <div class="pcard">
@@ -33,6 +34,8 @@
         <input type="hidden" name="product_id" value="{{ $product->id }}">
         <button type="submit"><i class="bi bi-bag-plus"></i> Ajouter au panier</button>
       </form>
+    @elseif ($isService)
+      <a href="{{ $url }}" class="pcard__addbar pcard__addbar--link"><i class="bi bi-eye"></i> Voir le service</a>
     @else
       <a href="{{ $url }}" class="pcard__addbar pcard__addbar--link"><i class="bi bi-eye"></i> Voir le produit</a>
     @endif
