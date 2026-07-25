@@ -43,11 +43,9 @@
       <div class="col-12 col-lg-4">
         <div class="footer-title">Paiement</div>
         <div class="d-flex flex-wrap gap-2 align-items-center">
-          <span class="pay-badge" title="Orange Money"><img src="{{ asset('shop/img/pay/orange.svg') }}" alt="Orange Money" height="20"></span>
-          <span class="pay-badge pay-badge--mtn" title="MTN MoMo">MTN</span>
-          <span class="pay-badge" title="Visa"><img src="{{ asset('shop/img/pay/visa.svg') }}" alt="Visa" height="13"></span>
-          <span class="pay-badge" title="Mastercard"><img src="{{ asset('shop/img/pay/mastercard.svg') }}" alt="Mastercard" height="22"></span>
-          <span class="pay-badge pay-badge--text" title="Paycard">Paycard</span>
+          <span class="pay-badge" title="Orange Money"><img src="{{ asset('shop/img/pay/om.svg') }}" alt="Orange Money" height="26"></span>
+          <span class="pay-badge" title="MTN MoMo"><img src="{{ asset('shop/img/pay/momo.svg') }}" alt="MTN MoMo" height="26"></span>
+          <span class="pay-badge" title="Carte bancaire"><img src="{{ asset('shop/img/pay/card.svg') }}" alt="Carte bancaire" height="24"></span>
         </div>
         <div class="footer-title mt-4">Suivez-nous</div>
         <div class="d-flex gap-2">
