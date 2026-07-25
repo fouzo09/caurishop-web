@@ -63,18 +63,13 @@ class CheckoutController extends Controller
             'address'         => ['required', 'string', 'max:255'],
             'city'            => ['required', 'string', 'max:100'],
             'delivery_method' => ['required', 'string', 'in:' . implode(',', array_keys(self::DELIVERY))],
-            'payment_method'  => ['required', 'string'],
+            'payment_method'  => ['nullable', 'string'],
             'payment_phone'   => ['nullable', 'string', 'max:30'],
         ]);
 
-        $provider = $this->payments->get($data['payment_method']);
-        if (! $provider || ! $provider->isAvailableFor($customer)) {
-            return back()->withErrors(['payment_method' => 'Moyen de paiement invalide.'])->withInput();
-        }
-
-        if ($provider->requiresPhone() && empty($data['payment_phone'])) {
-            return back()->withErrors(['payment_phone' => 'Numéro Mobile Money requis pour ce moyen de paiement.'])->withInput();
-        }
+        // Le moyen de paiement est optionnel ici : s'il n'est pas fourni,
+        // la commande est créée en attente de paiement (règlement ultérieur).
+        $provider = ! empty($data['payment_method']) ? $this->payments->get($data['payment_method']) : null;
 
         // 1) Création de la commande via le service existant (réutilisation).
         $order = $orders->createOrder([
@@ -98,18 +93,18 @@ class CheckoutController extends Controller
             'delivery_method'  => $data['delivery_method'],
             'delivery_fee'     => $deliveryFee,
             'discount_amount'  => $summary['discount'],
-            'payment_method'   => $provider->key(),
+            'payment_method'   => $provider?->key(),
         ]);
 
-        // 3) Paiement (simulé) + finalisation.
-        $result = $provider->process($order, $data);
+        // 3) Paiement (si un moyen a été choisi) + finalisation.
+        $result = $provider ? $provider->process($order, $data) : null;
 
         $order->update([
-            'payment_status'    => $result->status,
-            'payment_reference' => $result->reference,
+            'payment_status'    => $result?->status ?? \App\Payments\PaymentResult::PENDING,
+            'payment_reference' => $result?->reference,
         ]);
 
-        if ($result->isPaid()) {
+        if ($result && $result->isPaid()) {
             // Commande réglée → confirmée (cash : pas de plan de crédit).
             $orders->confirmOrder($order);
         } else {

@@ -6,27 +6,10 @@
         $activeTab = 'login';
     }
 @endphp
-<div class="container-xl py-5" style="max-width:1080px;">
+<div class="container-xl py-5" style="max-width:480px;">
   <div class="panel overflow-hidden shadow-card">
     <div class="row g-0">
-
-      <div class="col-lg-6 brand-panel d-flex flex-column p-4 p-lg-5">
-        <a href="{{ route('home') }}" class="d-flex align-items-center gap-2 mb-auto">
-          <span class="logo__mark">C</span><span class="logo__name fs-5">CAURISHOP</span>
-        </a>
-        <div class="mt-5">
-          <div style="font-size:72px;">🐚</div>
-          <h2 class="fw-bold text-ink mt-2 mb-3" style="font-size:28px;">Bienvenue sur le marché de la Guinée</h2>
-          <p class="text-muted mb-4">Suivez vos commandes, enregistrez vos adresses et profitez d'offres exclusives réservées aux membres.</p>
-          <div class="d-flex flex-column gap-2 small">
-            <span>✓ Paiement mobile money en 1 clic</span>
-            <span>✓ Suivi de livraison en temps réel</span>
-            <span>✓ Vos commandes centralisées</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-6 p-4 p-lg-5">
+      <div class="col-12 p-4 p-lg-5">
         <ul class="nav nav-pills auth-pills mb-4" role="tablist">
           <li class="nav-item flex-fill" role="presentation">
             <button class="nav-link w-100 {{ $activeTab === 'login' ? 'active' : '' }}" data-bs-toggle="pill" data-bs-target="#pane-login" type="button" role="tab">Connexion</button>
@@ -39,8 +22,8 @@
         <div class="tab-content">
           {{-- CONNEXION --}}
           <div class="tab-pane fade {{ $activeTab === 'login' ? 'show active' : '' }}" id="pane-login" role="tabpanel">
-            <h3 class="fw-bold text-ink mb-1" style="font-size:22px;">Content de vous revoir 👋</h3>
-            <p class="small text-muted mb-4">Connectez-vous pour continuer vos achats.</p>
+            <h3 class="fw-bold text-ink mb-1" style="font-size:22px;">Connexion</h3>
+            <p class="small text-muted mb-4">Accédez à votre compte CauriShop.</p>
             <form method="POST" action="{{ route('shop.login.store') }}">
               @csrf
               <div class="mb-3">

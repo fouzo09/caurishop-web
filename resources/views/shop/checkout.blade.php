@@ -58,24 +58,6 @@
         @endforeach
       </div>
 
-      <!-- 3. Paiement -->
-      <div class="panel p-4">
-        <div class="step-title"><span class="step-num">3</span> Moyen de paiement</div>
-        <div class="row g-2">
-          @foreach ($methods as $method)
-            <div class="col-md-6"><label class="choice-card d-flex align-items-center gap-3 mb-0 h-100">
-              <input class="form-check-input m-0 js-payment" type="radio" name="payment_method" value="{{ $method->key() }}" data-phone="{{ $method->requiresPhone() ? '1' : '0' }}" @checked($loop->first)>
-              <span class="pay-chip">{{ $method->icon() }}</span><span class="fw-bold small">{{ $method->label() }}</span>
-            </label></div>
-          @endforeach
-        </div>
-        <div class="pay-hint mt-3">
-          <div id="payPhoneWrap">
-            <div class="fw-bold text-brand small mb-2">Un code de confirmation vous sera envoyé sur votre numéro Mobile Money.</div>
-            <input class="form-control" name="payment_phone" value="{{ old('payment_phone') }}" id="payPhone" placeholder="Numéro Mobile Money (+224 …)">
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Récapitulatif -->
@@ -125,15 +107,7 @@
   }
   document.querySelectorAll('.js-delivery').forEach(function (r) { r.addEventListener('change', refresh); });
 
-  var phoneWrap = document.getElementById('payPhoneWrap');
-  function refreshPay() {
-    var chosen = document.querySelector('.js-payment:checked');
-    if (phoneWrap) phoneWrap.style.display = (chosen && chosen.dataset.phone === '1') ? '' : 'none';
-  }
-  document.querySelectorAll('.js-payment').forEach(function (r) { r.addEventListener('change', refreshPay); });
-
   refresh();
-  refreshPay();
 })();
 </script>
 @endpush

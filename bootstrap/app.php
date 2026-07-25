@@ -20,6 +20,16 @@ return Application::configure(basePath: dirname(__DIR__))
             'djomy/webhook',
         ]);
         $middleware->trustProxies(at: '*');
+
+        // Invités : redirection vers la connexion client (/connexion) pour le parcours
+        // public, vers la connexion admin (/login) partout ailleurs.
+        $middleware->redirectGuestsTo(function (\Illuminate\Http\Request $request) {
+            if ($request->is('checkout', 'commande/*', 'mon-compte', 'mon-compte/*', 'deconnexion')) {
+                return route('shop.login');
+            }
+
+            return route('login');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
