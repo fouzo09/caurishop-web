@@ -43,14 +43,16 @@
       <div class="col-12 col-lg-4">
         <div class="footer-title">Paiement</div>
         <div class="d-flex flex-wrap gap-2">
-          <span class="pay-badge">Orange Money</span>
-          <span class="pay-badge">MTN MoMo</span>
-          <span class="pay-badge">Visa / Paycard</span>
-          <span class="pay-badge">Virement</span>
+          <span class="pay-badge" title="Orange Money" aria-label="Orange Money"><i class="bi bi-phone" style="color:#ff7900"></i></span>
+          <span class="pay-badge" title="MTN MoMo" aria-label="MTN MoMo"><i class="bi bi-phone-vibrate" style="color:#f5b800"></i></span>
+          <span class="pay-badge" title="Visa / Mastercard" aria-label="Visa / Mastercard"><i class="bi bi-credit-card-2-front"></i></span>
+          <span class="pay-badge" title="Paycard" aria-label="Paycard"><i class="bi bi-credit-card"></i></span>
         </div>
         <div class="footer-title mt-4">Suivez-nous</div>
         <div class="d-flex gap-2">
-          <span class="social">📘</span><span class="social">📸</span><span class="social">▶️</span>
+          <a href="#" class="social" title="Facebook" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+          <a href="#" class="social" title="Instagram" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+          <a href="#" class="social" title="TikTok" aria-label="TikTok"><i class="bi bi-tiktok"></i></a>
         </div>
       </div>
     </div>
