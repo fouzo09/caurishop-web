@@ -18,12 +18,12 @@
     <div class="carousel-inner">
       @if ($heroProducts->isEmpty())
         <div class="carousel-item active">
-          <div class="container-xl mf-slide__inner">
-            <div class="mf-slide__text">
-              <span class="mf-eyebrow">Bienvenue sur CAURISHOP</span>
-              <h1 class="mf-title">Le marché en ligne<br>de la <span class="hl">Guinée</span></h1>
-              <p class="mf-sub">Des milliers de produits, payables par mobile money ou à la livraison.</p>
-              <a href="{{ route('shop.products.index') }}" class="mf-btn">Découvrir la boutique</a>
+          <div class="container mf-slide__inner mf-slide--right">
+            <div class="mf-slide__content">
+              <h5 class="mf-subtitle">Bienvenue sur <span class="hl">CAURISHOP</span></h5>
+              <h1 class="mf-title">Le marché<br>de la Guinée</h1>
+              <p class="mf-offer">Livré partout, payé <span class="hl">mobile money</span></p>
+              <a href="{{ route('shop.products.index') }}" class="mf-btn">Découvrir <i class="bi bi-arrow-right"></i></a>
             </div>
           </div>
         </div>
@@ -32,18 +32,19 @@
           @php
               $isVar = $product->isVariable();
               $price = $isVar ? (float) ($product->variants->min('price') ?? 0) : (float) $product->price;
+              $flip  = $i % 2 === 1; // alterne image/texte comme Wolmart
           @endphp
           <div class="carousel-item {{ $i === 0 ? 'active' : '' }}" data-bs-interval="6000">
-            <div class="container-xl mf-slide__inner">
-              <div class="mf-slide__text">
-                <span class="mf-eyebrow">{{ $heroLabels[$i] ?? 'Sélection CAURISHOP' }}</span>
+            <div class="container mf-slide__inner {{ $flip ? 'mf-slide--left' : 'mf-slide--right' }}">
+              <figure class="mf-slide__media">
+                <a href="{{ route('shop.products.show', $product->id) }}"><img src="{{ $product->coverUrl() }}" alt="{{ $product->name }}" loading="lazy"></a>
+              </figure>
+              <div class="mf-slide__content">
+                <h5 class="mf-subtitle">{{ $heroLabels[$i] ?? 'Sélection CAURISHOP' }}</h5>
                 <h{{ $i === 0 ? '1' : '2' }} class="mf-title">{{ $product->name }}</h{{ $i === 0 ? '1' : '2' }}>
-                <p class="mf-price">{{ $isVar ? 'À partir de ' : '' }}<span class="hl">@gnf($price)</span></p>
-                <a href="{{ route('shop.products.show', $product->id) }}" class="mf-btn">Acheter maintenant</a>
+                <p class="mf-offer">{{ $isVar ? 'À partir de ' : '' }}<span class="hl">@gnf($price)</span></p>
+                <a href="{{ route('shop.products.show', $product->id) }}" class="mf-btn">Acheter <i class="bi bi-arrow-right"></i></a>
               </div>
-              <a href="{{ route('shop.products.show', $product->id) }}" class="mf-slide__media">
-                <img src="{{ $product->coverUrl() }}" alt="{{ $product->name }}" loading="lazy">
-              </a>
             </div>
           </div>
         @endforeach
@@ -56,8 +57,8 @@
           <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $i }}" class="{{ $i === 0 ? 'active' : '' }}" aria-label="Slide {{ $i + 1 }}"></button>
         @endforeach
       </div>
-      <button class="carousel-control-prev mf-arrow" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
-      <button class="carousel-control-next mf-arrow" type="button" data-bs-target="#heroCarousel" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
+      <button class="carousel-control-prev mf-arrow" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev"><i class="bi bi-chevron-left"></i></button>
+      <button class="carousel-control-next mf-arrow" type="button" data-bs-target="#heroCarousel" data-bs-slide="next"><i class="bi bi-chevron-right"></i></button>
     @endif
   </div>
 </section>
