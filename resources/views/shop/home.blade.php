@@ -3,65 +3,59 @@
 @section('title', 'Accueil — CAURISHOP')
 
 @section('content')
-<!-- HERO : bannière promo pleine largeur (image produit à droite) -->
+<!-- HERO : bannière pleine largeur (image de fond floutée + texte) -->
 @php
-    // Produits mis en avant : meilleures ventes puis nouveautés, uniquement ceux avec image.
-    $heroProducts = $bestSellers->concat($newArrivals)
-        ->filter(fn ($p) => $p && $p->coverUrl())
-        ->unique('id')
-        ->take(3)
-        ->values();
-    $heroLabels = ['Promo de la semaine', 'Meilleure vente', 'Nouveauté'];
+    $heroSlides = [
+        [
+            'img'   => asset('shop/img/hero-alimentation.jpg'),
+            'sub'   => 'Épicerie & Alimentation',
+            'title' => "Le meilleur de<br>l'alimentation",
+            'offer' => 'Produits frais et essentiels du quotidien',
+            'url'   => route('shop.products.index'),
+        ],
+        [
+            'img'   => asset('shop/img/hero-electronique.jpg'),
+            'sub'   => 'High-Tech',
+            'title' => 'Électronique<br>& gadgets',
+            'offer' => 'Smartphones, accessoires et bien plus',
+            'url'   => route('shop.products.index', ['category' => 'electronique']),
+        ],
+        [
+            'img'   => asset('shop/img/hero-mode.jpg'),
+            'sub'   => 'Mode & Lifestyle',
+            'title' => 'Collection<br>mode',
+            'offer' => 'Les dernières tendances à petits prix',
+            'url'   => route('shop.products.index', ['category' => 'mode-vetements']),
+        ],
+    ];
 @endphp
 <section class="mf-hero">
   <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-inner">
-      @if ($heroProducts->isEmpty())
-        <div class="carousel-item active">
+      @foreach ($heroSlides as $i => $s)
+        <div class="carousel-item {{ $i === 0 ? 'active' : '' }}" data-bs-interval="6000">
           <div class="mf-slide">
-            <div class="mf-slide__bg mf-slide__bg--plain"></div>
+            <div class="mf-slide__bg" style="background-image:url('{{ $s['img'] }}')"></div>
             <div class="container mf-slide__inner">
               <div class="mf-slide__content">
-                <h5 class="mf-subtitle">Bienvenue sur CAURISHOP</h5>
-                <h1 class="mf-title">Le marché en ligne<br>de la Guinée</h1>
-                <p class="mf-offer">Livré partout, payé par <span class="hl">mobile money</span></p>
-                <a href="{{ route('shop.products.index') }}" class="mf-btn">Découvrir la boutique <i class="bi bi-arrow-right"></i></a>
+                <h5 class="mf-subtitle">{{ $s['sub'] }}</h5>
+                <h{{ $i === 0 ? '1' : '2' }} class="mf-title">{!! $s['title'] !!}</h{{ $i === 0 ? '1' : '2' }}>
+                <p class="mf-offer">{{ $s['offer'] }}</p>
+                <a href="{{ $s['url'] }}" class="mf-btn">Découvrir <i class="bi bi-arrow-right"></i></a>
               </div>
             </div>
           </div>
         </div>
-      @else
-        @foreach ($heroProducts as $i => $product)
-          @php
-              $isVar = $product->isVariable();
-              $price = $isVar ? (float) ($product->variants->min('price') ?? 0) : (float) $product->price;
-          @endphp
-          <div class="carousel-item {{ $i === 0 ? 'active' : '' }}" data-bs-interval="6000">
-            <div class="mf-slide">
-              <div class="mf-slide__bg" style="background-image:url('{{ $product->coverUrl() }}')"></div>
-              <div class="container mf-slide__inner">
-                <div class="mf-slide__content">
-                  <h5 class="mf-subtitle">{{ $heroLabels[$i] ?? 'Sélection CAURISHOP' }}</h5>
-                  <h{{ $i === 0 ? '1' : '2' }} class="mf-title">{{ $product->name }}</h{{ $i === 0 ? '1' : '2' }}>
-                  <p class="mf-offer">{{ $isVar ? 'À partir de ' : '' }}<span class="hl">@gnf($price)</span></p>
-                  <a href="{{ route('shop.products.show', $product->id) }}" class="mf-btn">Acheter maintenant <i class="bi bi-arrow-right"></i></a>
-                </div>
-              </div>
-            </div>
-          </div>
-        @endforeach
-      @endif
+      @endforeach
     </div>
 
-    @if ($heroProducts->count() > 1)
-      <div class="carousel-indicators mf-dots">
-        @foreach ($heroProducts as $i => $product)
-          <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $i }}" class="{{ $i === 0 ? 'active' : '' }}" aria-label="Slide {{ $i + 1 }}"></button>
-        @endforeach
-      </div>
-      <button class="carousel-control-prev mf-arrow" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev"><i class="bi bi-chevron-left"></i></button>
-      <button class="carousel-control-next mf-arrow" type="button" data-bs-target="#heroCarousel" data-bs-slide="next"><i class="bi bi-chevron-right"></i></button>
-    @endif
+    <div class="carousel-indicators mf-dots">
+      @foreach ($heroSlides as $i => $s)
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $i }}" class="{{ $i === 0 ? 'active' : '' }}" aria-label="Slide {{ $i + 1 }}"></button>
+      @endforeach
+    </div>
+    <button class="carousel-control-prev mf-arrow" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev"><i class="bi bi-chevron-left"></i></button>
+    <button class="carousel-control-next mf-arrow" type="button" data-bs-target="#heroCarousel" data-bs-slide="next"><i class="bi bi-chevron-right"></i></button>
   </div>
 </section>
 
