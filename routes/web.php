@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\SecurityController;
 use App\Http\Controllers\Admin\MarginController;
 use App\Http\Controllers\Admin\ScraperController;
 use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Company\DashboardController as CompanyDashboard;
 use App\Http\Controllers\Company\OrderController as CompanyOrderController;
 use App\Http\Controllers\Company\EmployeeController as CompanyEmployeeController;
@@ -224,6 +225,16 @@ Route::middleware('auth')->group(function () {
             Route::delete('/{customer}', [CustomerController::class, 'destroy'])->name('destroy');
             Route::post('/{customer}/activate', [CustomerController::class, 'activate'])->name('activate');
             Route::post('/{customer}/deactivate', [CustomerController::class, 'deactivate'])->name('deactivate');
+        });
+
+        Route::prefix('categories')->name('categories.')->group(function () {
+            Route::get('/', [CategoryController::class, 'index'])->name('index');
+            Route::get('/create', [CategoryController::class, 'create'])->name('create');
+            Route::post('/', [CategoryController::class, 'store'])->name('store');
+            Route::get('/{category}/edit', [CategoryController::class, 'edit'])->name('edit');
+            Route::put('/{category}', [CategoryController::class, 'update'])->name('update');
+            Route::delete('/{category}', [CategoryController::class, 'destroy'])->name('destroy');
+            Route::post('/{category}/toggle', [CategoryController::class, 'toggle'])->name('toggle');
         });
 
         Route::prefix('products')->name('products.')->group(function () {

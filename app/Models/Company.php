@@ -20,6 +20,7 @@ class Company extends Model
         'email',
         'phone',
         'address',
+        'quartier',
         'city',
         'country',
         'credit_limit',

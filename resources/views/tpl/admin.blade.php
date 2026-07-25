@@ -41,6 +41,10 @@
                 <i class="fas fa-users"></i>
                 <span>Clients</span>
             </a>
+            <a href="{{ route('admin.categories.index') }}" class="menu-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                <i class="fas fa-tags"></i>
+                <span>Catégories</span>
+            </a>
             <a href="{{ route('admin.products.index') }}" class="menu-item {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
                 <i class="fas fa-box"></i>
                 <span>Produits</span>

@@ -259,7 +259,7 @@ footer{background:#fff;border-top:1px solid var(--b);padding:64px 48px 40px}
       </div>
       <div class="field full">
         <label class="fl" for="e-adresse">Adresse de l'entreprise</label>
-        <input type="text" id="e-adresse" name="e_adresse" placeholder="Quartier, commune — ex : Almamya, Kaloum" value="{{ old('e_adresse') }}" class="{{ $errors->has('e_adresse') ? 'err' : '' }}"/>
+        <input type="text" id="e-adresse" name="e_adresse" placeholder="Quartier, commune — ex : Almamya, Kaloum" value="{{ old('e_adresse') }}" class="{{ $errors->has('e_adresse') ? 'err' : '' }}" minlength="2" maxlength="20"/>
         <span class="ferr" id="err-e-adresse">{{ $errors->first('e_adresse') }}</span>
       </div>
       <div class="field">
