@@ -90,11 +90,21 @@
     <h2 class="section-title mb-0">Parcourir par catégorie</h2>
     <a href="{{ route('shop.products.index') }}" class="section-link">Tout voir →</a>
   </div>
+  @php
+    $catIcons = [
+        'electronique'   => 'bi-phone',
+        'mode-vetements' => 'bi-bag',
+        'maison-cuisine' => 'bi-house-door',
+        'beaute-sante'   => 'bi-heart',
+        'informatique'   => 'bi-laptop',
+        'accessoires'    => 'bi-smartwatch',
+    ];
+  @endphp
   <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3">
     @foreach ($categories as $cat)
       <div class="col">
         <a href="{{ route('shop.products.index', ['category' => $cat->slug]) }}" class="cat d-flex flex-column align-items-center gap-2">
-          <span class="cat__icon"><span class="cat__fallback">🏷️</span></span>
+          <span class="cat__icon"><i class="bi {{ $catIcons[$cat->slug] ?? 'bi-tag' }}"></i></span>
           <span class="cat__name">{{ $cat->name }}</span>
         </a>
       </div>
