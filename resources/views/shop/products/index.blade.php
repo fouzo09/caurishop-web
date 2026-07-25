@@ -40,20 +40,14 @@
 
         <div class="side-card mb-3">
           <div class="side-card__title">Prix (GNF)</div>
-          <input type="range" class="form-range" id="priceRange" name="max_price" min="0" max="2000000" step="50000" value="{{ request('max_price', 2000000) }}">
+          <input type="range" class="form-range" id="priceRange" name="max_price" min="0" max="{{ $maxPrice }}" step="50000" value="{{ request('max_price', $maxPrice) }}">
           <div class="d-flex justify-content-between small mt-1">
             <span class="text-muted">0 GNF</span>
-            <span class="fw-bold text-brand">Jusqu'à <span id="priceLabel">@gnf(request('max_price', 2000000))</span></span>
+            <span class="fw-bold text-brand">Jusqu'à <span id="priceLabel">@gnf(request('max_price', $maxPrice))</span></span>
           </div>
           <button type="submit" class="btn btn-sm btn-brand w-100 mt-2">Filtrer</button>
         </div>
       </form>
-
-      <div class="offer-card">
-        <div class="offer-card__kicker">Bienvenue</div>
-        <div class="offer-card__title">Livraison offerte</div>
-        <div class="offer-card__code">dès @gnf(500000)</div>
-      </div>
     </aside>
 
     <!-- PRODUITS -->

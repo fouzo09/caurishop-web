@@ -32,7 +32,12 @@ class ProductController extends Controller
             $query->whereRaw('LOWER(name) LIKE LOWER(?)', ['%' . $term . '%']);
         }
 
-        if ($request->filled('max_price')) {
+        // Prix max réel du catalogue publié (borne du curseur).
+        $maxPrice = (int) ceil((float) (Product::published()->max('price') ?? 0));
+        $maxPrice = max($maxPrice, 1);
+
+        // On ne filtre que si l'utilisateur a réellement abaissé la borne sous le max.
+        if ($request->filled('max_price') && (float) $request->input('max_price') < $maxPrice) {
             $query->where('price', '<=', (float) $request->input('max_price'));
         }
         if ($request->filled('min_price')) {
@@ -55,6 +60,7 @@ class ProductController extends Controller
             'categories'     => $categories,
             'activeCategory' => $activeCategory,
             'sort'           => $sort,
+            'maxPrice'       => $maxPrice,
         ]);
     }
 
