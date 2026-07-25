@@ -3,11 +3,11 @@
     <div class="container-xl py-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
       <div>
         <div class="fw-bold fs-5 text-ink">Restez informé des bons plans</div>
-        <div class="text-muted small mt-1">-25% sur votre première commande et nos nouveautés.</div>
+        <div class="text-muted small mt-1">Recevez nos offres et nouveautés en avant-première.</div>
       </div>
-      <div class="d-flex gap-2 flex-wrap">
+      <div class="d-flex gap-2 flex-nowrap">
         <input class="form-control newsletter-input" placeholder="Votre adresse e-mail" aria-label="E-mail newsletter">
-        <button class="btn btn-brand px-4" type="button">S'abonner</button>
+        <button class="btn btn-brand px-4 flex-shrink-0" type="button">S'abonner</button>
       </div>
     </div>
   </div>
