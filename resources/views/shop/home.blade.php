@@ -113,21 +113,6 @@
 </section>
 @endif
 
-<!-- Meilleures ventes -->
-@if ($bestSellers->isNotEmpty())
-<section class="container-xl section">
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <h2 class="section-title mb-0">Meilleures ventes</h2>
-    <a href="{{ route('shop.products.index') }}" class="section-link">Tout voir →</a>
-  </div>
-  <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3">
-    @foreach ($bestSellers as $product)
-      <div class="col">@include('shop.partials.product-card', ['product' => $product])</div>
-    @endforeach
-  </div>
-</section>
-@endif
-
 <!-- Nouveautés -->
 @if ($newArrivals->isNotEmpty())
 <section class="container-xl section">
