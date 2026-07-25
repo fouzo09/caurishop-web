@@ -89,12 +89,12 @@
             <input type="number" name="quantity" value="1" min="1" class="form-control border-0 text-center" style="width:64px" aria-label="Quantité">
             <button type="button" class="btn" onclick="const i=this.parentNode.querySelector('input'); i.value=parseInt(i.value||1)+1">+</button>
           </div>
-          <button type="submit" class="btn btn-brand btn-lg flex-grow-1" @disabled($soldOut)>🛒 Ajouter au panier</button>
+          <button type="submit" class="btn btn-brand btn-lg flex-grow-1" @disabled($soldOut)><i class="bi bi-bag-plus"></i> Ajouter au panier</button>
         </div>
       </form>
 
       <div class="info-card">
-        <div class="d-flex align-items-center gap-2"><i class="bi bi-wallet2 fs-5 text-brand"></i> Payez avec <strong>Orange Money</strong>, <strong>MTN MoMo</strong>, carte ou à la livraison</div>
+        <div class="d-flex align-items-center gap-2"><i class="bi bi-wallet2 fs-5 text-brand"></i> Payez avec <strong>Orange Money</strong>, <strong>MTN MoMo</strong> ou <strong>carte</strong></div>
         <div class="d-flex align-items-center gap-2"><i class="bi bi-truck fs-5 text-brand"></i> Livraison dans les 33 préfectures de Guinée</div>
         <div class="d-flex align-items-center gap-2"><i class="bi bi-arrow-repeat fs-5 text-brand"></i> Retour sous 7 jours en cas de problème</div>
         <div class="d-flex align-items-center gap-2"><i class="bi bi-headset fs-5 text-brand"></i> Support client à votre écoute 6j/7</div>
