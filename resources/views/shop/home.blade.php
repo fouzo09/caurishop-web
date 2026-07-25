@@ -18,12 +18,15 @@
     <div class="carousel-inner">
       @if ($heroProducts->isEmpty())
         <div class="carousel-item active">
-          <div class="container mf-slide__inner mf-slide--right">
-            <div class="mf-slide__content">
-              <h5 class="mf-subtitle">Bienvenue sur <span class="hl">CAURISHOP</span></h5>
-              <h1 class="mf-title">Le marché<br>de la Guinée</h1>
-              <p class="mf-offer">Livré partout, payé <span class="hl">mobile money</span></p>
-              <a href="{{ route('shop.products.index') }}" class="mf-btn">Découvrir <i class="bi bi-arrow-right"></i></a>
+          <div class="mf-slide">
+            <div class="mf-slide__bg mf-slide__bg--plain"></div>
+            <div class="container mf-slide__inner">
+              <div class="mf-slide__content">
+                <h5 class="mf-subtitle">Bienvenue sur CAURISHOP</h5>
+                <h1 class="mf-title">Le marché en ligne<br>de la Guinée</h1>
+                <p class="mf-offer">Livré partout, payé par <span class="hl">mobile money</span></p>
+                <a href="{{ route('shop.products.index') }}" class="mf-btn">Découvrir la boutique <i class="bi bi-arrow-right"></i></a>
+              </div>
             </div>
           </div>
         </div>
@@ -32,18 +35,17 @@
           @php
               $isVar = $product->isVariable();
               $price = $isVar ? (float) ($product->variants->min('price') ?? 0) : (float) $product->price;
-              $flip  = $i % 2 === 1; // alterne image/texte comme Wolmart
           @endphp
           <div class="carousel-item {{ $i === 0 ? 'active' : '' }}" data-bs-interval="6000">
-            <div class="container mf-slide__inner {{ $flip ? 'mf-slide--left' : 'mf-slide--right' }}">
-              <figure class="mf-slide__media">
-                <a href="{{ route('shop.products.show', $product->id) }}"><img src="{{ $product->coverUrl() }}" alt="{{ $product->name }}" loading="lazy"></a>
-              </figure>
-              <div class="mf-slide__content">
-                <h5 class="mf-subtitle">{{ $heroLabels[$i] ?? 'Sélection CAURISHOP' }}</h5>
-                <h{{ $i === 0 ? '1' : '2' }} class="mf-title">{{ $product->name }}</h{{ $i === 0 ? '1' : '2' }}>
-                <p class="mf-offer">{{ $isVar ? 'À partir de ' : '' }}<span class="hl">@gnf($price)</span></p>
-                <a href="{{ route('shop.products.show', $product->id) }}" class="mf-btn">Acheter <i class="bi bi-arrow-right"></i></a>
+            <div class="mf-slide">
+              <div class="mf-slide__bg" style="background-image:url('{{ $product->coverUrl() }}')"></div>
+              <div class="container mf-slide__inner">
+                <div class="mf-slide__content">
+                  <h5 class="mf-subtitle">{{ $heroLabels[$i] ?? 'Sélection CAURISHOP' }}</h5>
+                  <h{{ $i === 0 ? '1' : '2' }} class="mf-title">{{ $product->name }}</h{{ $i === 0 ? '1' : '2' }}>
+                  <p class="mf-offer">{{ $isVar ? 'À partir de ' : '' }}<span class="hl">@gnf($price)</span></p>
+                  <a href="{{ route('shop.products.show', $product->id) }}" class="mf-btn">Acheter maintenant <i class="bi bi-arrow-right"></i></a>
+                </div>
               </div>
             </div>
           </div>
