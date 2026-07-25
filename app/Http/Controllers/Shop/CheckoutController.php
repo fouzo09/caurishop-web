@@ -4,14 +4,17 @@ namespace App\Http\Controllers\Shop;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\DjomyTransaction;
 use App\Models\Order;
-use App\Payments\PaymentManager;
-use App\Payments\PaymentResult;
+use App\Models\Payment;
 use App\Services\Admin\OrderService;
+use App\Services\DjomyService;
 use App\Services\Shop\CartService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class CheckoutController extends Controller
@@ -24,7 +27,7 @@ class CheckoutController extends Controller
 
     public function __construct(
         private readonly CartService $cart,
-        private readonly PaymentManager $payments,
+        private readonly DjomyService $djomy,
     ) {
     }
 
@@ -36,12 +39,9 @@ class CheckoutController extends Controller
             return redirect()->route('shop.cart.index')->with('success', 'Votre panier est vide.');
         }
 
-        $customer = $this->currentCustomer();
-
         return view('shop.checkout', [
-            'summary'   => $summary,
-            'customer'  => $customer,
-            'methods'   => $this->payments->available($customer),
+            'summary'    => $summary,
+            'customer'   => $this->currentCustomer(),
             'deliveries' => self::DELIVERY,
         ]);
     }
@@ -63,15 +63,9 @@ class CheckoutController extends Controller
             'address'         => ['required', 'string', 'max:255'],
             'city'            => ['required', 'string', 'max:100'],
             'delivery_method' => ['required', 'string', 'in:' . implode(',', array_keys(self::DELIVERY))],
-            'payment_method'  => ['nullable', 'string'],
-            'payment_phone'   => ['nullable', 'string', 'max:30'],
         ]);
 
-        // Le moyen de paiement est optionnel ici : s'il n'est pas fourni,
-        // la commande est créée en attente de paiement (règlement ultérieur).
-        $provider = ! empty($data['payment_method']) ? $this->payments->get($data['payment_method']) : null;
-
-        // 1) Création de la commande via le service existant (réutilisation).
+        // 1) Création de la commande (en attente de paiement) via le service existant.
         $order = $orders->createOrder([
             'items' => array_map(fn ($item) => [
                 'product_id' => $item['product']->id,
@@ -82,10 +76,10 @@ class CheckoutController extends Controller
             'order_type'  => Order::TYPE_CASH,
         ]);
 
-        // 2) Renseignement des infos livraison / paiement (colonnes additives).
         $deliveryFee = self::DELIVERY[$data['delivery_method']]['fee'];
 
         $order->update([
+            'status'           => Order::STATUS_PENDING_PAYMENT,
             'shipping_name'    => trim($data['first_name'] . ' ' . $data['last_name']),
             'shipping_phone'   => $data['phone'],
             'shipping_address' => $data['address'],
@@ -93,44 +87,192 @@ class CheckoutController extends Controller
             'delivery_method'  => $data['delivery_method'],
             'delivery_fee'     => $deliveryFee,
             'discount_amount'  => $summary['discount'],
-            'payment_method'   => $provider?->key(),
+            'payment_status'   => 'pending',
         ]);
 
-        // 3) Paiement (si un moyen a été choisi) + finalisation.
-        $result = $provider ? $provider->process($order, $data) : null;
-
-        $order->update([
-            'payment_status'    => $result?->status ?? \App\Payments\PaymentResult::PENDING,
-            'payment_reference' => $result?->reference,
-        ]);
-
-        if ($result && $result->isPaid()) {
-            // Commande réglée → confirmée (cash : pas de plan de crédit).
-            $orders->confirmOrder($order);
-        } else {
-            $order->update(['status' => Order::STATUS_PENDING_PAYMENT]);
+        // Synchronise l'adresse/téléphone sur le profil client si absent.
+        if (empty($customer->phone)) {
+            $customer->update(['phone' => $data['phone']]);
         }
 
-        // 4) Vidage du panier.
-        $this->cart->clear();
-        $this->cart->clearPromo();
+        // 2) Initialisation du paiement Djomy (redirection vers le portail).
+        $amount    = (int) round($order->netTotal());
+        $reference = 'SHOP-' . $order->id . '-' . strtoupper(Str::random(6));
 
-        return redirect()->route('shop.checkout.confirmation', $order->id);
+        try {
+            $resp = $this->djomy->createGatewayPayment([
+                'amount'                   => $amount,
+                'countryCode'              => config('djomy.country_code', 'GN'),
+                'payerNumber'              => $this->normalizePhone($data['phone']),
+                'description'              => 'Commande ' . $order->order_number . ' — CAURISHOP',
+                'merchantPaymentReference' => $reference,
+                'returnUrl'                => $this->callbackUrl('shop.checkout.return', ['ref' => $reference]),
+                'cancelUrl'                => $this->callbackUrl('shop.checkout.cancel', ['ref' => $reference]),
+                'metadata'                 => [
+                    'order_id'    => (string) $order->id,
+                    'customer_id' => (string) $customer->id,
+                ],
+            ]);
+
+            $txnId      = $resp['data']['transactionId'] ?? $resp['transactionId'] ?? null;
+            $paymentUrl = $resp['data']['redirectUrl'] ?? $resp['data']['paymentUrl']
+                       ?? $resp['redirectUrl'] ?? $resp['paymentUrl'] ?? null;
+
+            DjomyTransaction::create([
+                'order_id'             => $order->id,
+                'customer_id'          => $customer->id,
+                'djomy_transaction_id' => $txnId,
+                'merchant_reference'   => $reference,
+                'amount'               => $amount,
+                'status'               => DjomyTransaction::STATUS_PENDING,
+                'payer_identifier'     => $data['phone'],
+                'djomy_response'       => $resp,
+            ]);
+
+            $order->update(['payment_reference' => $reference, 'payment_method' => 'djomy']);
+
+            if (! $paymentUrl) {
+                throw new \RuntimeException('Aucune URL de redirection retournée par Djomy.');
+            }
+
+            // 3) Vidage du panier avant redirection vers le portail de paiement.
+            $this->cart->clear();
+            $this->cart->clearPromo();
+
+            return redirect()->away($paymentUrl);
+        } catch (\Throwable $e) {
+            Log::error('Djomy shop checkout error', ['order' => $order->id, 'error' => $e->getMessage()]);
+
+            return redirect()->route('shop.checkout.index')
+                ->with('error', "Le paiement n'a pas pu être initialisé. Réessayez dans un instant.");
+        }
+    }
+
+    /** Retour depuis le portail Djomy : vérifie le statut et redirige vers la confirmation. */
+    public function paymentReturn(Request $request, OrderService $orders): RedirectResponse
+    {
+        $ref = $request->query('ref');
+        $txn = $ref ? DjomyTransaction::where('merchant_reference', $ref)->first() : null;
+
+        if (! $txn || ! $txn->order_id) {
+            return redirect()->route('shop.account.orders')->with('error', 'Transaction introuvable.');
+        }
+
+        $this->syncTransactionStatus($txn, $orders);
+
+        return redirect()->route('shop.checkout.confirmation', $txn->order_id);
+    }
+
+    /** Annulation depuis le portail Djomy. */
+    public function paymentCancel(Request $request): RedirectResponse
+    {
+        $ref = $request->query('ref');
+        $txn = $ref ? DjomyTransaction::where('merchant_reference', $ref)->first() : null;
+
+        if ($txn && $txn->status === DjomyTransaction::STATUS_PENDING) {
+            $txn->update(['status' => DjomyTransaction::STATUS_CANCELLED]);
+        }
+
+        return redirect()->route('shop.cart.index')->with('error', 'Paiement annulé.');
     }
 
     public function confirmation(Order $order): View
     {
         $this->authorizeOrder($order);
-
         $order->load(['items.product', 'items.variant', 'customer']);
 
         return view('shop.confirmation', compact('order'));
     }
 
-    /**
-     * Récupère le Customer du user connecté, en le créant si nécessaire
-     * (cas d'un compte sans profil client encore rattaché).
-     */
+    /** Interroge Djomy et règle la commande si le paiement est confirmé (idempotent). */
+    private function syncTransactionStatus(DjomyTransaction $txn, OrderService $orders): void
+    {
+        if (! $txn->djomy_transaction_id) {
+            return;
+        }
+
+        try {
+            $resp   = $this->djomy->getPaymentStatus($txn->djomy_transaction_id);
+            $data   = $resp['data'] ?? [];
+            $status = strtoupper($data['status'] ?? $resp['status'] ?? '');
+
+            $map = [
+                'SUCCESS'   => DjomyTransaction::STATUS_SUCCESS,
+                'FAILED'    => DjomyTransaction::STATUS_FAILED,
+                'CANCELLED' => DjomyTransaction::STATUS_CANCELLED,
+                'CANCELED'  => DjomyTransaction::STATUS_CANCELLED,
+            ];
+
+            if (! isset($map[$status])) {
+                return; // toujours en attente
+            }
+
+            if ($txn->status !== $map[$status]) {
+                $txn->update([
+                    'status'         => $map[$status],
+                    'payment_method' => $data['paymentMethod'] ?? $txn->payment_method,
+                    'djomy_response' => array_merge($txn->djomy_response ?? [], ['return_check' => $resp]),
+                ]);
+            }
+
+            if ($map[$status] === DjomyTransaction::STATUS_SUCCESS) {
+                $this->settleOrder($txn, $data, $orders);
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Djomy shop return status check failed', ['ref' => $txn->merchant_reference, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /** Enregistre le paiement et confirme la commande (sans doublon avec le webhook). */
+    private function settleOrder(DjomyTransaction $txn, array $data, OrderService $orders): void
+    {
+        $order = Order::find($txn->order_id);
+        if (! $order) {
+            return;
+        }
+
+        $paidAmount = (float) ($data['paidAmount'] ?? $txn->amount);
+
+        Payment::firstOrCreate(
+            ['reference' => $txn->merchant_reference],
+            [
+                'customer_id'  => $txn->customer_id,
+                'order_id'     => $txn->order_id,
+                'amount'       => $paidAmount,
+                'payment_date' => now(),
+                'method'       => Payment::METHOD_MOBILE_MONEY,
+                'created_by'   => null,
+            ]
+        );
+
+        $order->update([
+            'payment_status'    => 'paid',
+            'payment_reference' => $txn->merchant_reference,
+        ]);
+
+        if (in_array($order->status, [Order::STATUS_DRAFT, Order::STATUS_PENDING_PAYMENT])) {
+            try {
+                $orders->confirmOrder($order);
+            } catch (\Throwable $e) {
+                $order->update(['status' => Order::STATUS_CONFIRMED]);
+            }
+        }
+    }
+
+    private function callbackUrl(string $routeName, array $params = []): string
+    {
+        $base = rtrim(config('djomy.callback_url'), '/');
+        $url  = $base . route($routeName, $params, false);
+
+        return preg_replace('#^http://#', 'https://', $url);
+    }
+
+    private function normalizePhone(string $phone): string
+    {
+        $p = preg_replace('/[\s\-\(\)]/', '', $phone);
+        return str_starts_with($p, '+') ? '00' . substr($p, 1) : $p;
+    }
+
     private function currentCustomer(): Customer
     {
         $user = Auth::user();

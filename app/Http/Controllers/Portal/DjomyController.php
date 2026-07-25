@@ -322,17 +322,24 @@ class DjomyController extends Controller
 
             $paidAmount = (float) ($data['paidAmount'] ?? $txn->amount);
 
-            Payment::create([
-                'customer_id' => $txn->customer_id,
-                'order_id'    => $txn->order_id,
-                'amount'      => $paidAmount,
-                'payment_date'=> now(),
-                'method'      => Payment::METHOD_MOBILE_MONEY,
-                'reference'   => $txn->merchant_reference,
-                'created_by'  => null,
-            ]);
+            // Idempotent : évite un doublon si le retour et le webhook arrivent tous les deux.
+            Payment::firstOrCreate(
+                ['reference' => $txn->merchant_reference],
+                [
+                    'customer_id' => $txn->customer_id,
+                    'order_id'    => $txn->order_id,
+                    'amount'      => $paidAmount,
+                    'payment_date'=> now(),
+                    'method'      => Payment::METHOD_MOBILE_MONEY,
+                    'created_by'  => null,
+                ]
+            );
 
-            $order->update(['status' => Order::STATUS_CONFIRMED]);
+            $order->update([
+                'status'            => Order::STATUS_CONFIRMED,
+                'payment_status'    => 'paid',
+                'payment_reference' => $txn->merchant_reference,
+            ]);
         } catch (\Throwable $e) {
             Log::error('Djomy: failed to record order payment', [
                 'txn_id' => $txn->id,

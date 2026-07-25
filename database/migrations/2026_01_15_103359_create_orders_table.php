@@ -14,7 +14,9 @@ return new class extends Migration {
             $table->foreignId('customer_id')->constrained('customers')->restrictOnDelete();
 
             $table->enum('order_type', ['cash', 'credit']);
-            $table->enum('status', ['draft', 'confirmed', 'completed', 'cancelled'])->default('draft');
+            // string plutôt qu'enum : les statuts additionnels (pending_payment, pending_approval)
+            // sont ajoutés par des migrations ultérieures (CHECK constraint côté PostgreSQL).
+            $table->string('status')->default('draft');
 
             $table->decimal('total_amount', 14, 2)->default(0);
 

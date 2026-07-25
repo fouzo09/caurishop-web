@@ -77,6 +77,8 @@ Route::name('shop.')->group(function () {
 
         Route::get('/checkout', [ShopCheckoutController::class, 'index'])->name('checkout.index');
         Route::post('/checkout', [ShopCheckoutController::class, 'store'])->name('checkout.store');
+        Route::get('/paiement/retour', [ShopCheckoutController::class, 'paymentReturn'])->name('checkout.return');
+        Route::get('/paiement/annule', [ShopCheckoutController::class, 'paymentCancel'])->name('checkout.cancel');
         Route::get('/commande/{order}/confirmation', [ShopCheckoutController::class, 'confirmation'])->name('checkout.confirmation');
 
         Route::prefix('mon-compte')->name('account.')->group(function () {

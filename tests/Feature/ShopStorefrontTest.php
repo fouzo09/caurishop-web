@@ -74,7 +74,15 @@ it('connexion par téléphone', function () {
     $this->assertAuthenticated();
 });
 
-it('déroule un checkout complet et crée une commande confirmée', function () {
+it('déroule un checkout et initialise le paiement Djomy (commande en attente)', function () {
+    // Simule Djomy pour éviter tout appel réseau.
+    $this->app->instance(\App\Services\DjomyService::class, new class extends \App\Services\DjomyService {
+        public function __construct() {}
+        public function createGatewayPayment(array $payload): array {
+            return ['data' => ['transactionId' => 'TXN-TEST', 'redirectUrl' => 'https://pay.djomy.test/redirect']];
+        }
+    });
+
     $user = User::create([
         'name' => 'Client Test', 'email' => 'client@test.local',
         'password' => bcrypt('motdepasse'), 'is_active' => true,
@@ -86,7 +94,6 @@ it('déroule un checkout complet et crée une commande confirmée', function () 
     ]);
 
     $this->actingAs($user);
-
     $this->post(route('shop.cart.add'), ['product_id' => $this->product->id, 'quantity' => 3]);
 
     $response = $this->post(route('shop.checkout.store'), [
@@ -96,19 +103,17 @@ it('déroule un checkout complet et crée une commande confirmée', function () 
         'address'         => 'Almamya, rue 12',
         'city'            => 'Conakry',
         'delivery_method' => 'standard',
-        'payment_method'  => 'orange_money',
-        'payment_phone'   => '620000003',
     ]);
 
-    $order = Order::latest('id')->first();
+    $order = Order::latest('created_at')->first();
     expect($order)->not->toBeNull();
     expect($order->order_type)->toBe(Order::TYPE_CASH);
-    expect($order->status)->toBe(Order::STATUS_CONFIRMED);
-    expect($order->payment_status)->toBe('paid');
+    expect($order->status)->toBe(Order::STATUS_PENDING_PAYMENT);
     expect((float) $order->total_amount)->toBe(300000.0);
 
-    $response->assertRedirect(route('shop.checkout.confirmation', $order->id));
-    $this->get(route('shop.checkout.confirmation', $order->id))->assertOk()->assertSee($order->order_number);
+    // Une transaction Djomy est créée et l'utilisateur est redirigé vers le portail.
+    expect(\App\Models\DjomyTransaction::where('order_id', $order->id)->exists())->toBeTrue();
+    $response->assertRedirect('https://pay.djomy.test/redirect');
 });
 
 it('ne casse pas la page de connexion admin existante', function () {
