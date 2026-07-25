@@ -540,3 +540,21 @@ a:hover{color:var(--brand);}
 .cat__icon{position:relative;overflow:hidden;}
 .cat__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;}
 .cat__fallback{position:relative;}
+
+/* ===================== SweetAlert2 — thème CauriShop ===================== */
+.swal2-popup{font-family:'DM Sans',sans-serif;}
+/* Popup standard */
+.swal-cauri{border-radius:20px;padding:26px 24px 24px;box-shadow:0 28px 70px rgba(18,58,135,.20);border-top:5px solid var(--brand);}
+.swal-cauri__title{font-weight:800;color:var(--ink);font-size:21px;}
+.swal-cauri__html{color:var(--gray);font-size:14.5px;}
+.swal-cauri__actions{gap:10px;}
+.swal-cauri__btn{background:var(--brand);color:#fff;font-weight:700;border:0;border-radius:11px;padding:12px 30px;font-size:14px;transition:background .15s;}
+.swal-cauri__btn:hover{background:var(--brand-dark);}
+.swal-cauri__cancel{background:var(--brand-light);color:var(--brand);font-weight:700;border:0;border-radius:11px;padding:12px 26px;font-size:14px;}
+.swal-cauri__cancel:hover{background:#dde7ff;}
+/* Toast */
+.swal-cauri-toast{border-radius:13px!important;border-left:5px solid var(--brand);box-shadow:0 10px 30px rgba(18,58,135,.16)!important;font-family:'DM Sans',sans-serif;padding:6px 6px!important;}
+.swal-cauri-toast .swal2-title{font-weight:600;font-size:14px;color:var(--ink);}
+.swal-cauri-toast .swal2-timer-progress-bar{background:var(--brand)!important;}
+.swal-cauri-toast.swal-cauri-toast--error{border-left-color:#e0403a;}
+.swal-cauri-toast.swal-cauri-toast--error .swal2-timer-progress-bar{background:#e0403a!important;}

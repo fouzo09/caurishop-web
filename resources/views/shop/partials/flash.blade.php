@@ -17,26 +17,38 @@
       @if (session('success'))
         Swal.fire({
           toast: true, position: 'top-end', icon: 'success',
+          iconColor: '#1F8A5B',
           title: @json(session('success')),
           showConfirmButton: false, timer: 3500, timerProgressBar: true,
+          customClass: { popup: 'swal-cauri-toast' },
         });
       @endif
 
       @if (session('error'))
         Swal.fire({
           toast: true, position: 'top-end', icon: 'error',
+          iconColor: '#e0403a',
           title: @json(session('error')),
           showConfirmButton: false, timer: 4000, timerProgressBar: true,
+          customClass: { popup: 'swal-cauri-toast swal-cauri-toast--error' },
         });
       @endif
 
       @if ($errors->any())
         Swal.fire({
           icon: 'error',
-          title: 'Une erreur est survenue',
+          iconColor: '#e0403a',
+          title: 'Oups, une erreur est survenue',
           html: @json($errHtml),
-          confirmButtonText: 'OK',
-          confirmButtonColor: '#1E4FD6',
+          confirmButtonText: "J'ai compris",
+          buttonsStyling: false,
+          customClass: {
+            popup: 'swal-cauri',
+            title: 'swal-cauri__title',
+            htmlContainer: 'swal-cauri__html',
+            actions: 'swal-cauri__actions',
+            confirmButton: 'swal-cauri__btn',
+          },
         });
       @endif
     });
