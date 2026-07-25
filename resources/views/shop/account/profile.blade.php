@@ -16,10 +16,12 @@
     <aside class="col-lg-3">@include('shop.account._nav', ['active' => 'profile'])</aside>
 
     <div class="col-lg-9">
-      <div class="panel p-4" style="max-width:640px;">
-        <form method="POST" action="{{ route('shop.account.profile.update') }}">
-          @csrf
-          @method('PUT')
+      <form method="POST" action="{{ route('shop.account.profile.update') }}" style="max-width:680px;">
+        @csrf
+        @method('PUT')
+
+        <div class="panel p-4 mb-3">
+          <div class="fs-6 fw-bold text-ink mb-3"><i class="bi bi-person-badge text-brand me-1"></i> Informations personnelles</div>
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label">Prénom</label>
@@ -32,23 +34,26 @@
               @error('last_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-6">
-              <label class="form-label">Téléphone</label>
+              <label class="form-label"><i class="bi bi-telephone me-1"></i>Téléphone</label>
               <input name="phone" value="{{ old('phone', $customer->phone ?? '') }}" class="form-control @error('phone') is-invalid @enderror">
               @error('phone')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-6">
-              <label class="form-label">E-mail</label>
+              <label class="form-label"><i class="bi bi-envelope me-1"></i>E-mail</label>
               <input name="email" type="email" value="{{ old('email', $customer->email ?? auth()->user()->email) }}" class="form-control @error('email') is-invalid @enderror">
               @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
-            <div class="col-12">
-              <label class="form-label">Adresse de livraison</label>
-              <input name="address" value="{{ old('address', $customer->address ?? '') }}" class="form-control" placeholder="Quartier, rue, repère…">
-            </div>
           </div>
-          <button type="submit" class="btn btn-brand mt-4">Enregistrer</button>
-        </form>
-      </div>
+        </div>
+
+        <div class="panel p-4 mb-3">
+          <div class="fs-6 fw-bold text-ink mb-3"><i class="bi bi-geo-alt text-brand me-1"></i> Adresse de livraison</div>
+          <label class="form-label">Adresse</label>
+          <input name="address" value="{{ old('address', $customer->address ?? '') }}" class="form-control" placeholder="Quartier, rue, repère…">
+        </div>
+
+        <button type="submit" class="btn btn-brand"><i class="bi bi-check2 me-1"></i> Enregistrer</button>
+      </form>
     </div>
   </div>
 </div>

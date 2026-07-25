@@ -398,19 +398,3 @@ Route::middleware('auth')->group(function () {
 
 // Djomy webhook — public, no auth required, CSRF excluded in bootstrap/app.php
 Route::post('/djomy/webhook', [DjomyController::class, 'webhook'])->name('djomy.webhook');
-
-//Tahoma - 400
-//
-//Family
-//Inter, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif
-//Style
-//normal
-//Weight
-//400
-//Color
-//rgb(31, 41, 55)
-//Size
-//14px
-//Line Height
-//20px
-//AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrS

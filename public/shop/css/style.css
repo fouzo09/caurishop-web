@@ -559,3 +559,32 @@ a:hover{color:var(--brand);}
 .swal-cauri-toast .swal2-timer-progress-bar{background:var(--brand)!important;}
 .swal-cauri-toast.swal-cauri-toast--error{border-left-color:#e0403a;}
 .swal-cauri-toast.swal-cauri-toast--error .swal2-timer-progress-bar{background:#e0403a!important;}
+
+/* ===================== ESPACE CLIENT ===================== */
+.acct-side{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+.acct-side__head{display:flex;align-items:center;gap:12px;padding:18px;border-bottom:1px solid var(--line);}
+.acct-avatar{width:46px;height:46px;border-radius:50%;background:var(--brand-light);color:var(--brand);font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-transform:uppercase;}
+.acct-name{font-weight:700;color:var(--ink);line-height:1.15;}
+.acct-mail{font-size:12px;color:var(--gray);word-break:break-all;}
+.acct-nav{padding:8px;display:flex;flex-direction:column;gap:2px;}
+.acct-nav__link{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:11px 13px;border-radius:10px;color:var(--ink);font-weight:600;font-size:14px;background:none;border:0;text-decoration:none;transition:background .15s,color .15s;}
+.acct-nav__link i{font-size:17px;width:20px;text-align:center;}
+.acct-nav__link:hover{background:var(--surface);color:var(--brand);}
+.acct-nav__link.active{background:var(--brand);color:#fff;}
+.acct-nav__link--out{color:#e0403a;}
+.acct-nav__link--out:hover{background:#fdeceb;color:#e0403a;}
+
+.acct-stat{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;height:100%;}
+.acct-stat__ic{width:46px;height:46px;border-radius:12px;background:var(--brand-light);color:var(--brand);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.acct-stat__label{font-size:12.5px;color:var(--gray);}
+.acct-stat__value{font-weight:800;color:var(--ink);font-size:18px;line-height:1.2;}
+
+.acct-order{display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.acct-order:last-child{border-bottom:0;}
+.acct-order__ic{width:42px;height:42px;border-radius:12px;background:var(--surface);color:var(--brand);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+
+.st-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 11px;border-radius:20px;white-space:nowrap;}
+.st-pill--paid,.st-pill--completed{background:#e7f6ef;color:#1F8A5B;}
+.st-pill--pending{background:#fff4e0;color:#b26b00;}
+.st-pill--confirmed{background:var(--brand-light);color:var(--brand);}
+.st-pill--cancelled{background:#fdeceb;color:#e0403a;}

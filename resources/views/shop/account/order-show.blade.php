@@ -17,14 +17,35 @@
 
     <div class="col-lg-9">
       <div class="row g-3 mb-4">
-        <div class="col-md-4"><div class="tile"><div class="small text-muted">Statut</div><div class="fw-bold text-ink mt-1">{{ ucfirst(str_replace('_', ' ', $order->status)) }}</div></div></div>
-        <div class="col-md-4"><div class="tile"><div class="small text-muted">Paiement</div><div class="fw-bold text-ink mt-1">{{ ucfirst(str_replace('_', ' ', (string) $order->payment_method)) }} · {{ $order->payment_status === 'paid' ? 'Payé' : 'En attente' }}</div></div></div>
-        <div class="col-md-4"><div class="tile"><div class="small text-muted">Date</div><div class="fw-bold text-ink mt-1">{{ $order->created_at?->translatedFormat('d M Y') }}</div></div></div>
+        <div class="col-sm-6 col-lg-4">
+          <div class="acct-stat">
+            <span class="acct-stat__ic"><i class="bi bi-truck"></i></span>
+            <div><div class="acct-stat__label">Statut</div><div class="mt-1">@include('shop.account._status', ['status' => $order->status])</div></div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-4">
+          <div class="acct-stat">
+            <span class="acct-stat__ic"><i class="bi bi-wallet2"></i></span>
+            <div><div class="acct-stat__label">Paiement</div>
+              <div class="acct-stat__value">
+                @if ($order->payment_status === 'paid')<span class="text-success"><i class="bi bi-check-circle-fill"></i> Payé</span>
+                @else <span style="color:#b26b00"><i class="bi bi-clock-history"></i> En attente</span>@endif
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-4">
+          <div class="acct-stat">
+            <span class="acct-stat__ic"><i class="bi bi-calendar3"></i></span>
+            <div><div class="acct-stat__label">Date</div><div class="acct-stat__value">{{ $order->created_at?->translatedFormat('d M Y') }}</div></div>
+          </div>
+        </div>
       </div>
 
       <div class="panel mb-4">
+        <div class="p-3 border-bottom fw-bold text-ink"><i class="bi bi-box-seam text-brand me-1"></i> Articles</div>
         @foreach ($order->items as $item)
-          <div class="d-flex align-items-center gap-3 p-3 border-bottom m-0">
+          <div class="d-flex align-items-center gap-3 p-3 border-bottom">
             <span class="flex-grow-1 small text-ink">{{ $item->product?->name }} @if ($item->variant)<span class="text-muted">— {{ $item->variant->name }}</span>@endif <span class="text-muted">×{{ $item->quantity }}</span></span>
             <span class="fw-bold small text-brand text-nowrap">@gnf($item->line_total)</span>
           </div>
@@ -36,11 +57,11 @@
       </div>
 
       <div class="panel p-4">
-        <div class="fs-5 fw-bold text-ink mb-2">Livraison</div>
-        <div class="small text-muted">
-          {{ $order->shipping_name }}<br>
-          {{ $order->shipping_phone }}<br>
-          {{ $order->shipping_address }}, {{ $order->shipping_city }}
+        <div class="fs-6 fw-bold text-ink mb-3"><i class="bi bi-geo-alt text-brand me-1"></i> Adresse de livraison</div>
+        <div class="small text-muted lh-lg">
+          <i class="bi bi-person me-1"></i>{{ $order->shipping_name }}<br>
+          <i class="bi bi-telephone me-1"></i>{{ $order->shipping_phone }}<br>
+          <i class="bi bi-house-door me-1"></i>{{ $order->shipping_address }}, {{ $order->shipping_city }}
         </div>
       </div>
     </div>
