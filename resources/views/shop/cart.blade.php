@@ -89,13 +89,12 @@
           <span class="total-amount">@gnf($summary['total'])</span>
         </div>
         <a href="{{ route('shop.checkout.index') }}" class="btn btn-brand w-100 btn-lg">Passer la commande →</a>
-        <div class="d-flex gap-2 flex-wrap justify-content-center mt-3">
-          <span class="mini-chip">🟠 Orange Money</span>
-          <span class="mini-chip">🟡 MTN MoMo</span>
-          <span class="mini-chip">💳 Visa</span>
+        <div class="d-flex gap-2 flex-wrap justify-content-center align-items-center mt-3">
+          <span class="mini-chip" title="Orange Money"><img src="{{ asset('shop/img/pay/om.svg') }}" alt="Orange Money" height="22"></span>
+          <span class="mini-chip" title="MTN MoMo"><img src="{{ asset('shop/img/pay/momo.svg') }}" alt="MTN MoMo" height="22"></span>
+          <span class="mini-chip" title="Carte bancaire"><img src="{{ asset('shop/img/pay/card.svg') }}" alt="Carte bancaire" height="20"></span>
         </div>
       </div>
-      <div class="secure-note mt-3"><span class="fs-5">🔒</span> Paiement 100% sécurisé. Vos informations sont protégées.</div>
     </aside>
   </div>
   @endif
