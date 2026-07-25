@@ -94,9 +94,10 @@
       </form>
 
       <div class="info-card">
-        <div class="d-flex align-items-center gap-2"><span class="fs-5">📲</span> Payez avec <strong>Orange Money</strong>, <strong>MTN MoMo</strong> ou à la livraison</div>
-        <div class="d-flex align-items-center gap-2"><span class="fs-5">🚚</span> Livraison à Conakry sous 24h · régions 2-4 jours</div>
-        <div class="d-flex align-items-center gap-2"><span class="fs-5">↩️</span> Retour gratuit sous 7 jours</div>
+        <div class="d-flex align-items-center gap-2"><i class="bi bi-wallet2 fs-5 text-brand"></i> Payez avec <strong>Orange Money</strong>, <strong>MTN MoMo</strong>, carte ou à la livraison</div>
+        <div class="d-flex align-items-center gap-2"><i class="bi bi-truck fs-5 text-brand"></i> Livraison dans les 33 préfectures de Guinée</div>
+        <div class="d-flex align-items-center gap-2"><i class="bi bi-arrow-repeat fs-5 text-brand"></i> Retour sous 7 jours en cas de problème</div>
+        <div class="d-flex align-items-center gap-2"><i class="bi bi-headset fs-5 text-brand"></i> Support client à votre écoute 6j/7</div>
       </div>
     </div>
   </div>
