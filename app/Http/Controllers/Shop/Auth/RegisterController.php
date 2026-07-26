@@ -47,6 +47,8 @@ class RegisterController extends Controller
             'is_active' => true,
         ]);
 
+        // Garantit l'existence du rôle (évite l'échec si le seeder n'a pas tourné en prod).
+        \Spatie\Permission\Models\Role::findOrCreate('customer', 'web');
         $user->assignRole('customer');
 
         Customer::create([
