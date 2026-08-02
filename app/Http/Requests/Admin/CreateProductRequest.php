@@ -27,6 +27,11 @@ class CreateProductRequest extends FormRequest
             'credit_enabled'            => 'boolean',
             'credit_duration_months'    => 'nullable|integer|min:1|max:24',
             'credit_installments_count' => 'nullable|integer|min:1|max:12',
+
+            // Sans ces règles, une image refusée par PHP (trop lourde) était
+            // ignorée en silence : le produit se créait sans aucune image.
+            'images'                    => 'nullable|array|max:10',
+            'images.*'                  => 'image|mimes:jpg,jpeg,png,webp|max:4096',
         ];
 
         $isService = $this->boolean('is_service');
@@ -57,6 +62,10 @@ class CreateProductRequest extends FormRequest
             'stock_quantity.required' => 'La quantité en stock est obligatoire.',
             'credit_duration_months.max' => 'La durée maximale est de 24 mois.',
             'credit_installments_count.max' => 'Le nombre maximum de mensualités est 12.',
+            'images.max' => 'Vous pouvez envoyer 10 images au maximum.',
+            'images.*.image' => "Le fichier :position n'est pas une image valide. Elle est peut-être trop lourde pour le serveur.",
+            'images.*.mimes' => 'Formats acceptés : JPG, PNG ou WEBP.',
+            'images.*.max' => 'Chaque image doit peser 4 Mo au maximum.',
         ];
     }
 

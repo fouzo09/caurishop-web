@@ -17,13 +17,15 @@ class AccountController extends Controller
         $customer = $this->customer();
 
         $orders = $customer
-            ? $customer->orders()->latest('id')->take(5)->get()
+            ? $customer->orders()->with('items')->latest('id')->take(5)->get()
             : collect();
 
         return view('shop.account.index', [
-            'customer'    => $customer,
-            'recentOrders' => $orders,
-            'ordersCount' => $customer ? $customer->orders()->count() : 0,
+            'customer'        => $customer,
+            'recentOrders'    => $orders,
+            'ordersCount'     => $customer ? $customer->orders()->count() : 0,
+            'favoritesCount'  => $customer ? $customer->favorites()->count() : 0,
+            'defaultAddress'  => $customer?->addresses()->where('is_default', true)->first(),
         ]);
     }
 

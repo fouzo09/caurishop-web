@@ -16,14 +16,24 @@ class HomeController extends Controller
             ->orderBy('name')
             ->get();
 
-        // Nouveautés : derniers produits publiés (3 rangées de 5).
+        // Nouveautés : derniers produits publiés (carrousel horizontal).
         $newArrivals = Product::query()
             ->published()
-            ->with(['images', 'variants'])
+            ->with(['images', 'variants', 'category'])
             ->latest('id')
-            ->take(15)
+            ->take(10)
             ->get();
 
-        return view('shop.home', compact('categories', 'newArrivals'));
+        // Nos produits : les plus commandés (grille).
+        $popularProducts = Product::query()
+            ->published()
+            ->with(['images', 'variants', 'category'])
+            ->withCount('orderItems')
+            ->orderByDesc('order_items_count')
+            ->orderByDesc('id')
+            ->take(10)
+            ->get();
+
+        return view('shop.home', compact('categories', 'newArrivals', 'popularProducts'));
     }
 }

@@ -84,10 +84,18 @@ class User extends Authenticatable
      */
     public function homeRoute(): string
     {
-        if ($this->isSuperAdmin())     return route('admin.dashboard');
-        if ($this->isCompanyAdmin())   return route('company.dashboard');
-        if ($this->isCompanyEmployee()) return route('portal.dashboard');
+        // Le back-office plateforme reste la destination des équipes CAURISHOP.
+        if ($this->isSuperAdmin())      return route('admin.dashboard');
+        if ($this->hasRole('employee')) return route('admin.dashboard');
+
+        // Tout le reste est client : particulier ou salarié rattaché à une
+        // entreprise. Même espace, seules les entrées de menu diffèrent.
         if ($this->isCustomer())        return route('shop.account.index');
-        return route('login');
+        if ($this->isCompanyAdmin())    return route('shop.account.index');
+        if ($this->isCompanyEmployee()) return route('shop.account.index');
+
+        // Aucun rôle reconnu : la boutique publique, jamais le formulaire de
+        // connexion — ce qui provoquerait une boucle de redirection.
+        return route('home');
     }
 }

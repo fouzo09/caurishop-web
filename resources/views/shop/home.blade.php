@@ -3,128 +3,91 @@
 @section('title', 'Accueil — CAURISHOP')
 
 @section('content')
-<!-- HERO : bannière pleine largeur (image de fond floutée + texte) -->
-@php
-    $heroSlides = [
-        [
-            'img'   => asset('shop/img/hero-alimentation.jpg'),
-            'sub'   => 'Épicerie & Alimentation',
-            'title' => "Le meilleur de<br>l'alimentation",
-            'offer' => 'Produits frais et essentiels du quotidien',
-            'url'   => route('shop.products.index'),
-        ],
-        [
-            'img'   => asset('shop/img/hero-electronique.jpg'),
-            'sub'   => 'High-Tech',
-            'title' => 'Électronique<br>& gadgets',
-            'offer' => 'Smartphones, accessoires et bien plus',
-            'url'   => route('shop.products.index', ['category' => 'electronique']),
-        ],
-        [
-            'img'   => asset('shop/img/hero-mode.jpg'),
-            'sub'   => 'Mode & Lifestyle',
-            'title' => 'Collection<br>mode',
-            'offer' => 'Les dernières tendances à petits prix',
-            'url'   => route('shop.products.index', ['category' => 'mode-vetements']),
-        ],
-    ];
-@endphp
-<section class="mf-hero">
-  <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-inner">
-      @foreach ($heroSlides as $i => $s)
-        <div class="carousel-item {{ $i === 0 ? 'active' : '' }}" data-bs-interval="6000">
-          <div class="mf-slide">
-            <div class="mf-slide__bg" style="background-image:url('{{ $s['img'] }}')"></div>
-            <div class="container mf-slide__inner">
-              <div class="mf-slide__content">
-                <h5 class="mf-subtitle">{{ $s['sub'] }}</h5>
-                <h{{ $i === 0 ? '1' : '2' }} class="mf-title">{!! $s['title'] !!}</h{{ $i === 0 ? '1' : '2' }}>
-                <p class="mf-offer">{{ $s['offer'] }}</p>
-                <a href="{{ $s['url'] }}" class="mf-btn">Découvrir <i class="bi bi-arrow-right"></i></a>
-              </div>
-            </div>
-          </div>
+<section class="hero">
+  <div class="row g-0 mx-0" style="min-height:540px">
+    <div class="col-lg-7 d-flex flex-column justify-content-center gap-3 py-5" style="padding-left:max(32px,calc((100vw - 1296px)/2));padding-right:48px">
+      <span class="eyebrow">Paiement échelonné</span>
+      <h1>Commandez aujourd'hui,<br>payez molo molo.</h1>
+      <p class="text-muted" style="font-size:17px;line-height:1.6;max-width:520px">Artisanat, mode, cosmétiques : les boutiques de tout le pays, livrées jusqu'à votre porte, de Conakry à Nzérékoré.</p>
+      <div class="d-flex gap-3 mt-2">
+        <a href="{{ route('shop.products.index') }}" class="btn-brand">Commander maintenant</a>
+        <a href="{{ route('get-started') }}" class="btn-outline-ink">Ouvrir un compte pro</a>
+      </div>
+    </div>
+    <div class="col-lg-5 position-relative">
+      <div id="heroCarousel" class="carousel slide carousel-fade h-100" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Casque"></button>
+          <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Réfrigérateur"></button>
         </div>
-      @endforeach
-    </div>
-
-    <div class="carousel-indicators mf-dots">
-      @foreach ($heroSlides as $i => $s)
-        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $i }}" class="{{ $i === 0 ? 'active' : '' }}" aria-label="Slide {{ $i + 1 }}"></button>
-      @endforeach
-    </div>
-    <button class="carousel-control-prev mf-arrow" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev"><i class="bi bi-chevron-left"></i></button>
-    <button class="carousel-control-next mf-arrow" type="button" data-bs-target="#heroCarousel" data-bs-slide="next"><i class="bi bi-chevron-right"></i></button>
-  </div>
-</section>
-
-<!-- Services -->
-<section class="mf-services border-bottom">
-  <div class="container-xl">
-    <div class="row">
-      <div class="col-6 col-lg-3 mf-service">
-        <i class="bi bi-truck"></i>
-        <div><div class="mf-service__t">Livraison nationale</div><div class="mf-service__s">Dans les 33 préfectures</div></div>
-      </div>
-      <div class="col-6 col-lg-3 mf-service">
-        <i class="bi bi-arrow-repeat"></i>
-        <div><div class="mf-service__t">Retour sous 7 jours</div><div class="mf-service__s">En cas de problème</div></div>
-      </div>
-      <div class="col-6 col-lg-3 mf-service">
-        <i class="bi bi-credit-card-2-back"></i>
-        <div><div class="mf-service__t">Paiement sécurisé</div><div class="mf-service__s">Mobile money &amp; carte</div></div>
-      </div>
-      <div class="col-6 col-lg-3 mf-service">
-        <i class="bi bi-headset"></i>
-        <div><div class="mf-service__t">Support client</div><div class="mf-service__s">À votre écoute 6j/7</div></div>
+        <div class="carousel-inner">
+          <div class="carousel-item active" data-bs-interval="4000"><img class="cover" src="https://images.unsplash.com/photo-1583394838336-acd977736f90?q=80&w=900&h=760&fit=crop&auto=format" alt="Casque audio — Électronique"></div>
+          <div class="carousel-item" data-bs-interval="4000"><div class="contain-wrap"><img src="{{ asset('shop/img/frigo.png') }}" alt="Réfrigérateur — Électroménager"></div></div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Catégories -->
-@if ($categories->isNotEmpty())
-<section class="container-xl section">
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <h2 class="section-title mb-0">Parcourir par catégorie</h2>
-    <a href="{{ route('shop.products.index') }}" class="section-link">Tout voir →</a>
-  </div>
-  @php
-    $catIcons = [
-        'electronique'   => 'bi-phone',
-        'mode-vetements' => 'bi-bag',
-        'maison-cuisine' => 'bi-house-door',
-        'beaute-sante'   => 'bi-heart',
-        'informatique'   => 'bi-laptop',
-        'accessoires'    => 'bi-smartwatch',
-    ];
-  @endphp
-  <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3">
-    @foreach ($categories as $cat)
-      <div class="col">
-        <a href="{{ route('shop.products.index', ['category' => $cat->slug]) }}" class="cat d-flex flex-column align-items-center gap-2">
-          <span class="cat__icon"><i class="bi {{ $catIcons[$cat->slug] ?? 'bi-tag' }}"></i></span>
-          <span class="cat__name">{{ $cat->name }}</span>
-        </a>
-      </div>
-    @endforeach
-  </div>
-</section>
-@endif
+<main class="container-xl py-4">
 
-<!-- Nouveautés -->
-@if ($newArrivals->isNotEmpty())
-<section class="container-xl section">
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <h2 class="section-title mb-0">Nouveautés</h2>
-    <a href="{{ route('shop.products.index') }}" class="section-link">Tout voir →</a>
-  </div>
-  <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3">
-    @foreach ($newArrivals as $product)
-      <div class="col">@include('shop.partials.product-card', ['product' => $product])</div>
-    @endforeach
-  </div>
-</section>
-@endif
+  @if ($categories->isNotEmpty())
+    <section class="mb-4" data-hscroll>
+      <div class="d-flex align-items-baseline justify-content-between mb-3"><span class="section-title">Categories</span>
+        <div class="d-flex align-items-center gap-2">
+          <a href="{{ route('shop.products.index') }}" class="section-link me-2">Tout voir</a>
+          <button class="arrow-btn" data-dir="prev" type="button" aria-label="Précédent"><i class="bi bi-chevron-left"></i></button>
+          <button class="arrow-btn" data-dir="next" type="button" aria-label="Suivant"><i class="bi bi-chevron-right"></i></button>
+        </div>
+      </div>
+      @php
+        $catIcons = [
+            'electronique'   => 'bi-phone',
+            'mode-vetements' => 'bi-bag',
+            'maison-cuisine' => 'bi-house-door',
+            'beaute-sante'   => 'bi-heart',
+            'informatique'   => 'bi-laptop',
+            'accessoires'    => 'bi-smartwatch',
+        ];
+      @endphp
+      <div class="hscroll pb-1">
+        @foreach ($categories as $cat)
+          <a href="{{ route('shop.products.index', ['category' => $cat->slug]) }}" class="cat-tile d-flex flex-column align-items-center gap-2">
+            <span class="cat-ic"><i class="bi {{ $catIcons[$cat->slug] ?? 'bi-tag' }}"></i></span>
+            <span>{{ $cat->name }}</span>
+          </a>
+        @endforeach
+      </div>
+    </section>
+  @endif
+
+  @if ($newArrivals->isNotEmpty())
+    <section class="mb-4" data-hscroll>
+      <div class="d-flex align-items-baseline justify-content-between mb-3"><span class="section-title">Nouveautés</span>
+        <div class="d-flex align-items-center gap-2">
+          <a href="{{ route('shop.products.index', ['sort' => 'newest']) }}" class="section-link me-2">Tout voir</a>
+          <button class="arrow-btn" data-dir="prev" type="button" aria-label="Précédent"><i class="bi bi-chevron-left"></i></button>
+          <button class="arrow-btn" data-dir="next" type="button" aria-label="Suivant"><i class="bi bi-chevron-right"></i></button>
+        </div>
+      </div>
+      <div class="hscroll pb-1">
+        @foreach ($newArrivals as $product)
+          @include('shop.partials.product-card', ['product' => $product, 'isNew' => true])
+        @endforeach
+      </div>
+    </section>
+  @endif
+
+  @if ($popularProducts->isNotEmpty())
+    <section>
+      <div class="d-flex align-items-baseline justify-content-between mb-3"><span class="section-title">Nos produits</span><a href="{{ route('shop.products.index') }}" class="section-link">Tout voir</a></div>
+      <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3">
+        @foreach ($popularProducts as $product)
+          <div class="col">@include('shop.partials.product-card', ['product' => $product])</div>
+        @endforeach
+      </div>
+    </section>
+  @endif
+
+</main>
 @endsection

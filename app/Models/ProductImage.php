@@ -19,8 +19,13 @@ class ProductImage extends Model
         return $this->belongsTo(Product::class);
     }
 
+    /**
+     * Les fichiers sont écrits sur le disque « public » (storage/app/public).
+     * On nomme ce disque explicitement : Storage::url() viserait le disque par
+     * défaut (local, racine storage/app/private), où le fichier n'existe pas.
+     */
     public function getUrlAttribute(): string
     {
-        return Storage::url($this->path);
+        return Storage::disk('public')->url($this->path);
     }
 }

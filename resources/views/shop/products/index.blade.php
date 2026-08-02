@@ -3,88 +3,100 @@
 @section('title', ($activeCategory->name ?? 'Boutique') . ' — CAURISHOP')
 
 @section('content')
-<div class="page-banner border-bottom">
-  <div class="container-xl py-4">
-    <div class="crumbs mb-2"><a href="{{ route('home') }}">Accueil</a> › <span class="crumb-current">{{ $activeCategory->name ?? 'Boutique' }}</span></div>
-    <span class="title-tick"></span>
-    <h1 class="page-title mb-0">{{ $activeCategory ? $activeCategory->name : 'Boutique — Tous les produits' }}</h1>
+@php
+    // Paramètres à conserver d'un filtre à l'autre.
+    $keep = array_filter([
+        'q'    => request('q'),
+        'sort' => $sort !== 'popularity' ? $sort : null,
+    ]);
+    $hasFilter = $activeCategory || request('q') || request('min_price') || request('max_price');
+@endphp
+
+<div class="breadcrumb-bar">
+  <div class="container-xl d-flex align-items-center gap-2 py-2 px-3">
+    <a href="{{ route('home') }}">Accueil</a>
+    <i class="bi bi-chevron-right" style="font-size:11px"></i>
+    <span class="fw-semibold text-dark">{{ $activeCategory->name ?? 'Boutique' }}</span>
   </div>
 </div>
 
-<div class="container-xl py-4">
-  <div class="row g-4">
+<div class="container-xl"><div class="row g-0">
 
-    <!-- SIDEBAR -->
-    <aside class="col-lg-3">
-      <form method="GET" action="{{ route('shop.products.index') }}">
-        {{-- conserve la recherche courante --}}
-        @if (request('q'))<input type="hidden" name="q" value="{{ request('q') }}">@endif
-        <input type="hidden" name="sort" value="{{ $sort }}">
-
-        <div class="side-card mb-3">
-          <div class="side-card__title">Catégories</div>
-          <label class="form-check d-flex align-items-center justify-content-between filter-row">
-            <span class="d-flex align-items-center gap-2">
-              <input class="form-check-input m-0" type="radio" name="category" value="" @checked(! $activeCategory) onchange="this.form.submit()"> Toutes
-            </span>
-          </label>
-          @foreach ($categories as $cat)
-            <label class="form-check d-flex align-items-center justify-content-between filter-row">
-              <span class="d-flex align-items-center gap-2">
-                <input class="form-check-input m-0" type="radio" name="category" value="{{ $cat->slug }}" @checked($activeCategory && $activeCategory->id === $cat->id) onchange="this.form.submit()"> {{ $cat->name }}
-              </span>
-              <span class="filter-count">{{ $cat->products()->where('is_published', true)->where('is_active', true)->count() }}</span>
-            </label>
-          @endforeach
-        </div>
-
-        <div class="side-card mb-3">
-          <div class="side-card__title">Prix (GNF)</div>
-          <input type="range" class="form-range" id="priceRange" name="max_price" min="0" max="{{ $maxPrice }}" step="50000" value="{{ request('max_price', $maxPrice) }}">
-          <div class="d-flex justify-content-between small mt-1">
-            <span class="text-muted">0 GNF</span>
-            <span class="fw-bold text-brand">Jusqu'à <span id="priceLabel">@gnf(request('max_price', $maxPrice))</span></span>
-          </div>
-          <button type="submit" class="btn btn-sm btn-brand w-100 mt-2">Filtrer</button>
-        </div>
-      </form>
-    </aside>
-
-    <!-- PRODUITS -->
-    <div class="col-lg-9">
-      <div class="toolbar d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
-        <span class="small text-muted"><strong class="text-ink">{{ $products->total() }}</strong> produits trouvés</span>
-        <form method="GET" action="{{ route('shop.products.index') }}" class="d-flex align-items-center gap-2">
-          @if (request('q'))<input type="hidden" name="q" value="{{ request('q') }}">@endif
-          @if ($activeCategory)<input type="hidden" name="category" value="{{ $activeCategory->slug }}">@endif
-          @if (request('max_price'))<input type="hidden" name="max_price" value="{{ request('max_price') }}">@endif
-          <span class="small text-muted">Trier par</span>
-          <select name="sort" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
-            <option value="popularity" @selected($sort === 'popularity')>Popularité</option>
-            <option value="price_asc" @selected($sort === 'price_asc')>Prix croissant</option>
-            <option value="price_desc" @selected($sort === 'price_desc')>Prix décroissant</option>
-            <option value="newest" @selected($sort === 'newest')>Nouveautés</option>
-          </select>
-        </form>
-      </div>
-
-      @if ($products->isEmpty())
-        <div class="side-card text-center py-5">
-          <div class="fs-1 mb-2">🛍️</div>
-          <p class="text-muted mb-0">Aucun produit ne correspond à votre recherche.</p>
-        </div>
-      @else
-        <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
-          @foreach ($products as $product)
-            <div class="col">@include('shop.partials.product-card', ['product' => $product])</div>
-          @endforeach
-        </div>
-
-        <nav class="mt-4" aria-label="Pagination des produits">
-          {{ $products->links('pagination::bootstrap-5') }}
-        </nav>
+  <aside class="col-lg-3 col-xl-2 shop-aside p-4">
+    <div class="d-flex align-items-baseline justify-content-between pb-3">
+      <span class="fw-bolder d-flex align-items-center gap-2" style="font-size:16px"><i class="bi bi-sliders" style="font-size:14px"></i>Filtres</span>
+      @if ($hasFilter)
+        <a href="{{ route('shop.products.index') }}" class="text-brand fw-semibold" style="font-size:12.5px">Effacer tout</a>
       @endif
     </div>
-  </div>
-</div>
+
+    <div class="border-top py-3">
+      <div class="d-flex align-items-center justify-content-between filter-title mb-2">Catégories</div>
+      <a href="{{ route('shop.products.index', $keep) }}" class="filter-item{{ $activeCategory ? '' : ' active' }}">
+        Toutes <span class="count">{{ $totalPublished }}</span>
+      </a>
+      @foreach ($categories as $cat)
+        <a href="{{ route('shop.products.index', $keep + ['category' => $cat->slug]) }}"
+           class="filter-item{{ $activeCategory && $activeCategory->id === $cat->id ? ' active' : '' }}">
+          {{ $cat->name }} <span class="count">{{ $cat->products_count }}</span>
+        </a>
+      @endforeach
+    </div>
+
+    <form method="GET" action="{{ route('shop.products.index') }}" class="border-top py-3">
+      @foreach ($keep as $name => $value)
+        <input type="hidden" name="{{ $name }}" value="{{ $value }}">
+      @endforeach
+      @if ($activeCategory)<input type="hidden" name="category" value="{{ $activeCategory->slug }}">@endif
+
+      <div class="d-flex align-items-center justify-content-between filter-title mb-3">Prix (GNF)</div>
+      <div class="d-flex align-items-center gap-2">
+        <input type="number" name="min_price" min="0" class="range-input" value="{{ request('min_price') }}" placeholder="0" aria-label="Prix minimum">
+        <span class="text-muted" style="font-size:12px">—</span>
+        <input type="number" name="max_price" min="0" class="range-input" value="{{ request('max_price') }}" placeholder="{{ (int) $maxPrice }}" aria-label="Prix maximum">
+      </div>
+      <button class="btn-brand w-100 mt-3" type="submit" style="font-size:14px;padding:.7rem 0">Appliquer les filtres</button>
+    </form>
+  </aside>
+
+  <main class="col p-4">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+      <span class="fw-bolder" style="font-size:20px">
+        {{ $activeCategory->name ?? 'Boutique' }}
+        <span class="text-muted fw-normal" style="font-size:13.5px">— {{ $products->total() }} produit{{ $products->total() > 1 ? 's' : '' }}</span>
+      </span>
+      <form method="GET" action="{{ route('shop.products.index') }}">
+        @if (request('q'))<input type="hidden" name="q" value="{{ request('q') }}">@endif
+        @if ($activeCategory)<input type="hidden" name="category" value="{{ $activeCategory->slug }}">@endif
+        @if (request('min_price'))<input type="hidden" name="min_price" value="{{ request('min_price') }}">@endif
+        @if (request('max_price'))<input type="hidden" name="max_price" value="{{ request('max_price') }}">@endif
+        <select name="sort" class="form-select w-auto" style="font-size:13.5px" aria-label="Tri" onchange="this.form.submit()">
+          <option value="popularity" @selected($sort === 'popularity')>Trier : Pertinence</option>
+          <option value="price_asc" @selected($sort === 'price_asc')>Prix croissant</option>
+          <option value="price_desc" @selected($sort === 'price_desc')>Prix décroissant</option>
+          <option value="newest" @selected($sort === 'newest')>Nouveautés</option>
+        </select>
+      </form>
+    </div>
+
+    @if ($products->isEmpty())
+      <div class="empty-state">
+        <i class="bi bi-search"></i>
+        Aucun produit ne correspond à votre recherche.
+        <div class="mt-3"><a href="{{ route('shop.products.index') }}" class="btn-brand btn-sm">Voir tous les produits</a></div>
+      </div>
+    @else
+      <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
+        @foreach ($products as $product)
+          <div class="col">@include('shop.partials.product-card', ['product' => $product])</div>
+        @endforeach
+      </div>
+
+      @if ($products->hasPages())
+        <nav class="mt-4" aria-label="Pagination des produits">{{ $products->links('pagination::bootstrap-5') }}</nav>
+      @endif
+    @endif
+  </main>
+
+</div></div>
 @endsection

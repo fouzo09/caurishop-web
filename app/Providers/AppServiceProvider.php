@@ -38,5 +38,18 @@ class AppServiceProvider extends ServiceProvider
         View::composer('shop.partials.header', function ($view) {
             $view->with('shopCartCount', app(CartService::class)->lineCount());
         });
+
+        // Favoris du client connecté — résolus une seule fois par requête,
+        // la carte produit étant incluse des dizaines de fois par page.
+        View::composer('shop.partials.product-card', function ($view) {
+            static $favoriteIds = null;
+
+            if ($favoriteIds === null) {
+                $customer = auth()->check() ? auth()->user()->customer : null;
+                $favoriteIds = $customer ? $customer->favorites()->pluck('product_id')->all() : [];
+            }
+
+            $view->with('shopFavoriteIds', $favoriteIds);
+        });
     }
 }

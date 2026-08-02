@@ -32,7 +32,7 @@ class DjomyController extends Controller
         abort_unless($installment->creditPlan?->order?->customer_id === $customer->id, 403);
         abort_if($installment->status === Installment::STATUS_PAID, 422, 'Cette échéance est déjà réglée.');
 
-        return view('portal.djomy.checkout', compact('installment', 'customer'));
+        return view('shop.account.installment-pay', compact('installment', 'customer'));
     }
 
     // POST /portal/djomy/checkout/{installment}
@@ -43,7 +43,7 @@ class DjomyController extends Controller
         abort_if($installment->status === Installment::STATUS_PAID, 422, 'Cette échéance est déjà réglée.');
 
         if (empty($customer->phone)) {
-            return redirect()->route('portal.profile')
+            return redirect()->route('shop.account.profile')
                 ->with('error', 'Veuillez renseigner votre numéro de téléphone avant de procéder au paiement.');
         }
 
@@ -101,10 +101,10 @@ class DjomyController extends Controller
         $txn = $ref ? DjomyTransaction::where('merchant_reference', $ref)->first() : null;
 
         if (!$txn) {
-            return redirect()->route('portal.orders.index')->with('error', 'Transaction introuvable.');
+            return redirect()->route('shop.account.orders')->with('error', 'Transaction introuvable.');
         }
 
-        return view('portal.djomy.return', ['ref' => $ref, 'txn' => $txn]);
+        return view('shop.account.payment-return', ['ref' => $ref, 'txn' => $txn]);
     }
 
     // GET /portal/djomy/check-status?ref=XXX  (appelé en AJAX depuis la page return)
@@ -153,8 +153,8 @@ class DjomyController extends Controller
 
             if ($finalStatus === DjomyTransaction::STATUS_SUCCESS) {
                 $redirect = $txn->installment_id
-                    ? route('portal.payments.index')
-                    : route('portal.orders.show', $txn->order_id);
+                    ? route('shop.account.payments')
+                    : route('shop.account.orders.show', $txn->order_id);
 
                 return response()->json([
                     'status'   => 'success',
@@ -164,8 +164,8 @@ class DjomyController extends Controller
             }
 
             $redirect = $txn->installment_id
-                ? route('portal.payments.index')
-                : route('portal.orders.show', $txn->order_id);
+                ? route('shop.account.payments')
+                : route('shop.account.orders.show', $txn->order_id);
 
             return response()->json([
                 'status'   => 'failed',
@@ -189,7 +189,7 @@ class DjomyController extends Controller
             $txn->update(['status' => DjomyTransaction::STATUS_CANCELLED]);
         }
 
-        return redirect()->route('portal.payments.index')
+        return redirect()->route('shop.account.payments')
             ->with('error', 'Paiement annulé.');
     }
 
@@ -201,7 +201,7 @@ class DjomyController extends Controller
         abort_unless(in_array($order->status, [Order::STATUS_DRAFT, Order::STATUS_PENDING_PAYMENT]), 422, 'Cette commande ne peut plus être payée.');
 
         $order->load('items.product');
-        return view('portal.djomy.checkout-order', compact('order', 'customer'));
+        return view('shop.account.order-pay', compact('order', 'customer'));
     }
 
     // POST /portal/djomy/order-checkout/{order}
@@ -212,7 +212,7 @@ class DjomyController extends Controller
         abort_unless(in_array($order->status, [Order::STATUS_DRAFT, Order::STATUS_PENDING_PAYMENT]), 422, 'Cette commande ne peut plus être payée.');
 
         if (empty($customer->phone)) {
-            return redirect()->route('portal.profile')
+            return redirect()->route('shop.account.profile')
                 ->with('error', 'Veuillez renseigner votre numéro de téléphone avant de procéder au paiement.');
         }
 

@@ -25,6 +25,9 @@ class CheckoutController extends Controller
         'express'  => ['label' => 'Livraison express', 'fee' => 50000],
     ];
 
+    /** Échelonnements proposés au client rattaché à une entreprise. */
+    private const CREDIT_PLANS = [3, 6, 9, 12];
+
     public function __construct(
         private readonly CartService $cart,
         private readonly DjomyService $djomy,
@@ -39,11 +42,42 @@ class CheckoutController extends Controller
             return redirect()->route('shop.cart.index')->with('success', 'Votre panier est vide.');
         }
 
+        $customer = $this->currentCustomer();
+
         return view('shop.checkout', [
             'summary'    => $summary,
-            'customer'   => $this->currentCustomer(),
+            'customer'   => $customer,
             'deliveries' => self::DELIVERY,
+            // Crédit entreprise : proposé au client rattaché à une entreprise
+            // dont le plafond disponible couvre le panier.
+            'credit'     => $this->creditOffer($customer, (float) $summary['total']),
         ]);
+    }
+
+    /**
+     * Conditions du paiement à crédit pour ce client et ce panier.
+     * Retourne null si le crédit n'est pas ouvert.
+     *
+     * @return array{available: float|null, limit: float|null, plans: array<int>}|null
+     */
+    private function creditOffer(?Customer $customer, float $total): ?array
+    {
+        if (! $customer?->company_id) {
+            return null;
+        }
+
+        $available = $customer->availableCredit();
+
+        // availableCredit() vaut null quand aucun plafond n'est défini : pas de crédit.
+        if (is_null($available) || $available <= 0 || $total > $available) {
+            return null;
+        }
+
+        return [
+            'available' => $available,
+            'limit'     => $customer->effectiveCreditLimit(),
+            'plans'     => self::CREDIT_PLANS,
+        ];
     }
 
     public function store(Request $request, OrderService $orders): RedirectResponse
@@ -56,6 +90,8 @@ class CheckoutController extends Controller
 
         $customer = $this->currentCustomer();
 
+        $credit = $this->creditOffer($customer, (float) $summary['total']);
+
         $data = $request->validate([
             'first_name'      => ['required', 'string', 'max:100'],
             'last_name'       => ['required', 'string', 'max:100'],
@@ -63,9 +99,17 @@ class CheckoutController extends Controller
             'address'         => ['required', 'string', 'max:255'],
             'city'            => ['required', 'string', 'max:100'],
             'delivery_method' => ['required', 'string', 'in:' . implode(',', array_keys(self::DELIVERY))],
+            'payment_mode'    => ['nullable', 'string', 'in:cash,credit'],
+            'installments'    => ['nullable', 'integer', 'in:' . implode(',', self::CREDIT_PLANS)],
+            'down_payment'    => ['nullable', 'numeric', 'min:0', 'lt:' . (int) $summary['total']],
         ]);
 
-        // 1) Création de la commande (en attente de paiement) via le service existant.
+        // Le crédit n'est retenu que s'il est réellement ouvert à ce client.
+        $onCredit = ($data['payment_mode'] ?? 'cash') === 'credit' && $credit !== null;
+
+        $deliveryFee = self::DELIVERY[$data['delivery_method']]['fee'];
+
+        // 1) Création de la commande via le service existant.
         $order = $orders->createOrder([
             'items' => array_map(fn ($item) => [
                 'product_id' => $item['product']->id,
@@ -73,13 +117,14 @@ class CheckoutController extends Controller
                 'quantity'   => $item['quantity'],
             ], $summary['items']),
             'customer_id' => $customer->id,
-            'order_type'  => Order::TYPE_CASH,
+            'order_type'  => $onCredit ? Order::TYPE_CREDIT : Order::TYPE_CASH,
+            // Le crédit part en attente d'approbation du responsable d'entreprise.
+            'pending_approval'          => $onCredit,
+            'down_payment'              => $onCredit ? (float) ($data['down_payment'] ?? 0) : 0,
+            'credit_installments_count' => $onCredit ? (int) ($data['installments'] ?? self::CREDIT_PLANS[0]) : null,
         ]);
 
-        $deliveryFee = self::DELIVERY[$data['delivery_method']]['fee'];
-
-        $order->update([
-            'status'           => Order::STATUS_PENDING_PAYMENT,
+        $shipping = [
             'shipping_name'    => trim($data['first_name'] . ' ' . $data['last_name']),
             'shipping_phone'   => $data['phone'],
             'shipping_address' => $data['address'],
@@ -87,7 +132,24 @@ class CheckoutController extends Controller
             'delivery_method'  => $data['delivery_method'],
             'delivery_fee'     => $deliveryFee,
             'discount_amount'  => $summary['discount'],
-            'payment_status'   => 'pending',
+        ];
+
+        // 1 bis) Crédit : pas de passage par Djomy, la commande attend son approbation.
+        if ($onCredit) {
+            $order->update($shipping + ['payment_method' => 'credit', 'payment_status' => 'pending']);
+
+            $this->cart->clear();
+            $this->cart->clearPromo();
+
+            return redirect()->route('shop.account.orders.show', $order->id)->with(
+                'success',
+                "Commande {$order->order_number} soumise — en attente de validation par votre entreprise.",
+            );
+        }
+
+        $order->update($shipping + [
+            'status'         => Order::STATUS_PENDING_PAYMENT,
+            'payment_status' => 'pending',
         ]);
 
         // Synchronise l'adresse/téléphone sur le profil client si absent.

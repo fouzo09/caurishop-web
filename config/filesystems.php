@@ -41,7 +41,9 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => rtrim(env('APP_URL'), '/').'/storage',
+            // URL relative : les images restent valides quel que soit le domaine
+            // servi, même si APP_URL est mal renseigné en production.
+            'url' => '/storage',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,

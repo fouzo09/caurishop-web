@@ -1,52 +1,88 @@
 @php
     $cover = $product->coverUrl();
+    // Seconde photo : révélée au survol pour donner un aperçu du produit.
+    $altCover = $product->images->pluck('url')->first(fn ($url) => $url !== $cover);
+
     $isVariable = $product->isVariable();
     $displayPrice = $isVariable ? (float) ($product->variants->min('price') ?? 0) : (float) $product->price;
-    $prefix = $isVariable ? 'À partir de ' : '';
     $isService = $product->isService();
-    $soldOut = ! $isService && $product->stock_status === 'rupture';
+    $stock = $product->stock_status;                 // disponible | faible | rupture
+    $soldOut = ! $isService && $stock === 'rupture';
     $canQuickAdd = ! $isVariable && ! $isService && ! $soldOut;
     $url = route('shop.products.show', $product->id);
+    $isFavorite = in_array($product->id, $shopFavoriteIds ?? [], true);
+    $isNew = $isNew ?? false;
 @endphp
 <div class="pcard">
-  <div class="pcard__media">
-    <a href="{{ $url }}" class="pcard__imglink" aria-label="{{ $product->name }}">
-      <span class="pcard__emoji">🛍️</span>
+  <div class="media">
+    <a href="{{ $url }}" aria-label="{{ $product->name }}">
       @if ($cover)
-        <img class="pcard__img" src="{{ $cover }}" alt="{{ $product->name }}" loading="lazy" onerror="this.remove()">
+        <img src="{{ $cover }}" alt="{{ $product->name }}" loading="lazy" onerror="this.remove()">
+        @if ($altCover)
+          <img class="alt" src="{{ $altCover }}" alt="" aria-hidden="true" loading="lazy" onerror="this.remove()">
+        @endif
+      @else
+        <span class="ph">🛍️</span>
       @endif
     </a>
 
-    @if ($soldOut)
-      <span class="pcard__badge pcard__badge--out">Rupture</span>
-    @elseif ($product->isService())
-      <span class="pcard__badge pcard__badge--new">Service</span>
-    @endif
+    <div class="badges">
+      @if ($soldOut)
+        <span class="badge-promo badge-promo--out">Rupture</span>
+      @else
+        @if ($isNew)<span class="badge-promo">Nouveau</span>@endif
+        @if ($isService)<span class="badge-promo badge-promo--new">Service</span>@endif
+        @if ($stock === 'faible')<span class="badge-promo badge-promo--low">Stock limité</span>@endif
+      @endif
+    </div>
 
-    <div class="pcard__actions">
-      <button type="button" class="pcard__act" title="Ajouter aux favoris"><i class="bi bi-heart"></i></button>
-      <a href="{{ $url }}" class="pcard__act" title="Voir le produit"><i class="bi bi-eye"></i></a>
+    <div class="quick">
+      <button type="button" class="wish{{ $isFavorite ? ' is-on' : '' }}"
+              data-fav-toggle="{{ route('shop.account.favorites.toggle', $product->id) }}"
+              data-fav-login="{{ route('shop.login') }}"
+              aria-pressed="{{ $isFavorite ? 'true' : 'false' }}"
+              title="Ajouter aux favoris" aria-label="Ajouter aux favoris">
+        <i class="bi {{ $isFavorite ? 'bi-heart-fill' : 'bi-heart' }}"></i>
+      </button>
+      <a href="{{ $url }}" title="Voir le produit" aria-label="Voir le produit"><i class="bi bi-eye"></i></a>
     </div>
 
     @if ($canQuickAdd)
-      <form method="POST" action="{{ route('shop.cart.add') }}" class="pcard__addbar">
+      <form method="POST" action="{{ route('shop.cart.add') }}" class="addbar">
         @csrf
         <input type="hidden" name="product_id" value="{{ $product->id }}">
-        <button type="submit"><i class="bi bi-bag-plus"></i> Ajouter au panier</button>
+        <button type="submit"><i class="bi bi-cart-plus"></i> Ajouter au panier</button>
       </form>
+    @elseif ($isVariable)
+      <div class="addbar"><a href="{{ $url }}"><i class="bi bi-sliders"></i> Choisir une option</a></div>
     @elseif ($isService)
-      <a href="{{ $url }}" class="pcard__addbar pcard__addbar--link"><i class="bi bi-eye"></i> Voir le service</a>
+      <div class="addbar"><a href="{{ $url }}"><i class="bi bi-calendar-check"></i> Voir le service</a></div>
     @else
-      <a href="{{ $url }}" class="pcard__addbar pcard__addbar--link"><i class="bi bi-eye"></i> Voir le produit</a>
+      <div class="addbar addbar--muted"><a href="{{ $url }}"><i class="bi bi-eye"></i> Voir le produit</a></div>
     @endif
   </div>
 
-  <div class="pcard__body">
-    @if ($product->category)
-      <span class="pcard__cat">{{ $product->category->name }}</span>
-    @endif
-    <a href="{{ $url }}" class="pcard__title">{{ $product->name }}</a>
-    <div class="pcard__rating" aria-hidden="true">★★★★★</div>
-    <div class="pcard__price">{{ $prefix }}@gnf($displayPrice)</div>
+  {{-- Chaque ligne a une hauteur fixe : toutes les cartes font la même taille. --}}
+  <div class="body">
+    <span class="cat">{{ $product->category->name ?? '' }}</span>
+    <a href="{{ $url }}" class="title">{{ $product->name }}</a>
+
+    <span class="stars" aria-hidden="true">
+      <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i>
+    </span>
+
+    <div class="foot d-flex align-items-end justify-content-between gap-2">
+      <span class="price">
+        <small>{{ $isVariable ? 'À partir de' : '' }}</small>
+        @gnf($displayPrice)
+      </span>
+      @if ($soldOut)
+        <span class="stock stock--out"><i class="bi bi-x-circle"></i> Épuisé</span>
+      @elseif ($stock === 'faible')
+        <span class="stock stock--low"><i class="bi bi-exclamation-circle"></i> Bientôt fini</span>
+      @else
+        <span class="stock stock--ok"><i class="bi bi-check-circle"></i> En stock</span>
+      @endif
+    </div>
   </div>
 </div>

@@ -5,58 +5,85 @@
 @section('content')
 @php
     $paid = $order->payment_status === \App\Payments\PaymentResult::PAID;
-    $statusLabels = [
-        \App\Models\Order::STATUS_CONFIRMED       => 'Confirmée',
-        \App\Models\Order::STATUS_PENDING_PAYMENT  => 'En attente de paiement',
-        \App\Models\Order::STATUS_COMPLETED        => 'Livrée',
+
+    // Étape atteinte dans le suivi : 0 = confirmée … 3 = livrée.
+    $reached = match ($order->status) {
+        \App\Models\Order::STATUS_COMPLETED => 3,
+        \App\Models\Order::STATUS_CONFIRMED => 1,
+        default                             => 0,
+    };
+    $steps = [
+        ['bi-bag-check',   'Confirmée'],
+        ['bi-box-seam',    'Préparation'],
+        ['bi-truck',       'En route'],
+        ['bi-house-check', 'Livrée'],
     ];
 @endphp
-<div class="container-xl py-5" style="max-width:860px;">
-  <div class="panel overflow-hidden shadow-card">
-    <div class="text-center p-5 border-bottom">
-      <div class="ok-badge">✓</div>
-      <h1 class="fw-bold text-ink mb-2" style="font-size:30px;">Merci pour votre commande ! 🎉</h1>
-      <p class="text-muted mb-0">Votre commande <strong class="text-brand">#{{ $order->order_number }}</strong> a bien été enregistrée.</p>
-    </div>
-    <div class="p-4 p-md-5">
-      <div class="row g-3 mb-4">
-        <div class="col-md-6"><div class="tile"><div class="small text-muted">Livraison</div><div class="fw-bold text-ink mt-1">{{ $order->delivery_method === 'express' ? 'Express (jour même)' : 'Standard (24h – 4 jours)' }}</div></div></div>
-        <div class="col-md-6"><div class="tile"><div class="small text-muted">Paiement</div><div class="fw-bold text-ink mt-1">{{ ucfirst(str_replace('_', ' ', $order->payment_method)) }} · {{ $paid ? 'Payé' : 'En attente' }}</div></div></div>
-      </div>
 
-      <div class="d-flex mb-4">
-        <div class="ostep flex-fill"><span class="ostep__dot ostep__dot--done">✓</span><span class="ostep__label">{{ $statusLabels[$order->status] ?? 'Enregistrée' }}</span></div>
-        <div class="ostep flex-fill"><span class="ostep__dot ostep__dot--current">●</span><span class="ostep__label">En préparation</span></div>
-        <div class="ostep flex-fill"><span class="ostep__dot">○</span><span class="ostep__label">Expédiée</span></div>
-        <div class="ostep flex-fill"><span class="ostep__dot">○</span><span class="ostep__label">Livrée</span></div>
-      </div>
+<main class="mx-auto px-4 py-5 text-center d-flex flex-column align-items-center gap-3" style="max-width:720px">
+  <span class="rounded-circle d-grid" style="width:72px;height:72px;background:#e8f5ee;color:var(--green);place-items:center;font-size:34px">
+    <i class="bi bi-check-lg"></i>
+  </span>
 
-      <div class="panel mb-4">
-        @foreach ($order->items as $item)
-          @php $cover = $item->product?->coverUrl(); @endphp
-          <div class="d-flex align-items-center gap-3 p-3 border-bottom m-0">
-            <span class="ck-thumb"><span>🛍️</span>@if ($cover)<img class="mini__img" src="{{ $cover }}" alt="{{ $item->product?->name }}" loading="lazy" onerror="this.remove()">@endif</span>
-            <span class="flex-grow-1 small text-ink">{{ $item->product?->name }} @if ($item->variant)<span class="text-muted">— {{ $item->variant->name }}</span>@endif <span class="text-muted">×{{ $item->quantity }}</span></span>
-            <span class="fw-bold small text-brand text-nowrap">@gnf($item->line_total)</span>
-          </div>
-        @endforeach
-        @if ($order->discount_amount > 0)
-          <div class="d-flex justify-content-between p-3 small border-bottom"><span class="text-muted">Remise</span><span class="text-brand">− @gnf($order->discount_amount)</span></div>
-        @endif
-        @if ($order->delivery_fee > 0)
-          <div class="d-flex justify-content-between p-3 small border-bottom"><span class="text-muted">Livraison</span><span>@gnf($order->delivery_fee)</span></div>
-        @endif
-        <div class="d-flex justify-content-between p-3 bg-surface">
-          <span class="fw-bold">Total {{ $paid ? 'payé' : 'à payer' }}</span>
-          <span class="total-amount">@gnf($order->netTotal())</span>
-        </div>
-      </div>
+  <h1 class="fw-bolder m-0" style="font-size:28px">Merci, votre commande est enregistrée !</h1>
+  <p class="text-muted m-0" style="font-size:15px;line-height:1.6;max-width:480px">
+    Commande <span class="fw-bold text-dark">N° {{ $order->order_number }}</span>
+    @if ($order->shipping_phone) — une confirmation a été envoyée au {{ $order->shipping_phone }}.@endif
+    {{ $paid ? 'Paiement reçu.' : 'Paiement en attente de validation.' }}
+  </p>
 
-      <div class="d-flex gap-2 flex-wrap">
-        <a href="{{ route('shop.account.orders') }}" class="btn btn-brand btn-lg flex-fill">Suivre mes commandes</a>
-        <a href="{{ route('shop.products.index') }}" class="btn btn-soft btn-lg flex-fill">Continuer mes achats</a>
+  {{-- Suivi --}}
+  <div class="d-flex align-items-start w-100 my-3" style="font-size:12.5px">
+    @foreach ($steps as $i => $step)
+      @if ($i > 0)
+        <span class="flex-fill {{ $i <= $reached ? 'bg-brand' : '' }}" style="height:2px;margin-top:16px;{{ $i <= $reached ? '' : 'background:#e4e4e4' }}"></span>
+      @endif
+      <div class="flex-fill d-flex flex-column align-items-center gap-2 {{ $i <= $reached ? 'text-brand fw-bold' : 'text-muted' }}">
+        <span class="{{ $i <= $reached ? 'step-done' : 'step-todo' }}" style="width:34px;height:34px;font-size:15px"><i class="bi {{ $step[0] }}"></i></span>
+        {{ $step[1] }}
       </div>
-    </div>
+    @endforeach
   </div>
-</div>
+
+  {{-- Récapitulatif --}}
+  <div class="border rounded-3 p-4 w-100 text-start d-flex flex-column gap-2">
+    <span class="fw-bolder" style="font-size:15px">Récapitulatif</span>
+
+    @foreach ($order->items as $item)
+      <div class="d-flex justify-content-between gap-3" style="font-size:13.5px;color:#555">
+        <span>{{ $item->product?->name }}@if ($item->variant) — {{ $item->variant->name }}@endif <span class="text-muted">× {{ $item->quantity }}</span></span>
+        <span class="fw-semibold text-dark text-nowrap">@gnf($item->line_total)</span>
+      </div>
+    @endforeach
+
+    @if ($order->discount_amount > 0)
+      <div class="d-flex justify-content-between" style="font-size:13.5px;color:#555">
+        <span>Remise</span><span class="fw-semibold text-brand">− @gnf($order->discount_amount)</span>
+      </div>
+    @endif
+
+    <div class="d-flex justify-content-between" style="font-size:13.5px;color:#555">
+      <span>Livraison — {{ $order->shipping_city }}</span>
+      @if ($order->delivery_fee > 0)
+        <span class="fw-semibold text-dark">@gnf($order->delivery_fee)</span>
+      @else
+        <span class="fw-semibold" style="color:var(--green)">Offerte</span>
+      @endif
+    </div>
+
+    <div class="d-flex justify-content-between fw-bolder border-top pt-2" style="font-size:15px">
+      <span>Total {{ $paid ? 'payé' : 'à payer' }}</span><span>@gnf($order->netTotal())</span>
+    </div>
+
+    <span class="text-muted d-flex align-items-center gap-2" style="font-size:12.5px">
+      <i class="bi bi-truck text-brand"></i>
+      {{ $order->delivery_method === 'express' ? 'Livraison express — le jour même à Conakry' : 'Livraison standard — Conakry 24h, régions 2 à 4 jours' }}
+    </span>
+  </div>
+
+  <div class="d-flex gap-3 mt-2 flex-wrap justify-content-center">
+    <a href="{{ route('shop.account.orders.show', $order->id) }}" class="btn-outline-ink">Suivre ma commande</a>
+    <a href="{{ route('shop.products.index') }}" class="btn-brand">Continuer mes achats</a>
+  </div>
+</main>
 @endsection

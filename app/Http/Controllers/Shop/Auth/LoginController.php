@@ -32,6 +32,8 @@ class LoginController extends Controller
         $login    = trim($credentials['login']);
 
         // Résolution de l'utilisateur : e-mail direct, sinon via le téléphone du client.
+        // Le téléphone ne concerne que les clients ; les autres profils se connectent
+        // par e-mail, ce qui suffit puisque la page est commune à tout le monde.
         if (str_contains($login, '@')) {
             $user = User::where('email', $login)->first();
         } else {
@@ -51,20 +53,25 @@ class LoginController extends Controller
         }
 
         $request->session()->regenerate();
-        $cart->mergeSessionIntoUser();
 
-        app(ActivityLogService::class)->log('login', 'Connexion client — ' . $user->name, $user->id);
+        // Le panier de session n'a de sens que pour un client du storefront.
+        if ($user->isCustomer()) {
+            $cart->mergeSessionIntoUser();
+        }
 
+        app(ActivityLogService::class)->log('login', 'Connexion — ' . $user->name, $user->id);
+
+        // Chaque profil repart vers son espace (admin, entreprise, portail, boutique).
         return redirect()->intended($user->homeRoute())
             ->with('success', 'Connexion réussie ! Bienvenue ' . $user->name);
     }
 
     public function destroy(Request $request): RedirectResponse
     {
-        $name = Auth::user()?->name ?? 'Client';
+        $name = Auth::user()?->name ?? 'Utilisateur';
         $id   = Auth::id();
 
-        app(ActivityLogService::class)->log('logout', 'Déconnexion client — ' . $name, $id);
+        app(ActivityLogService::class)->log('logout', 'Déconnexion — ' . $name, $id);
 
         Auth::logout();
         $request->session()->invalidate();
@@ -75,7 +82,7 @@ class LoginController extends Controller
 
     protected function failed(string $login): RedirectResponse
     {
-        app(ActivityLogService::class)->log('login_failed', 'Connexion client échouée — ' . $login, null);
+        app(ActivityLogService::class)->log('login_failed', 'Connexion échouée — ' . $login, null);
 
         return back()->withErrors([
             'login' => 'Identifiants incorrects. Vérifiez votre e-mail/téléphone et mot de passe.',

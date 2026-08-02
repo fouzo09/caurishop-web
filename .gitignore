@@ -22,3 +22,6 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Comptes de test locaux — contient des mots de passe
+/test-accounts.html

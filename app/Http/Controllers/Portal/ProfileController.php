@@ -11,13 +11,6 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    public function show(): View
-    {
-        $user     = auth()->user()->load('roles', 'customer');
-        $customer = $user->customer;
-
-        return view('portal.profile.index', compact('user', 'customer'));
-    }
 
     public function update(UpdateProfileRequest $request): RedirectResponse
     {

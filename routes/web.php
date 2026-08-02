@@ -18,14 +18,7 @@ use App\Http\Controllers\Admin\MarginController;
 use App\Http\Controllers\Admin\ScraperController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Company\DashboardController as CompanyDashboard;
-use App\Http\Controllers\Company\OrderController as CompanyOrderController;
-use App\Http\Controllers\Company\EmployeeController as CompanyEmployeeController;
 use App\Http\Controllers\Company\ProfileController as CompanyProfileController;
-use App\Http\Controllers\Portal\DashboardController as PortalDashboard;
-use App\Http\Controllers\Portal\ProductController as PortalProductController;
-use App\Http\Controllers\Portal\OrderController as PortalOrderController;
-use App\Http\Controllers\Portal\PaymentController as PortalPaymentController;
 use App\Http\Controllers\Portal\ProfileController as PortalProfileController;
 use App\Http\Controllers\Portal\DjomyController;
 use App\Http\Controllers\AuthController;
@@ -34,6 +27,9 @@ use App\Http\Controllers\Shop\ProductController as ShopProductController;
 use App\Http\Controllers\Shop\CartController as ShopCartController;
 use App\Http\Controllers\Shop\CheckoutController as ShopCheckoutController;
 use App\Http\Controllers\Shop\AccountController as ShopAccountController;
+use App\Http\Controllers\Shop\AddressController as ShopAddressController;
+use App\Http\Controllers\Shop\CompanyController as ShopCompanyController;
+use App\Http\Controllers\Shop\FavoriteController as ShopFavoriteController;
 use App\Http\Controllers\Shop\ContactController as ShopContactController;
 use App\Http\Controllers\Shop\Auth\RegisterController as ShopRegisterController;
 use App\Http\Controllers\Shop\Auth\LoginController as ShopLoginController;
@@ -88,6 +84,34 @@ Route::name('shop.')->group(function () {
             Route::get('/commandes/{order}', [ShopAccountController::class, 'showOrder'])->name('orders.show');
             Route::get('/profil', [ShopAccountController::class, 'profile'])->name('profile');
             Route::put('/profil', [ShopAccountController::class, 'updateProfile'])->name('profile.update');
+
+            // Carnet d'adresses
+            Route::get('/adresses', [ShopAddressController::class, 'index'])->name('addresses');
+            Route::post('/adresses', [ShopAddressController::class, 'store'])->name('addresses.store');
+            Route::put('/adresses/{address}', [ShopAddressController::class, 'update'])->name('addresses.update');
+            Route::put('/adresses/{address}/defaut', [ShopAddressController::class, 'setDefault'])->name('addresses.default');
+            Route::delete('/adresses/{address}', [ShopAddressController::class, 'destroy'])->name('addresses.destroy');
+
+            // Favoris
+            Route::get('/favoris', [ShopFavoriteController::class, 'index'])->name('favorites');
+            Route::post('/favoris/{product}', [ShopFavoriteController::class, 'toggle'])->name('favorites.toggle');
+            Route::delete('/favoris/{product}', [ShopFavoriteController::class, 'destroy'])->name('favorites.destroy');
+
+            // Crédit — client rattaché à une entreprise (ex-espace /portal).
+            Route::get('/echeances', [ShopCompanyController::class, 'payments'])->name('payments');
+            // Paiement d'une échéance. Les URL de retour restent chez /portal/djomy,
+            // elles sont déjà enregistrées auprès de l'opérateur.
+            Route::get('/echeances/{installment}/payer', [DjomyController::class, 'checkout'])->name('payments.pay');
+
+            // Entreprise — administrateur d'entreprise (ex-espace /company).
+            Route::middleware('role:company_admin')->prefix('entreprise')->name('company.')->group(function () {
+                Route::get('/', [ShopCompanyController::class, 'company'])->name('index');
+                Route::get('/salaries', [ShopCompanyController::class, 'staff'])->name('staff');
+                Route::get('/commandes', [ShopCompanyController::class, 'orders'])->name('orders');
+                Route::get('/commandes/{order}', [ShopCompanyController::class, 'showOrder'])->name('orders.show');
+                Route::post('/commandes/{order}/approuver', [ShopCompanyController::class, 'approve'])->name('orders.approve');
+                Route::post('/commandes/{order}/rejeter', [ShopCompanyController::class, 'reject'])->name('orders.reject');
+            });
         });
     });
 });
@@ -170,15 +194,14 @@ Route::post('/demarrer', function (\Illuminate\Http\Request $request, \App\Servi
     return redirect()->route('get-started')->with('success', true);
 })->name('get-started.store');
 
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [AuthController::class, 'login'])->name('login');
-    Route::post('/login', [AuthController::class, 'authenticate'])->name('login.authenticate');
-});
+// Page de connexion unique : /connexion. /login reste valide et y renvoie, pour ne
+// casser ni les liens existants ni la redirection des invités par Laravel.
+Route::get('/login', fn () => redirect()->route('shop.login'))->name('login');
 
 Route::middleware('auth')->group(function () {
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    Route::prefix('admin')->name('admin.')->group(function () {
+    Route::prefix('admin')->name('admin.')->middleware('role:admin|employee')->group(function () {
 
         Route::get('/', [HomeController::class, 'index'])->name('dashboard');
 
@@ -346,45 +369,53 @@ Route::middleware('auth')->group(function () {
     });
 
     // ── Portail Admin Entreprise ─────────────────────────────────────
+    /*
+    | L'espace entreprise vit désormais dans /mon-compte (UI client). Les anciennes
+    | URL sont conservées et redirigées : liens en circulation, favoris, e-mails.
+    | Seule la création de commande à crédit reste ici, faute d'équivalent client.
+    */
     Route::prefix('company')->name('company.')->middleware('role:company_admin')->group(function () {
-        Route::get('/', [CompanyDashboard::class, 'index'])->name('dashboard');
+        Route::get('/', fn () => redirect()->route('shop.account.company.index'))->name('dashboard');
 
         Route::prefix('orders')->name('orders.')->group(function () {
-            Route::get('/', [CompanyOrderController::class, 'index'])->name('index');
-            Route::get('/create', [CompanyOrderController::class, 'create'])->name('create');
-            Route::post('/', [CompanyOrderController::class, 'store'])->name('store');
-            Route::get('/{order}', [CompanyOrderController::class, 'show'])->name('show');
-            Route::post('/{order}/approve', [CompanyOrderController::class, 'approve'])->name('approve');
-            Route::post('/{order}/reject', [CompanyOrderController::class, 'reject'])->name('reject');
+            Route::get('/', fn () => redirect()->route('shop.account.company.orders'))->name('index');
+            Route::get('/create', fn () => redirect()->route('shop.checkout.index'))->name('create');
+            Route::get('/{order}', fn ($order) => redirect()->route('shop.account.company.orders.show', $order))->name('show');
+            Route::post('/{order}/approve', fn ($order) => redirect()->route('shop.account.company.orders.show', $order))->name('approve');
+            Route::post('/{order}/reject', fn ($order) => redirect()->route('shop.account.company.orders.show', $order))->name('reject');
         });
 
         Route::prefix('employees')->name('employees.')->group(function () {
-            Route::get('/', [CompanyEmployeeController::class, 'index'])->name('index');
+            Route::get('/', fn () => redirect()->route('shop.account.company.staff'))->name('index');
         });
 
-        Route::get('/profile', [CompanyProfileController::class, 'show'])->name('profile');
+        Route::get('/profile', fn () => redirect()->route('shop.account.profile'))->name('profile');
         Route::put('/profile', [CompanyProfileController::class, 'update'])->name('profile.update');
         Route::put('/profile/password', [CompanyProfileController::class, 'changePassword'])->name('profile.password');
     });
 
     // ── Portail Employé ──────────────────────────────────────────────
+    /*
+    | Le portail salarié vit désormais dans /mon-compte (UI client). Les anciennes
+    | URL redirigent vers leur équivalent. Restent ici la création de commande à
+    | crédit et les écrans Djomy, dont les URL de retour sont déjà chez l'opérateur.
+    */
     Route::prefix('portal')->name('portal.')->middleware('role:company_employee')->group(function () {
-        Route::get('/', [PortalDashboard::class, 'index'])->name('dashboard');
+        Route::get('/', fn () => redirect()->route('shop.account.index'))->name('dashboard');
 
         Route::prefix('products')->name('products.')->group(function () {
-            Route::get('/', [PortalProductController::class, 'index'])->name('index');
-            Route::get('/{product}', [PortalProductController::class, 'show'])->name('show');
+            Route::get('/', fn () => redirect()->route('shop.products.index'))->name('index');
+            Route::get('/{product}', fn ($product) => redirect()->route('shop.products.show', $product))->name('show');
         });
 
         Route::prefix('orders')->name('orders.')->group(function () {
-            Route::get('/', [PortalOrderController::class, 'index'])->name('index');
-            Route::get('/create', [PortalOrderController::class, 'create'])->name('create');
-            Route::post('/', [PortalOrderController::class, 'store'])->name('store');
-            Route::get('/{order}', [PortalOrderController::class, 'show'])->name('show');
+            Route::get('/', fn () => redirect()->route('shop.account.orders'))->name('index');
+            Route::get('/create', fn () => redirect()->route('shop.checkout.index'))->name('create');
+            Route::get('/{order}', fn ($order) => redirect()->route('shop.account.orders.show', $order))->name('show');
         });
 
         Route::prefix('payments')->name('payments.')->group(function () {
-            Route::get('/', [PortalPaymentController::class, 'index'])->name('index');
+            Route::get('/', fn () => redirect()->route('shop.account.payments'))->name('index');
         });
 
         Route::prefix('djomy')->name('djomy.')->group(function () {
@@ -400,7 +431,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/check-status',  [DjomyController::class, 'checkStatus'])->name('check-status');
         });
 
-        Route::get('/profile', [PortalProfileController::class, 'show'])->name('profile');
+        Route::get('/profile', fn () => redirect()->route('shop.account.profile'))->name('profile');
         Route::put('/profile', [PortalProfileController::class, 'update'])->name('profile.update');
         Route::put('/profile/password', [PortalProfileController::class, 'changePassword'])->name('profile.password');
     });

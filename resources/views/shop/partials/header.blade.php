@@ -1,63 +1,28 @@
-<header class="site-header sticky-top bg-white">
-  <div class="border-bottom">
-    <div class="container-xl d-flex align-items-center gap-4 py-3 flex-wrap">
-      <a href="{{ route('home') }}" class="logo d-flex align-items-center gap-2 flex-shrink-0">
-        <span class="logo__mark">C</span>
-        <span class="logo__name">CAURISHOP</span>
-      </a>
-      <form action="{{ route('shop.products.index') }}" method="GET" class="search d-flex flex-grow-1">
-        <select name="category" class="search__select" aria-label="Catégorie de recherche">
-          <option value="">Toutes catégories</option>
-          @foreach ($shopCategories as $cat)
-            <option value="{{ $cat->slug }}" @selected(request('category') === $cat->slug)>{{ $cat->name }}</option>
-          @endforeach
-        </select>
-        <input name="q" value="{{ request('q') }}" class="search__input" placeholder="Rechercher un produit…" aria-label="Recherche">
-        <button class="search__btn" type="submit">Rechercher</button>
-      </form>
-      <div class="d-flex align-items-center gap-4 flex-shrink-0 header-actions">
-        @auth
-          <a href="{{ route('shop.account.index') }}" class="header-action d-flex align-items-center gap-2">
-            <i class="bi bi-person fs-5"></i><span class="header-action__label">Mon compte</span>
-          </a>
-        @else
-          <a href="{{ route('shop.login') }}" class="header-action d-flex align-items-center gap-2">
-            <i class="bi bi-person fs-5"></i><span class="header-action__label">Mon compte</span>
-          </a>
-        @endauth
-        <a href="{{ route('shop.cart.index') }}" class="header-action d-flex align-items-center gap-2">
-          <span class="cart-icon"><i class="bi bi-bag fs-5"></i>@if ($shopCartCount > 0)<span class="cart-badge">{{ $shopCartCount }}</span>@endif</span>
-          <span class="header-action__label">Panier</span>
-        </a>
-      </div>
+<header class="border-bottom">
+  <div class="container-xl d-flex align-items-center gap-4 py-3 px-3">
+    <a href="{{ route('home') }}" class="logo flex-shrink-0">caurishop<span class="text-brand">.</span></a>
+    <form action="{{ route('shop.products.index') }}" method="GET" class="search-box d-flex align-items-center flex-grow-1 px-3">
+      <i class="bi bi-search text-muted"></i>
+      <input name="q" value="{{ request('q') }}" class="form-control" placeholder="Rechercher un produit, une boutique…" aria-label="Recherche">
+    </form>
+    <div class="d-flex align-items-center gap-4 flex-shrink-0" style="font-size:14px">
+      <a href="{{ auth()->check() ? route('shop.account.index') : route('shop.login') }}" class="d-flex align-items-center gap-2"><i class="bi bi-person fs-5"></i><span class="header-action__label">Compte</span></a>
+      <a href="{{ route('shop.cart.index') }}" class="d-flex align-items-center gap-2"><i class="bi bi-cart2 fs-5"></i><span class="header-action__label">Panier</span> @if ($shopCartCount > 0)<span class="cart-badge">{{ $shopCartCount }}</span>@endif</a>
     </div>
   </div>
-
-  @php
-    // Catégorie active : filtre courant, sinon celle du produit consulté (fiche produit).
-    $currentCategory = request('category');
-    if (! $currentCategory && ($p = request()->route('product')) instanceof \App\Models\Product) {
-        $currentCategory = $p->category?->slug;
-    }
-    $allActive = request()->routeIs('shop.products.index') && ! $currentCategory;
-    // Icône Bootstrap par catégorie (fallback bi-tag).
-    $catIcons = [
-        'electronique'   => 'bi-phone',
-        'mode-vetements' => 'bi-bag',
-        'maison-cuisine' => 'bi-house-door',
-        'beaute-sante'   => 'bi-heart',
-        'informatique'   => 'bi-laptop',
-        'accessoires'    => 'bi-smartwatch',
-    ];
-  @endphp
-  <nav class="catbar">
-    <div class="container-xl catbar__inner d-flex align-items-center">
-      <a href="{{ route('shop.products.index') }}" class="catbar__all{{ $allActive ? ' catbar__link--active' : '' }}"><i class="bi bi-grid-3x3-gap-fill"></i> Toutes</a>
-      @foreach ($shopCategories as $cat)
-        <a href="{{ route('shop.products.index', ['category' => $cat->slug]) }}" class="catbar__link{{ $currentCategory === $cat->slug ? ' catbar__link--active' : '' }}">
-          <i class="bi {{ $catIcons[$cat->slug] ?? 'bi-tag' }}"></i> {{ $cat->name }}
-        </a>
-      @endforeach
-    </div>
-  </nav>
 </header>
+
+@php
+  // Catégorie active : filtre courant, sinon celle du produit consulté (fiche produit).
+  $currentCategory = request('category');
+  if (! $currentCategory && ($p = request()->route('product')) instanceof \App\Models\Product) {
+      $currentCategory = $p->category?->slug;
+  }
+@endphp
+<nav class="border-bottom"><div class="container-xl d-flex align-items-center gap-2 py-2 flex-wrap px-3">
+  <a href="{{ route('shop.products.index') }}" class="cat-pill-dark d-flex align-items-center gap-2"><i class="bi bi-list"></i>Toutes les catégories</a>
+  @foreach ($shopCategories as $cat)
+    <a href="{{ route('shop.products.index', ['category' => $cat->slug]) }}" class="cat-pill{{ $currentCategory === $cat->slug ? ' active' : '' }}">{{ $cat->name }}</a>
+  @endforeach
+  <span class="ms-auto d-none d-lg-flex align-items-center gap-2" style="font-size:13px;color:var(--muted)"><i class="bi bi-truck"></i>Livraison dans les 33 préfectures</span>
+</div></nav>

@@ -12,7 +12,12 @@ class ProductController extends Controller
 {
     public function index(Request $request): View
     {
-        $categories = Category::active()->orderBy('sort_order')->orderBy('name')->get();
+        // withCount : évite une requête de comptage par catégorie dans la sidebar.
+        $categories = Category::active()
+            ->withCount(['products' => fn ($q) => $q->published()])
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
 
         $activeCategory = $request->filled('category')
             ? $categories->firstWhere('slug', $request->string('category')->value())
@@ -61,6 +66,7 @@ class ProductController extends Controller
             'activeCategory' => $activeCategory,
             'sort'           => $sort,
             'maxPrice'       => $maxPrice,
+            'totalPublished' => Product::published()->count(),
         ]);
     }
 

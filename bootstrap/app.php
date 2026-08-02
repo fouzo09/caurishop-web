@@ -21,15 +21,11 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->trustProxies(at: '*');
 
-        // Invités : redirection vers la connexion client (/connexion) pour le parcours
-        // public, vers la connexion admin (/login) partout ailleurs.
-        $middleware->redirectGuestsTo(function (\Illuminate\Http\Request $request) {
-            if ($request->is('checkout', 'commande/*', 'mon-compte', 'mon-compte/*', 'deconnexion')) {
-                return route('shop.login');
-            }
+        // Connexion unique pour tous les profils : les invités sont envoyés sur /connexion.
+        $middleware->redirectGuestsTo(fn () => route('shop.login'));
 
-            return route('login');
-        });
+        // Déjà connecté : on renvoie chacun vers son espace plutôt que sur le formulaire.
+        $middleware->redirectUsersTo(fn (\Illuminate\Http\Request $request) => $request->user()->homeRoute());
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

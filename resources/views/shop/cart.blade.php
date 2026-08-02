@@ -3,100 +3,100 @@
 @section('title', 'Mon panier — CAURISHOP')
 
 @section('content')
-<div class="page-banner border-bottom">
-  <div class="container-xl py-4">
-    <div class="crumbs mb-2"><a href="{{ route('home') }}">Accueil</a> › <span class="crumb-current">Panier</span></div>
-    <span class="title-tick"></span>
-    <h1 class="page-title mb-0">Mon panier</h1>
-  </div>
-</div>
+<main class="container-xl py-4">
+  <span class="fw-bolder" style="font-size:24px">
+    Mon panier
+    @if (! empty($summary['items']))
+      <span class="text-muted fw-normal" style="font-size:14px">— {{ count($summary['items']) }} article{{ count($summary['items']) > 1 ? 's' : '' }}</span>
+    @endif
+  </span>
 
-<div class="container-xl py-4">
   @if (empty($summary['items']))
-    <div class="panel p-5 text-center">
-      <div class="fs-1 mb-2">🛒</div>
-      <p class="text-muted mb-3">Votre panier est vide.</p>
-      <a href="{{ route('shop.products.index') }}" class="btn btn-brand">Découvrir la boutique</a>
+    <div class="empty-state mt-3">
+      <i class="bi bi-cart-x"></i>
+      Votre panier est vide.
+      <div class="mt-3"><a href="{{ route('shop.products.index') }}" class="btn-brand btn-sm">Découvrir la boutique</a></div>
     </div>
   @else
-  <div class="row g-4">
+  <div class="row g-4 mt-1 align-items-start">
 
     <div class="col-lg-8">
-      <div class="panel">
-        <div class="cart-head row g-3 d-none d-md-flex">
-          <div class="col-md-5">Produit</div>
-          <div class="col-md-2">Prix</div>
-          <div class="col-md-3 text-center">Quantité</div>
-          <div class="col-md-2 text-end">Total</div>
-        </div>
-
+      <div class="border rounded-3 overflow-hidden">
         @foreach ($summary['items'] as $item)
           @php $product = $item['product']; $variant = $item['variant']; $cover = $product->coverUrl(); @endphp
-          <div class="cart-row row g-3 align-items-center">
-            <div class="col-12 col-md-5 d-flex align-items-center gap-3">
-              <span class="cart-thumb">
-                <span>🛍️</span>
-                @if ($cover)<img class="mini__img" src="{{ $cover }}" alt="{{ $product->name }}" loading="lazy" onerror="this.remove()">@endif
+          <div class="d-flex align-items-center gap-3 p-3 {{ $loop->last ? '' : 'border-bottom' }} flex-wrap">
+            <a href="{{ route('shop.products.show', $product->id) }}" class="cart-thumb" style="width:76px;height:76px">
+              @if ($cover)<img src="{{ $cover }}" alt="{{ $product->name }}" loading="lazy" onerror="this.remove()">@else<span>🛍️</span>@endif
+            </a>
+
+            <div class="flex-grow-1" style="min-width:150px">
+              <a href="{{ route('shop.products.show', $product->id) }}" class="fw-semibold d-block" style="font-size:14.5px">{{ $product->name }}</a>
+              <span class="text-muted" style="font-size:12.5px">
+                @if ($variant){{ $variant->name }} · @endif@gnf($item['unit_price']) l'unité
               </span>
-              <div>
-                <a href="{{ route('shop.products.show', $product->id) }}" class="fw-bold text-ink text-decoration-none">{{ $product->name }}</a>
-                @if ($variant)<div class="small text-muted">{{ $variant->name }}</div>@endif
+            </div>
+
+            <form method="POST" action="{{ route('shop.cart.update') }}">
+              @csrf
+              <input type="hidden" name="product_id" value="{{ $product->id }}">
+              <input type="hidden" name="variant_id" value="{{ $variant->id ?? '' }}">
+              <div class="qty-box">
+                <button type="button" data-minus aria-label="Diminuer"><i class="bi bi-dash"></i></button>
+                <input class="val" type="number" name="quantity" value="{{ $item['quantity'] }}" min="0" max="99" onchange="this.form.submit()" aria-label="Quantité">
+                <button type="button" data-plus aria-label="Augmenter"><i class="bi bi-plus"></i></button>
               </div>
-            </div>
-            <div class="col-4 col-md-2 small cart-price-label">@gnf($item['unit_price'])</div>
-            <div class="col-5 col-md-3 d-flex justify-content-md-center">
-              <form method="POST" action="{{ route('shop.cart.update') }}" class="d-flex align-items-center gap-1">
-                @csrf
-                <input type="hidden" name="product_id" value="{{ $product->id }}">
-                <input type="hidden" name="variant_id" value="{{ $variant->id ?? '' }}">
-                <input type="number" name="quantity" value="{{ $item['quantity'] }}" min="0" max="99" class="form-control form-control-sm text-center" style="width:70px">
-                <button type="submit" class="btn btn-sm btn-soft" title="Mettre à jour">↻</button>
-              </form>
-            </div>
-            <div class="col-3 col-md-2 text-end fw-bold text-brand">@gnf($item['line_total'])</div>
-            <div class="col-12 col-md-12 text-end">
-              <form method="POST" action="{{ route('shop.cart.remove') }}">
-                @csrf
-                <input type="hidden" name="product_id" value="{{ $product->id }}">
-                <input type="hidden" name="variant_id" value="{{ $variant->id ?? '' }}">
-                <button type="submit" class="btn btn-link btn-sm text-muted p-0" aria-label="Retirer l'article">✕ Retirer</button>
-              </form>
-            </div>
+            </form>
+
+            <span class="fw-bold text-end" style="font-size:15px;min-width:120px">@gnf($item['line_total'])</span>
+
+            <form method="POST" action="{{ route('shop.cart.remove') }}">
+              @csrf
+              <input type="hidden" name="product_id" value="{{ $product->id }}">
+              <input type="hidden" name="variant_id" value="{{ $variant->id ?? '' }}">
+              <button class="btn p-0" style="color:var(--danger)" type="submit" aria-label="Supprimer l'article"><i class="bi bi-trash"></i></button>
+            </form>
           </div>
         @endforeach
+      </div>
 
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 p-3">
-          <a href="{{ route('shop.products.index') }}" class="fw-bold text-brand small">← Continuer mes achats</a>
-          <form method="POST" action="{{ route('shop.cart.promo') }}" class="d-flex gap-2">
-            @csrf
-            <input name="code" value="{{ $summary['promo'] }}" class="form-control form-control-sm promo-input" placeholder="Code promo">
-            <button class="btn btn-soft btn-sm px-3" type="submit">Appliquer</button>
-          </form>
+      <form method="POST" action="{{ route('shop.cart.promo') }}" class="d-flex gap-2 mt-3">
+        @csrf
+        <input name="code" value="{{ $summary['promo'] }}" class="form-control promo-input" placeholder="Code promo">
+        <button class="btn-outline-ink btn-sm px-3" type="submit">Appliquer</button>
+      </form>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="border rounded-3 p-4 d-flex flex-column gap-3 summary-sticky sticky-lg-top">
+        <span class="fw-bolder" style="font-size:16px">Résumé de la commande</span>
+
+        <div class="d-flex justify-content-between" style="font-size:14px;color:#555">
+          <span>Sous-total ({{ count($summary['items']) }} article{{ count($summary['items']) > 1 ? 's' : '' }})</span>
+          <span class="fw-semibold text-dark">@gnf($summary['subtotal'])</span>
+        </div>
+        <div class="d-flex justify-content-between" style="font-size:14px;color:#555">
+          <span>Livraison</span><span class="fw-semibold" style="color:var(--green)">Offerte</span>
+        </div>
+        @if ($summary['discount'] > 0)
+          <div class="d-flex justify-content-between" style="font-size:14px;color:#555">
+            <span>Remise ({{ $summary['promo'] }})</span><span class="fw-semibold text-brand">− @gnf($summary['discount'])</span>
+          </div>
+        @endif
+        <div class="d-flex justify-content-between fw-bolder border-top pt-3" style="font-size:16px">
+          <span>Total</span><span class="total-amount">@gnf($summary['total'])</span>
+        </div>
+
+        <a href="{{ route('shop.checkout.index') }}" class="btn-brand text-center">Passer la commande</a>
+        <a href="{{ route('shop.products.index') }}" class="text-brand fw-semibold text-center" style="font-size:13.5px">Continuer mes achats</a>
+
+        <div class="d-flex gap-2 flex-wrap justify-content-center pt-2 border-top">
+          <span class="pay-chip"><img src="{{ asset('shop/img/pay/om.svg') }}" alt="Orange Money" height="18"></span>
+          <span class="pay-chip"><img src="{{ asset('shop/img/pay/momo.svg') }}" alt="MTN MoMo" height="18"></span>
+          <span class="pay-chip"><img src="{{ asset('shop/img/pay/card.svg') }}" alt="Carte bancaire" height="16"></span>
         </div>
       </div>
     </div>
-
-    <aside class="col-lg-4">
-      <div class="panel p-4 sticky-lg-top summary-sticky">
-        <div class="fs-5 fw-bold text-ink mb-3">Récapitulatif</div>
-        <div class="d-flex justify-content-between small mb-2"><span class="text-muted">Sous-total</span><span class="fw-semibold">@gnf($summary['subtotal'])</span></div>
-        <div class="d-flex justify-content-between small mb-2"><span class="text-muted">Livraison (Conakry)</span><span class="fw-semibold text-success">Offerte</span></div>
-        @if ($summary['discount'] > 0)
-          <div class="d-flex justify-content-between small mb-3"><span class="text-muted">Remise ({{ $summary['promo'] }})</span><span class="fw-semibold text-brand">− @gnf($summary['discount'])</span></div>
-        @endif
-        <div class="summary-total d-flex justify-content-between align-items-baseline mb-3">
-          <span class="fw-bold">Total</span>
-          <span class="total-amount">@gnf($summary['total'])</span>
-        </div>
-        <a href="{{ route('shop.checkout.index') }}" class="btn btn-brand w-100 btn-lg">Passer la commande →</a>
-        <div class="d-flex gap-2 flex-wrap justify-content-center align-items-center mt-3">
-          <span class="mini-chip" title="Orange Money"><img src="{{ asset('shop/img/pay/om.svg') }}" alt="Orange Money" height="22"></span>
-          <span class="mini-chip" title="MTN MoMo"><img src="{{ asset('shop/img/pay/momo.svg') }}" alt="MTN MoMo" height="22"></span>
-          <span class="mini-chip" title="Carte bancaire"><img src="{{ asset('shop/img/pay/card.svg') }}" alt="Carte bancaire" height="20"></span>
-        </div>
-      </div>
-    </aside>
   </div>
   @endif
-</div>
+</main>
 @endsection
