@@ -15,7 +15,8 @@ class ProductRepository
 
     public function paginate(int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
-        $query = $this->model->with(['variants']);
+        // images : la liste admin affiche une vignette par produit.
+        $query = $this->model->with(['variants', 'images']);
 
         if (!empty($filters['search'])) {
             $query->where(function($q) use ($filters) {

@@ -128,6 +128,7 @@
                     <thead>
                     <tr>
                         <th>ID</th>
+                        <th style="width:64px;">Image</th>
                         <th>Produit</th>
                         <th>Type</th>
                         <th>Prix</th>
@@ -141,6 +142,18 @@
                     @forelse($products as $product)
                     <tr>
                         <td>#{{ $product->id }}</td>
+                        <td>
+                            @php $cover = $product->coverUrl(); @endphp
+                            <div style="width:48px;height:48px;border-radius:6px;overflow:hidden;background:var(--light);display:flex;align-items:center;justify-content:center;">
+                                @if($cover)
+                                    <img src="{{ $cover }}" alt="{{ $product->name }}" loading="lazy"
+                                         style="width:100%;height:100%;object-fit:cover;"
+                                         onerror="this.parentNode.innerHTML='<i class=\'fas fa-image\' style=\'color:var(--gray);opacity:.4;\'></i>'">
+                                @else
+                                    <i class="fas fa-image" style="color: var(--gray); opacity: .4;" title="Aucune image"></i>
+                                @endif
+                            </div>
+                        </td>
                         <td>
                             <div style="font-weight: 600;">{{ $product->name }}</div>
                             <div style="font-size: 0.8rem; color: var(--gray);">SKU: {{ $product->sku }}</div>
@@ -228,7 +241,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" style="text-align: center; padding: 3rem; color: var(--gray);">
+                        <td colspan="9" style="text-align: center; padding: 3rem; color: var(--gray);">
                             <i class="fas fa-inbox" style="font-size: 3rem; opacity: 0.3; display: block; margin-bottom: 1rem;"></i>
                             Aucun produit trouvé
                         </td>

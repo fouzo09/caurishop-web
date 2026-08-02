@@ -123,7 +123,9 @@ return new class extends Migration {
 
         // Deux visuels par produit : la vignette et une vue secondaire.
         foreach ([0, 1] as $position) {
-            $path = $this->makeImage($product, $data['name'], $index, $position);
+            // Photo réelle livrée avec le dépôt, sinon visuel généré en repli.
+            $path = $this->copyPhoto($product, $position)
+                ?? $this->makeImage($product, $data['name'], $index, $position);
 
             if (! $path) {
                 continue;
@@ -136,6 +138,24 @@ return new class extends Migration {
                 'is_primary' => $position === 0,
             ]);
         }
+    }
+
+    /**
+     * Copie la photo fournie avec le dépôt vers le disque public.
+     * Retourne son chemin, ou null si le fichier n'est pas présent.
+     */
+    private function copyPhoto(Product $product, int $position): ?string
+    {
+        $source = database_path("seeders/fouzimport-images/{$product->sku}-{$position}.jpg");
+
+        if (! is_file($source)) {
+            return null;
+        }
+
+        $path = "products/{$product->id}/{$product->sku}-{$position}.jpg";
+        Storage::disk('public')->put($path, file_get_contents($source));
+
+        return $path;
     }
 
     /**
