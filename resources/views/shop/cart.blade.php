@@ -33,7 +33,7 @@
               <a href="{{ route('shop.products.show', $product->id) }}" class="fw-semibold d-block" style="font-size:14.5px">{{ $product->name }}</a>
               <span class="text-muted" style="font-size:12.5px">
                 @if ($variant){{ $variant->name }} · @endif
-                @gnf($item['unit_price']) l'unité
+                @gnf($item['unit_price']) × {{ $item['quantity'] }}
               </span>
             </div>
 
