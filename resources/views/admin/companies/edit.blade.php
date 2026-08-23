@@ -15,10 +15,6 @@
         </div>
     </div>
 
-    @if($errors->any())
-    <div class="alert danger"><i class="fas fa-exclamation-triangle"></i><span>Veuillez corriger les erreurs dans le formulaire</span></div>
-    @endif
-
     <form action="{{ route('admin.companies.update', $company) }}" method="POST">
         @csrf
         @method('PUT')

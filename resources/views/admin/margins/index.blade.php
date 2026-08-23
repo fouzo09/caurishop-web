@@ -23,20 +23,6 @@
         </div>
     </div>
 
-    @if(session('success'))
-    <div class="alert success">
-        <i class="fas fa-check-circle"></i>
-        <span>{{ session('success') }}</span>
-    </div>
-    @endif
-
-    @if($errors->any())
-    <div class="alert danger">
-        <i class="fas fa-exclamation-triangle"></i>
-        <span>Veuillez corriger les erreurs.</span>
-    </div>
-    @endif
-
     {{-- Info --}}
     <div class="alert" style="background:rgba(0,102,255,.06);border-color:rgba(0,102,255,.2);color:var(--dark);">
         <i class="fas fa-info-circle" style="color:var(--primary);"></i>

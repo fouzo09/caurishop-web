@@ -17,10 +17,6 @@
         </div>
     </div>
 
-    @if(session('error'))
-    <div class="alert danger"><i class="fas fa-exclamation-triangle"></i> <span>{{ session('error') }}</span></div>
-    @endif
-
     <form action="{{ route('admin.scraper.create-products', $filename) }}" method="POST" id="reviewForm">
         @csrf
         <input type="hidden" name="supplier_id" value="{{ $supplier->id }}">

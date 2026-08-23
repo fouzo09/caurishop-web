@@ -405,3 +405,15 @@ nav[aria-label] span[aria-current] {
 @media (max-width: 768px) {
     .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
 }
+
+/* ============================ SWEETALERT2 — thème admin ============================ */
+/* Les messages de succès et d'erreur passent par des toasts, plus de bloc .alert. */
+.swal2-popup{font-family:inherit}
+.swal-admin-toast{
+    border-radius:8px!important;border-left:4px solid var(--success);
+    box-shadow:0 10px 30px rgba(0,0,0,.12)!important;padding:6px!important;
+}
+.swal-admin-toast .swal2-title{font-weight:600;font-size:.9rem;color:var(--dark)}
+.swal-admin-toast .swal2-timer-progress-bar{background:var(--success)!important}
+.swal-admin-toast.swal-admin-toast--error{border-left-color:var(--danger)}
+.swal-admin-toast.swal-admin-toast--error .swal2-timer-progress-bar{background:var(--danger)!important}

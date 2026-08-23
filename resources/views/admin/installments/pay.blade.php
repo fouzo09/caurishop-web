@@ -20,13 +20,6 @@
         </div>
     </div>
 
-    @if(session('error'))
-    <div class="alert danger"><i class="fas fa-times-circle"></i><span>{{ session('error') }}</span></div>
-    @endif
-    @if($errors->any())
-    <div class="alert danger"><i class="fas fa-exclamation-triangle"></i><span>{{ $errors->first() }}</span></div>
-    @endif
-
     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
 
         {{-- Formulaire --}}

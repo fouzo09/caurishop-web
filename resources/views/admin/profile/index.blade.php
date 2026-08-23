@@ -13,27 +13,6 @@
         </div>
     </div>
 
-    @if(session('success'))
-    <div class="alert success" id="alert-success">
-        <i class="fas fa-check-circle"></i>
-        <span>{{ session('success') }}</span>
-    </div>
-    @endif
-
-    @if(session('password_success'))
-    <div class="alert success" id="alert-password">
-        <i class="fas fa-check-circle"></i>
-        <span>{{ session('password_success') }}</span>
-    </div>
-    @endif
-
-    @if(session('error'))
-    <div class="alert danger">
-        <i class="fas fa-times-circle"></i>
-        <span>{{ session('error') }}</span>
-    </div>
-    @endif
-
     <div style="display: grid; grid-template-columns: 280px 1fr; gap: 1.5rem; align-items: start;">
 
         {{-- Carte identité --}}
@@ -102,13 +81,6 @@
                         @csrf
                         @method('PUT')
                         <div class="card-body">
-                            @if($errors->hasAny(['name', 'email']))
-                            <div class="alert danger" style="margin-bottom: 1rem;">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <span>Veuillez corriger les erreurs ci-dessous.</span>
-                            </div>
-                            @endif
-
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                                 <div class="form-group">
                                     <label class="form-label">Nom complet</label>
@@ -154,13 +126,6 @@
                         @csrf
                         @method('PUT')
                         <div class="card-body">
-                            @if($errors->hasAny(['current_password', 'password']))
-                            <div class="alert danger" style="margin-bottom: 1rem;">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <span>Veuillez corriger les erreurs ci-dessous.</span>
-                            </div>
-                            @endif
-
                             <div style="max-width: 480px; display: flex; flex-direction: column; gap: 1.25rem;">
                                 <div class="form-group" style="margin: 0;">
                                     <label class="form-label">Mot de passe actuel</label>
@@ -343,12 +308,6 @@
         label.textContent = lvl.text;
         label.style.color = lvl.color;
     }
-
-    // Auto-fermeture des alertes après 4s
-    ['alert-success', 'alert-password'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.4s'; setTimeout(() => el.remove(), 400); }, 4000);
-    });
 
     // Ouvrir directement l'onglet mot de passe si demandé depuis le dropdown
     if (sessionStorage.getItem('profileTab') === 'password') {

@@ -13,13 +13,6 @@
         </div>
     </div>
 
-    @if(session('success'))
-    <div class="alert success"><i class="fas fa-check-circle"></i> <span>{{ session('success') }}</span></div>
-    @endif
-    @if(session('error'))
-    <div class="alert danger"><i class="fas fa-exclamation-triangle"></i> <span>{{ session('error') }}</span></div>
-    @endif
-
     {{-- Carte principale --}}
     <div class="card">
         <div class="card-header">
@@ -27,12 +20,6 @@
         </div>
 
         <div class="card-body">
-
-            @if($errors->has('html'))
-            <div class="alert danger" style="margin-bottom:1rem;">
-                <i class="fas fa-exclamation-triangle"></i> <span>{{ $errors->first('html') }}</span>
-            </div>
-            @endif
 
             <form action="{{ route('admin.scraper.run-html') }}" method="POST" id="formHtml">
                 @csrf

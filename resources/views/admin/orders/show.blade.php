@@ -46,13 +46,6 @@
         </div>
     </div>
 
-    @if(session('success'))
-    <div class="alert success"><i class="fas fa-check-circle"></i><span>{{ session('success') }}</span></div>
-    @endif
-    @if(session('error'))
-    <div class="alert danger"><i class="fas fa-times-circle"></i><span>{{ session('error') }}</span></div>
-    @endif
-
     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
 
         {{-- Colonne principale --}}

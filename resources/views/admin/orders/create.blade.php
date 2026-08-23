@@ -15,17 +15,6 @@
         </div>
     </div>
 
-    @if($errors->any())
-    <div class="alert danger">
-        <i class="fas fa-exclamation-triangle"></i>
-        <span>{{ $errors->first() }}</span>
-    </div>
-    @endif
-
-    @if(session('error'))
-    <div class="alert danger"><i class="fas fa-times-circle"></i><span>{{ session('error') }}</span></div>
-    @endif
-
     <form action="{{ route('admin.orders.store') }}" method="POST" id="order-form">
         @csrf
 

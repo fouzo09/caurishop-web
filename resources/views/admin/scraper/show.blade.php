@@ -18,16 +18,6 @@
         </a>
     </div>
 
-    @if(session('error'))
-    <div class="alert danger"><i class="fas fa-exclamation-triangle"></i> <span>{{ session('error') }}</span></div>
-    @endif
-    @if($errors->any())
-    <div class="alert danger">
-        <i class="fas fa-exclamation-triangle"></i>
-        @foreach($errors->all() as $e)<span>{{ $e }} </span>@endforeach
-    </div>
-    @endif
-
     {{-- Méta --}}
     <div class="card" style="margin-bottom:1.5rem;">
         <div class="card-body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;padding:1rem 1.5rem;">

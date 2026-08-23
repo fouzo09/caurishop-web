@@ -7,6 +7,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="{{ asset('assets/admin/app.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/admin/components.css') }}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 </head>
 <body>
 <aside class="sidebar">
@@ -167,6 +168,8 @@
 
     @yield('content')
 </main>
+
+@include('admin.partials.flash')
 
 <style>
     .header-actions { position: relative; }

@@ -20,12 +20,6 @@
 
     <div class="card" style="max-width:680px;">
         <div class="card-body">
-            @if($errors->any())
-            <div class="alert danger" style="margin-bottom:1.25rem;">
-                @foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach
-            </div>
-            @endif
-
             <form action="{{ route('admin.suppliers.update', $supplier) }}" method="POST">
                 @csrf @method('PUT')
 

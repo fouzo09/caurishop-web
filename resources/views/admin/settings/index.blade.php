@@ -12,13 +12,6 @@
         </div>
     </div>
 
-    @if(session('success'))
-    <div class="alert success">
-        <i class="fas fa-check-circle"></i>
-        <span>{{ session('success') }}</span>
-    </div>
-    @endif
-
     <div style="display: grid; grid-template-columns: 220px 1fr; gap: 1.5rem; align-items: start;">
 
         {{-- Onglets verticaux --}}

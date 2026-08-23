@@ -50,20 +50,6 @@
         </div>
     </div>
 
-    @if(session('success'))
-    <div class="alert success">
-        <i class="fas fa-check-circle"></i>
-        <span>{{ session('success') }}</span>
-    </div>
-    @endif
-
-    @if(session('error'))
-    <div class="alert danger">
-        <i class="fas fa-times-circle"></i>
-        <span>{{ session('error') }}</span>
-    </div>
-    @endif
-
     @if($product->isVariable() && $product->variants->isEmpty())
     <div class="alert warning" style="display: flex; align-items: center; justify-content: space-between;">
         <div style="display: flex; align-items: center; gap: 0.75rem;">

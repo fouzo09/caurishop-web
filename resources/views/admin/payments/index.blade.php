@@ -13,10 +13,6 @@
         </div>
     </div>
 
-    @if(session('success'))
-    <div class="alert success"><i class="fas fa-check-circle"></i><span>{{ session('success') }}</span></div>
-    @endif
-
     {{-- Filtres --}}
     <div class="card" style="margin-bottom: 1.5rem;">
         <div class="card-body">

@@ -13,13 +13,6 @@
         </div>
     </div>
 
-    @if(session('success'))
-    <div class="alert success"><i class="fas fa-check-circle"></i><span>{{ session('success') }}</span></div>
-    @endif
-    @if(session('error'))
-    <div class="alert danger"><i class="fas fa-times-circle"></i><span>{{ session('error') }}</span></div>
-    @endif
-
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-icon blue"><i class="fas fa-building"></i></div>

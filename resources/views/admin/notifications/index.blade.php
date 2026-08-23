@@ -21,13 +21,6 @@
         @endif
     </div>
 
-    @if(session('success'))
-    <div class="alert success">
-        <i class="fas fa-check-circle"></i>
-        <span>{{ session('success') }}</span>
-    </div>
-    @endif
-
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">

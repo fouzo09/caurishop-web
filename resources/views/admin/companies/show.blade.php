@@ -15,13 +15,6 @@
         </div>
     </div>
 
-    @if(session('success'))
-    <div class="alert success"><i class="fas fa-check-circle"></i><span>{{ session('success') }}</span></div>
-    @endif
-    @if(session('error'))
-    <div class="alert danger"><i class="fas fa-times-circle"></i><span>{{ session('error') }}</span></div>
-    @endif
-
     {{-- Bannière d'action pour les demandes en attente --}}
     @if($company->isPending())
     <div style="background:#fffbeb;border:1.5px solid #f59e0b;border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
