@@ -223,12 +223,31 @@
                     <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem;">
                         @foreach($images as $img)
                         <div style="position: relative; width: 110px;">
-                            <div style="width:110px;height:110px;border-radius:6px;overflow:hidden;border:2px solid {{ $img->is_primary ? 'var(--primary)' : 'var(--border)' }};">
+                            {{-- Le badge est posé sur l'image : il ne recouvre pas les
+                                 contrôles placés dessous. --}}
+                            <div style="position:relative;width:110px;height:110px;border-radius:6px;overflow:hidden;border:2px solid {{ $img->is_primary ? 'var(--primary)' : 'var(--border)' }};">
                                 <img src="{{ $img->url }}" alt="" style="width:100%;height:100%;object-fit:cover;">
+                                @if($img->is_primary)
+                                <span style="position:absolute;bottom:0;left:0;right:0;text-align:center;background:var(--primary);color:#fff;font-size:10px;padding:1px 0;">Principale</span>
+                                @endif
                             </div>
-                            @if($img->is_primary)
-                            <span style="position:absolute;bottom:24px;left:0;right:0;text-align:center;background:var(--primary);color:#fff;font-size:10px;padding:1px 0;">Principale</span>
+                            @if($product->isVariable() && $product->variants->isNotEmpty())
+                            {{-- Rattachement à une variante : le visuel sert de vignette
+                                 dans le sélecteur couleur/taille de la fiche publique. --}}
+                            <form action="{{ route('admin.products.images.variant', [$product, $img]) }}" method="POST" style="margin-top:4px;">
+                                @csrf
+                                <select name="variant_id" onchange="this.form.submit()" title="Variante illustrée"
+                                        style="width:110px;padding:2px;font-size:11px;border:1px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;">
+                                    <option value="">— Produit entier —</option>
+                                    @foreach($product->variants as $variant)
+                                    <option value="{{ $variant->id }}" {{ $img->variant_id === $variant->id ? 'selected' : '' }}>
+                                        {{ $variant->name ?: ('Variante #' . $variant->id) }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                            </form>
                             @endif
+
                             <div style="display:flex;gap:3px;margin-top:4px;">
                                 @if(!$img->is_primary)
                                 <form action="{{ route('admin.products.images.primary', [$product, $img]) }}" method="POST" style="flex:1;">

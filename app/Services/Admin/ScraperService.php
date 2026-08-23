@@ -301,7 +301,7 @@ class ScraperService
 
                     $variantName = trim($v['name'] ?? '');
 
-                    $product->variants()->create([
+                    $createdVariant = $product->variants()->create([
                         'sku'            => 'V' . strtoupper(substr(md5($product->id . $idx . $variantName), 0, 8)),
                         'name'           => $variantName ?: null,
                         'attributes'     => $v['attributes'] ?? [],
@@ -311,8 +311,10 @@ class ScraperService
                         'is_active'      => true,
                     ]);
 
+                    // L'image part sur la variante : elle sert de vignette dans le
+                    // sélecteur couleur/taille de la fiche publique.
                     if (!empty($v['image_url'])) {
-                        $this->attachImage($product, $v['image_url'], $imgIndex++);
+                        $this->attachImage($product, $v['image_url'], $imgIndex++, $createdVariant);
                     }
                 }
             } else {
@@ -343,7 +345,7 @@ class ScraperService
         return $slug;
     }
 
-    private function attachImage(Product $product, string $imageUrl, int $index = 0): void
+    private function attachImage(Product $product, string $imageUrl, int $index = 0, ?ProductVariant $variant = null): void
     {
         try {
             $response = Http::timeout(15)
@@ -361,6 +363,7 @@ class ScraperService
 
             $isPrimary = $product->images()->count() === 0;
             $product->images()->create([
+                'variant_id' => $variant?->id,
                 'path'       => $path,
                 'sort_order' => $index + 1,
                 'is_primary' => $isPrimary,

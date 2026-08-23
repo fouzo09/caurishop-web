@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Support\Money;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 
 class Product extends Model
 {
@@ -229,6 +231,68 @@ class Product extends Model
             ?? $this->images->first();
 
         return $primary?->url;
+    }
+
+    /**
+     * Axes de variation déduits des attributs des variantes actives.
+     * Ex. couleur => [Argent, Gris Sidéral], stockage => [256 Go, 512 Go].
+     *
+     * Chaque valeur porte le visuel de la première variante qui l'utilise.
+     * Un axe ne passe en vignettes que si *toutes* ses valeurs sont illustrées :
+     * sinon on retombe sur des pastilles de texte, pour ne pas mélanger une
+     * photo et des libellés dans la même ligne.
+     *
+     * @return array<int, array{key: string, label: string, imaged: bool, values: array<int, array{value: string, image: ?string}>}>
+     */
+    public function variantAxes(): array
+    {
+        $axes = [];
+
+        foreach ($this->variants->where('is_active', true) as $variant) {
+            $cover = $variant->coverUrl();
+
+            foreach ($variant->options() as $key => $value) {
+                if ($value === '') {
+                    continue;
+                }
+
+                // Première image rencontrée pour cette valeur, conservée ensuite.
+                $axes[$key][$value] = $axes[$key][$value] ?? $cover;
+            }
+        }
+
+        return array_map(
+            fn ($key, $values) => [
+                'key'    => $key,
+                'label'  => Str::ucfirst(str_replace('_', ' ', $key)),
+                'imaged' => count(array_filter($values)) === count($values),
+                'values' => array_map(
+                    fn ($value, $image) => ['value' => $value, 'image' => $image],
+                    array_keys($values),
+                    $values,
+                ),
+            ],
+            array_keys($axes),
+            $axes,
+        );
+    }
+
+    /**
+     * Variantes sérialisées pour le sélecteur de la fiche produit : le script
+     * retrouve la variante correspondant à la combinaison choisie.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function variantPayload(): array
+    {
+        return $this->variants->where('is_active', true)->map(fn ($variant) => [
+            'id'      => $variant->id,
+            'attrs'   => $variant->options(),
+            'price'   => Money::gnf($variant->price),
+            'inStock' => $variant->hasStock(),
+            'image'   => $variant->coverUrl(),
+            'label'   => $variant->name,
+        ])->values()->all();
     }
 
     /**

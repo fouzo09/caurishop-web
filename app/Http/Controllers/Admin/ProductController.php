@@ -12,6 +12,7 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use App\Support\Media;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -25,7 +26,7 @@ class ProductController extends Controller implements HasMiddleware
         return [
             new Middleware('permission:products.view', only: ['index', 'show']),
             new Middleware('permission:products.create', only: ['create', 'store', 'createVariant', 'storeVariant']),
-            new Middleware('permission:products.edit', only: ['edit', 'update', 'editVariant', 'updateVariant']),
+            new Middleware('permission:products.edit', only: ['edit', 'update', 'editVariant', 'updateVariant', 'setImageVariant']),
             new Middleware('permission:products.delete', only: ['destroy', 'destroyVariant']),
             new Middleware('permission:products.publish', only: ['publish', 'unpublish', 'activate', 'deactivate']),
         ];
@@ -126,6 +127,24 @@ class ProductController extends Controller implements HasMiddleware
         }
 
         return back()->with('success', 'Image supprimée.');
+    }
+
+    /** Rattache l'image à une variante (ou la remet sur le produit entier). */
+    public function setImageVariant(Request $request, Product $product, ProductImage $image): RedirectResponse
+    {
+        abort_unless($image->product_id === $product->id, 404);
+
+        $data = $request->validate([
+            'variant_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('product_variants', 'id')->where('product_id', $product->id),
+            ],
+        ]);
+
+        $image->update(['variant_id' => $data['variant_id'] ?? null]);
+
+        return back()->with('success', 'Image rattachée.');
     }
 
     public function setPrimaryImage(Product $product, ProductImage $image): RedirectResponse

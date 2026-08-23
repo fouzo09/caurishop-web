@@ -283,6 +283,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/{product}/images', [ProductController::class, 'storeImages'])->name('images.store');
             Route::delete('/{product}/images/{image}', [ProductController::class, 'destroyImage'])->name('images.destroy');
             Route::post('/{product}/images/{image}/primary', [ProductController::class, 'setPrimaryImage'])->name('images.primary');
+            Route::post('/{product}/images/{image}/variant', [ProductController::class, 'setImageVariant'])->name('images.variant');
 
             // Avis clients
             Route::get('/{product}/avis', [ProductReviewController::class, 'index'])->name('reviews.index');

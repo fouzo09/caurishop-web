@@ -63,15 +63,13 @@
           {{ $ratingCount > 0 ? $ratingAvg . '/5 · ' . $ratingCount . ' avis' : 'Aucun avis' }}
         </a>
         <span class="text-muted">·</span>
-        @if ($soldOut)
-          <span class="fw-semibold" style="color:var(--danger)">Rupture de stock</span>
-        @else
-          <span class="fw-semibold" style="color:var(--green)">En stock</span>
-        @endif
+        <span class="fw-semibold" id="productStock" style="color:{{ $soldOut ? 'var(--danger)' : 'var(--green)' }}">
+          {{ $soldOut ? 'Rupture de stock' : 'En stock' }}
+        </span>
       </div>
 
       <div class="d-flex align-items-baseline gap-3">
-        <span class="fw-bolder" style="font-size:28px">{{ $isVariable ? 'À partir de ' : '' }}@gnf($basePrice)</span>
+        <span class="fw-bolder" style="font-size:28px" id="productPrice">{{ $isVariable ? 'À partir de ' : '' }}@gnf($basePrice)</span>
       </div>
 
       {{-- Emplacement du paiement échelonné « molo molo » (à brancher sur les CreditPlan). --}}
@@ -81,16 +79,54 @@
         <input type="hidden" name="product_id" value="{{ $product->id }}">
 
         @if ($isVariable)
-          <div>
-            <div class="fw-bold mb-2" style="font-size:13.5px">Choix</div>
-            <select name="variant_id" class="form-select" required>
-              @foreach ($product->variants as $variant)
-                <option value="{{ $variant->id }}" @disabled(! $variant->hasStock())>
-                  {{ $variant->name ?? ('Variante #' . $variant->id) }} — @gnf($variant->price){{ $variant->hasStock() ? '' : ' (rupture)' }}
-                </option>
+          @php
+              $axes     = $product->variantAxes();
+              $variants = $product->variantPayload();
+              // Variante retenue au chargement : la première disponible.
+              $selected = collect($variants)->firstWhere('inStock', true) ?? ($variants[0] ?? null);
+          @endphp
+
+          @if ($axes)
+            <input type="hidden" name="variant_id" id="variantId" value="{{ $selected['id'] ?? '' }}">
+
+            <div class="variant-picker" id="variantPicker" data-variants="{{ json_encode($variants) }}">
+              @foreach ($axes as $axe)
+                <div class="variant-axis" data-axis="{{ $axe['key'] }}">
+                  <div class="variant-axis__head">
+                    <span class="variant-axis__label">{{ $axe['label'] }}&nbsp;:</span>
+                    <span class="variant-axis__value" data-axis-value></span>
+                  </div>
+                  <div class="variant-axis__options">
+                    @foreach ($axe['values'] as $option)
+                      <button type="button"
+                              class="variant-option{{ $axe['imaged'] ? ' variant-option--img' : '' }}"
+                              data-value="{{ $option['value'] }}"
+                              aria-label="{{ $axe['label'] }} {{ $option['value'] }}"
+                              title="{{ $option['value'] }}">
+                        @if ($axe['imaged'] && $option['image'])
+                          <img src="{{ $option['image'] }}" alt="{{ $option['value'] }}" loading="lazy" onerror="this.remove()">
+                        @else
+                          <span class="variant-option__text">{{ $option['value'] }}</span>
+                        @endif
+                      </button>
+                    @endforeach
+                  </div>
+                </div>
               @endforeach
-            </select>
-          </div>
+            </div>
+          @else
+            {{-- Variantes sans attributs : on garde la liste déroulante. --}}
+            <div>
+              <div class="fw-bold mb-2" style="font-size:13.5px">Choix</div>
+              <select name="variant_id" class="form-select" required>
+                @foreach ($product->variants as $variant)
+                  <option value="{{ $variant->id }}" @disabled(! $variant->hasStock())>
+                    {{ $variant->name ?? ('Variante #' . $variant->id) }} — @gnf($variant->price){{ $variant->hasStock() ? '' : ' (rupture)' }}
+                  </option>
+                @endforeach
+              </select>
+            </div>
+          @endif
         @endif
 
         <div class="d-flex gap-3 align-items-center flex-wrap">
@@ -99,7 +135,7 @@
             <input class="val" type="number" name="quantity" value="1" min="1" aria-label="Quantité">
             <button type="button" data-plus aria-label="Augmenter"><i class="bi bi-plus"></i></button>
           </div>
-          <button type="submit" class="btn-brand flex-grow-1 d-flex align-items-center justify-content-center gap-2" @disabled($soldOut)>
+          <button type="submit" id="addToCart" class="btn-brand flex-grow-1 d-flex align-items-center justify-content-center gap-2" @disabled($soldOut)>
             <i class="bi bi-cart-plus"></i>Ajouter au panier
           </button>
           <button type="button" class="btn-outline-ink px-3 wish-lg{{ $isFavorite ? ' is-on' : '' }}"
@@ -294,3 +330,107 @@
   @endif
 </main>
 @endsection
+
+@push('scripts')
+<script>
+/* Sélecteur de variantes : une ligne par axe (couleur, taille…), en vignettes
+   quand les valeurs ont un visuel, en pastilles sinon. Le champ caché
+   variant_id suit la combinaison choisie. */
+(function () {
+  var picker = document.getElementById('variantPicker');
+  if (!picker) return;
+
+  var variants = JSON.parse(picker.dataset.variants || '[]');
+  if (!variants.length) return;
+
+  var axisEls  = Array.prototype.slice.call(picker.querySelectorAll('.variant-axis'));
+  var axes     = axisEls.map(function (el) { return el.dataset.axis; });
+  var input    = document.getElementById('variantId');
+  var priceEl  = document.getElementById('productPrice');
+  var stockEl  = document.getElementById('productStock');
+  var addBtn   = document.getElementById('addToCart');
+  var mainImg  = document.getElementById('mainImage');
+
+  /* Première variante disponible, sinon la première tout court. */
+  var start = variants.filter(function (v) { return v.inStock; })[0] || variants[0];
+  var selection = {};
+  axes.forEach(function (axis) { selection[axis] = start.attrs[axis]; });
+
+  function find(combo) {
+    return variants.filter(function (v) {
+      return axes.every(function (axis) { return v.attrs[axis] === combo[axis]; });
+    })[0] || null;
+  }
+
+  /* Combinaison si l'on changeait `axis` pour `value`, les autres axes inchangés. */
+  function probe(axis, value) {
+    var combo = {};
+    axes.forEach(function (a) { combo[a] = a === axis ? value : selection[a]; });
+    return combo;
+  }
+
+  function choose(axis, value) {
+    var combo = probe(axis, value);
+
+    /* Combinaison inexistante : on bascule sur une variante portant la valeur
+       cliquée, en privilégiant celles qui sont en stock. */
+    if (!find(combo)) {
+      var candidates = variants.filter(function (v) { return v.attrs[axis] === value; });
+      var fallback = candidates.filter(function (v) { return v.inStock; })[0] || candidates[0];
+      if (!fallback) return;
+      axes.forEach(function (a) { combo[a] = fallback.attrs[a]; });
+    }
+
+    selection = combo;
+    render();
+  }
+
+  function render() {
+    var current = find(selection);
+
+    axisEls.forEach(function (axisEl) {
+      var axis  = axisEl.dataset.axis;
+      var label = axisEl.querySelector('[data-axis-value]');
+      if (label) label.textContent = selection[axis] || '';
+
+      axisEl.querySelectorAll('.variant-option').forEach(function (btn) {
+        var value = btn.dataset.value;
+        var match = find(probe(axis, value));
+
+        btn.classList.toggle('is-selected', value === selection[axis]);
+        /* Atténué quand la valeur ne se combine pas avec la sélection courante :
+           le clic reste possible, il ajuste alors les autres axes. */
+        btn.classList.toggle('is-dimmed', !match);
+        btn.classList.toggle('is-soldout', !!match && !match.inStock);
+      });
+    });
+
+    if (!current) return;
+
+    if (input)   input.value = current.id;
+    if (priceEl) priceEl.textContent = current.price;
+    if (addBtn)  addBtn.disabled = !current.inStock;
+
+    if (stockEl) {
+      stockEl.textContent = current.inStock ? 'En stock' : 'Rupture de stock';
+      stockEl.style.color = current.inStock ? 'var(--green)' : 'var(--danger)';
+    }
+
+    if (mainImg && current.image) {
+      mainImg.src = current.image;
+      document.querySelectorAll('.thumb').forEach(function (t) {
+        t.classList.toggle('active', t.dataset.full === current.image);
+      });
+    }
+  }
+
+  picker.addEventListener('click', function (event) {
+    var btn = event.target.closest('.variant-option');
+    if (!btn) return;
+    choose(btn.closest('.variant-axis').dataset.axis, btn.dataset.value);
+  });
+
+  render();
+})();
+</script>
+@endpush

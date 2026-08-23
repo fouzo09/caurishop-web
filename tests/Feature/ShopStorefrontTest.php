@@ -430,3 +430,136 @@ it('construit les URL publiques depuis le disque média', function () {
         ->toBe('https://caurishop.sfo3.digitaloceanspaces.com/images/products/1/img_0.jpg');
     expect(\App\Support\Media::url(null))->toBeNull();
 });
+
+/*
+|--------------------------------------------------------------------------
+| Sélecteur de variantes (vignettes / pastilles)
+|--------------------------------------------------------------------------
+*/
+
+/** Produit variable couleur × stockage, matrice volontairement incomplète. */
+function variableProduct(): Product
+{
+    $product = Product::create([
+        'type' => Product::TYPE_VARIABLE, 'name' => 'Tablette Pro', 'slug' => 'tablette-pro',
+        'price' => 900000, 'stock_quantity' => 0, 'is_published' => true, 'is_active' => true,
+    ]);
+
+    foreach ([
+        ['Gris', '256 Go', 900000],
+        ['Argent', '256 Go', 900000],
+        ['Gris', '512 Go', 1200000],
+    ] as [$couleur, $stockage, $prix]) {
+        $product->variants()->create([
+            'sku'        => 'TAB-' . $couleur . '-' . str_replace(' ', '', $stockage),
+            'name'       => $couleur . ' ' . $stockage,
+            'attributes' => ['couleur' => $couleur, 'stockage' => $stockage],
+            'price'      => $prix, 'stock_quantity' => 5, 'is_active' => true,
+        ]);
+    }
+
+    return $product->fresh(['variants']);
+}
+
+it('déduit les axes de variation depuis les attributs', function () {
+    $product = variableProduct()->load('variants.images');
+
+    $axes = collect($product->variantAxes());
+    expect($axes->pluck('key')->all())->toBe(['couleur', 'stockage']);
+    expect($axes->firstWhere('key', 'couleur')['label'])->toBe('Couleur');
+    expect(array_column($axes->firstWhere('key', 'couleur')['values'], 'value'))->toBe(['Gris', 'Argent']);
+    expect(array_column($axes->firstWhere('key', 'stockage')['values'], 'value'))->toBe(['256 Go', '512 Go']);
+
+    // Aucune image rattachée : les deux axes restent en pastilles de texte.
+    expect($axes->pluck('imaged')->all())->toBe([false, false]);
+});
+
+it('ne passe un axe en vignettes que si toutes ses valeurs sont illustrées', function () {
+    $product = variableProduct();
+    $gris   = $product->variants->firstWhere('name', 'Gris 256 Go');
+    $argent = $product->variants->firstWhere('name', 'Argent 256 Go');
+
+    // Une seule couleur illustrée : pas encore de vignettes.
+    $product->images()->create(['variant_id' => $gris->id, 'path' => 'images/products/x/gris.jpg', 'sort_order' => 1]);
+    $axes = collect($product->fresh(['variants.images'])->variantAxes());
+    expect($axes->firstWhere('key', 'couleur')['imaged'])->toBeFalse();
+
+    // Les deux couleurs illustrées : l'axe bascule en vignettes.
+    $product->images()->create(['variant_id' => $argent->id, 'path' => 'images/products/x/argent.jpg', 'sort_order' => 2]);
+    $axes = collect($product->fresh(['variants.images'])->variantAxes());
+    expect($axes->firstWhere('key', 'couleur')['imaged'])->toBeTrue();
+    // Le stockage n'hérite pas des visuels des couleurs.
+    expect($axes->firstWhere('key', 'stockage')['imaged'])->toBeFalse();
+});
+
+it('affiche le sélecteur en vignettes plutôt qu\'une liste déroulante', function () {
+    $product = variableProduct();
+
+    $this->get(route('shop.products.show', $product->id))
+        ->assertOk()
+        ->assertSee('variant-picker', false)
+        ->assertSee('data-axis="couleur"', false)
+        ->assertSee('data-axis="stockage"', false)
+        ->assertDontSee('<select name="variant_id"', false);
+});
+
+it('retombe sur la liste déroulante quand les variantes n\'ont pas d\'attributs', function () {
+    $product = Product::create([
+        'type' => Product::TYPE_VARIABLE, 'name' => 'Lot mystère', 'slug' => 'lot-mystere',
+        'price' => 50000, 'stock_quantity' => 0, 'is_published' => true, 'is_active' => true,
+    ]);
+    $product->variants()->create(['sku' => 'LOT-1', 'name' => 'Lot A', 'price' => 50000, 'stock_quantity' => 3, 'is_active' => true]);
+    $product->variants()->create(['sku' => 'LOT-2', 'name' => 'Lot B', 'price' => 60000, 'stock_quantity' => 3, 'is_active' => true]);
+
+    $this->get(route('shop.products.show', $product->id))
+        ->assertOk()
+        ->assertSee('<select name="variant_id"', false)
+        ->assertDontSee('variant-picker', false);
+});
+
+it('sérialise les variantes pour le script du sélecteur', function () {
+    $payload = collect(variableProduct()->load('variants.images')->variantPayload());
+
+    expect($payload)->toHaveCount(3);
+    expect($payload->first()['attrs'])->toBe(['couleur' => 'Gris', 'stockage' => '256 Go']);
+    expect($payload->first()['inStock'])->toBeTrue();
+    expect($payload->first()['price'])->toContain('GNF');
+});
+
+it('rattache une image à une variante depuis l\'admin', function () {
+    $this->seed(\Database\Seeders\PermissionsSeeder::class);
+    $product = variableProduct();
+    $variant = $product->variants->first();
+    $image   = $product->images()->create(['path' => 'images/products/x/img.jpg', 'sort_order' => 1]);
+
+    $this->actingAs(admin())
+        ->post(route('admin.products.images.variant', [$product, $image]), ['variant_id' => $variant->id])
+        ->assertRedirect();
+
+    expect($image->fresh()->variant_id)->toBe($variant->id);
+
+    // Valeur vide : l'image revient sur le produit entier.
+    $this->actingAs(admin())
+        ->post(route('admin.products.images.variant', [$product, $image]), ['variant_id' => ''])
+        ->assertRedirect();
+
+    expect($image->fresh()->variant_id)->toBeNull();
+});
+
+it('refuse de rattacher une image à la variante d\'un autre produit', function () {
+    $this->seed(\Database\Seeders\PermissionsSeeder::class);
+    $product = variableProduct();
+    $image   = $product->images()->create(['path' => 'images/products/x/img.jpg', 'sort_order' => 1]);
+
+    $autre = Product::create([
+        'type' => Product::TYPE_VARIABLE, 'name' => 'Autre', 'slug' => 'autre-variable',
+        'price' => 1000, 'stock_quantity' => 0, 'is_published' => true, 'is_active' => true,
+    ]);
+    $variantAilleurs = $autre->variants()->create(['sku' => 'A-1', 'name' => 'A', 'price' => 1000, 'stock_quantity' => 1, 'is_active' => true]);
+
+    $this->actingAs(admin())
+        ->post(route('admin.products.images.variant', [$product, $image]), ['variant_id' => $variantAilleurs->id])
+        ->assertSessionHasErrors('variant_id');
+
+    expect($image->fresh()->variant_id)->toBeNull();
+});

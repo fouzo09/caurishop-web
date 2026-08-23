@@ -75,7 +75,13 @@ class ProductController extends Controller
     {
         abort_unless($product->is_published && $product->is_active, 404);
 
-        $product->load(['images', 'variants' => fn ($q) => $q->where('is_active', true), 'category']);
+        $product->load([
+            'images',
+            // variants.images : le sélecteur affiche le visuel de chaque variante.
+            'variants' => fn ($q) => $q->where('is_active', true),
+            'variants.images',
+            'category',
+        ]);
         $product->loadAvg('approvedReviews as rating_avg', 'rating')
                 ->loadCount('approvedReviews as rating_count');
 

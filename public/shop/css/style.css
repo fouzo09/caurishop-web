@@ -452,6 +452,44 @@ a:hover{color:var(--brand)}
 .review-item__title{font-weight:700;font-size:14px;margin-top:6px}
 .review-item__body{margin:6px 0 0;font-size:13.5px;color:#555;line-height:1.65;white-space:pre-line}
 
+/* ============================ SÉLECTEUR DE VARIANTES ============================ */
+.variant-picker{display:flex;flex-direction:column;gap:16px}
+.variant-axis__head{display:flex;align-items:baseline;gap:6px;margin-bottom:8px;font-size:13.5px}
+.variant-axis__label{font-weight:700;color:var(--ink)}
+.variant-axis__value{color:#555}
+.variant-axis__options{display:flex;flex-wrap:wrap;gap:8px}
+
+.variant-option{
+  border:1px solid var(--line-input);background:#fff;border-radius:99px;
+  padding:9px 18px;font-size:13.5px;font-weight:600;color:var(--ink);cursor:pointer;
+  transition:border-color .15s,color .15s,opacity .15s;
+}
+.variant-option:hover{border-color:var(--ink)}
+.variant-option.is-selected{border-color:var(--brand);color:var(--brand);box-shadow:inset 0 0 0 1px var(--brand)}
+.variant-option:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+
+/* Vignettes : la valeur est représentée par le visuel de sa variante.
+   Bordure et retrait se compensent pour que la sélection ne décale rien. */
+.variant-option--img{border-radius:8px;padding:3px;width:76px;height:76px;overflow:hidden}
+.variant-option--img img{width:100%;height:100%;object-fit:cover;border-radius:6px;display:block}
+.variant-option--img.is-selected{border-width:2px;border-color:var(--ink);padding:2px;box-shadow:none}
+.variant-option--img .variant-option__text{
+  display:flex;align-items:center;justify-content:center;width:100%;height:100%;
+  padding:2px;font-size:11.5px;font-weight:600;line-height:1.2;text-align:center;color:var(--muted);
+}
+
+/* Atténué : la valeur ne se combine pas avec la sélection courante.
+   Le clic reste possible, il ajuste les autres axes. */
+.variant-option.is-dimmed{opacity:.45}
+/* Combinaison existante mais épuisée. */
+.variant-option.is-soldout{text-decoration:line-through;color:var(--muted)}
+.variant-option--img.is-soldout{text-decoration:none}
+.variant-option--img.is-soldout img{opacity:.45}
+
+@media (max-width:575.98px){
+  .variant-option--img{width:64px;height:64px}
+}
+
 /* ============================ RESPONSIVE ============================ */
 @media (max-width:991.98px){
   .shop-aside{border-right:0;border-bottom:1px solid var(--line)}
