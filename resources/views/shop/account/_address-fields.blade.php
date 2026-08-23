@@ -14,16 +14,20 @@
     <input name="phone" value="{{ $a->phone ?? '' }}" class="form-control" placeholder="+224 6XX XX XX XX" required>
   </div>
   <div class="col-md-6">
-    <label class="form-label">Préfecture / région</label>
-    <select name="city" class="form-select" required>
+    <label class="form-label">Ville</label>
+    <select name="city_id" class="form-select" required>
       @foreach ($cities as $ville)
-        <option value="{{ $ville }}" @selected(($a->city ?? 'Conakry') === $ville)>{{ $ville }}</option>
+        <option value="{{ $ville->id }}" @selected(($a->city_id ?? null) === $ville->id)>{{ $ville->name }}</option>
       @endforeach
     </select>
   </div>
+  <div class="col-md-6">
+    <label class="form-label">Quartier</label>
+    <input name="quartier" value="{{ $a->quartier ?? '' }}" class="form-control" placeholder="Ex. Almamya" required>
+  </div>
   <div class="col-12">
-    <label class="form-label">Quartier / repère</label>
-    <input name="address" value="{{ $a->address ?? '' }}" class="form-control" placeholder="Ex. Almamya, rue KA 020, en face de la pharmacie" required>
+    <label class="form-label">Précision <span class="text-muted" style="font-size:12px">(facultatif)</span></label>
+    <input name="precision" value="{{ $a->precision ?? '' }}" class="form-control" placeholder="Ex. rue KA 020, en face de la pharmacie">
   </div>
   <div class="col-12">
     <label class="form-check d-flex align-items-center gap-2 m-0" style="font-size:13.5px">

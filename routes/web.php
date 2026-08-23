@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\MarginController;
 use App\Http\Controllers\Admin\ScraperController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ProductReviewController;
 use App\Http\Controllers\Company\ProfileController as CompanyProfileController;
 use App\Http\Controllers\Portal\ProfileController as PortalProfileController;
 use App\Http\Controllers\Portal\DjomyController;
@@ -30,6 +31,7 @@ use App\Http\Controllers\Shop\AccountController as ShopAccountController;
 use App\Http\Controllers\Shop\AddressController as ShopAddressController;
 use App\Http\Controllers\Shop\CompanyController as ShopCompanyController;
 use App\Http\Controllers\Shop\FavoriteController as ShopFavoriteController;
+use App\Http\Controllers\Shop\ReviewController as ShopReviewController;
 use App\Http\Controllers\Shop\ContactController as ShopContactController;
 use App\Http\Controllers\Shop\Auth\RegisterController as ShopRegisterController;
 use App\Http\Controllers\Shop\Auth\LoginController as ShopLoginController;
@@ -71,6 +73,10 @@ Route::name('shop.')->group(function () {
     // Checkout + espace client (connexion requise)
     Route::middleware('auth')->group(function () {
         Route::post('/deconnexion', [ShopLoginController::class, 'destroy'])->name('logout');
+
+        // Avis produits
+        Route::post('/produits/{product}/avis', [ShopReviewController::class, 'store'])->name('products.reviews.store');
+        Route::delete('/avis/{review}', [ShopReviewController::class, 'destroy'])->name('products.reviews.destroy');
 
         Route::get('/checkout', [ShopCheckoutController::class, 'index'])->name('checkout.index');
         Route::post('/checkout', [ShopCheckoutController::class, 'store'])->name('checkout.store');
@@ -277,6 +283,11 @@ Route::middleware('auth')->group(function () {
             Route::post('/{product}/images', [ProductController::class, 'storeImages'])->name('images.store');
             Route::delete('/{product}/images/{image}', [ProductController::class, 'destroyImage'])->name('images.destroy');
             Route::post('/{product}/images/{image}/primary', [ProductController::class, 'setPrimaryImage'])->name('images.primary');
+
+            // Avis clients
+            Route::get('/{product}/avis', [ProductReviewController::class, 'index'])->name('reviews.index');
+            Route::post('/{product}/avis/{review}/toggle', [ProductReviewController::class, 'toggle'])->name('reviews.toggle');
+            Route::delete('/{product}/avis/{review}', [ProductReviewController::class, 'destroy'])->name('reviews.destroy');
 
             // Variants
             Route::get('/{product}/variants/create', [ProductController::class, 'createVariant'])->name('variants.create');

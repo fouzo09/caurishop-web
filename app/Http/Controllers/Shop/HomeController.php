@@ -19,6 +19,7 @@ class HomeController extends Controller
         // Nouveautés : derniers produits publiés (carrousel horizontal).
         $newArrivals = Product::query()
             ->published()
+            ->withRatings()
             ->with(['images', 'variants', 'category'])
             ->latest('id')
             ->take(10)
@@ -27,6 +28,7 @@ class HomeController extends Controller
         // Nos produits : les plus commandés (grille).
         $popularProducts = Product::query()
             ->published()
+            ->withRatings()
             ->with(['images', 'variants', 'category'])
             ->withCount('orderItems')
             ->orderByDesc('order_items_count')

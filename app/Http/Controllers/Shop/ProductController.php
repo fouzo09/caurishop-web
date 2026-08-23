@@ -25,6 +25,7 @@ class ProductController extends Controller
 
         $query = Product::query()
             ->published()
+            ->withRatings()
             ->with(['images', 'variants']);
 
         if ($activeCategory) {
@@ -75,10 +76,31 @@ class ProductController extends Controller
         abort_unless($product->is_published && $product->is_active, 404);
 
         $product->load(['images', 'variants' => fn ($q) => $q->where('is_active', true), 'category']);
+        $product->loadAvg('approvedReviews as rating_avg', 'rating')
+                ->loadCount('approvedReviews as rating_count');
+
+        // Avis publiés, le plus récent en tête ; l'avis du client connecté est
+        // sorti de la liste, il est déjà repris dans le formulaire.
+        $customer = auth()->user()?->customer;
+        $myReview = $customer ? $product->reviews()->where('customer_id', $customer->id)->first() : null;
+
+        $reviews = $product->approvedReviews()
+            ->with('customer')
+            ->when($myReview, fn ($q) => $q->where('id', '!=', $myReview->id))
+            ->latest('id')
+            ->paginate(5)
+            ->withQueryString();
+
+        // Répartition des notes (5 → 1) pour les barres du récapitulatif.
+        $breakdown = $product->approvedReviews()
+            ->selectRaw('rating, COUNT(*) as total')
+            ->groupBy('rating')
+            ->pluck('total', 'rating');
 
         // Suggestions : même catégorie, produits publiés différents.
         $suggestions = Product::query()
             ->published()
+            ->withRatings()
             ->where('id', '!=', $product->id)
             ->when($product->category_id, fn ($q) => $q->where('category_id', $product->category_id))
             ->with(['images', 'variants'])
@@ -86,6 +108,6 @@ class ProductController extends Controller
             ->take(4)
             ->get();
 
-        return view('shop.products.show', compact('product', 'suggestions'));
+        return view('shop.products.show', compact('product', 'suggestions', 'reviews', 'myReview', 'breakdown'));
     }
 }

@@ -8,6 +8,7 @@ use App\Models\Supplier;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Support\Media;
 
 /**
  * Catalogue de démonstration du fournisseur FOUZIMPORT :
@@ -66,7 +67,7 @@ return new class extends Migration {
 
         foreach (Product::where('supplier_id', $supplier->id)->with('images')->get() as $product) {
             foreach ($product->images as $image) {
-                Storage::disk('public')->delete($image->path);
+                Media::delete($image->path);
             }
 
             $product->images()->delete();
@@ -152,8 +153,8 @@ return new class extends Migration {
             return null;
         }
 
-        $path = "products/{$product->id}/{$product->sku}-{$position}.jpg";
-        Storage::disk('public')->put($path, file_get_contents($source));
+        $path = Media::productImages($product->id) . "/{$product->sku}-{$position}.jpg";
+        Media::disk()->put($path, file_get_contents($source));
 
         return $path;
     }
@@ -199,8 +200,8 @@ return new class extends Migration {
         $binary = ob_get_clean();
         imagedestroy($canvas);
 
-        $path = "products/{$product->id}/fouzimport_{$position}.jpg";
-        Storage::disk('public')->put($path, $binary);
+        $path = Media::productImages($product->id) . "/fouzimport_{$position}.jpg";
+        Media::disk()->put($path, $binary);
 
         return $path;
     }

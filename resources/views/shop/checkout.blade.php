@@ -13,10 +13,9 @@
     $first = old('first_name', $defaultParts[0] ?? $c?->first_name ?? '');
     $last  = old('last_name', $defaultParts[1] ?? $c?->last_name ?? '');
     $phone = old('phone', $default?->phone ?? $c?->phone ?? '');
-    $addr  = old('address', $default?->address ?? $c?->address ?? '');
-    $city  = old('city', $default?->city ?? 'Conakry');
-
-    $cities = \App\Http\Controllers\Shop\AddressController::CITIES;
+    $quartier  = old('quartier', $default?->quartier ?? '');
+    $precision = old('precision', $default?->precision ?? '');
+    $cityId    = (int) old('city_id', $default?->city_id ?? $cities->first()?->id);
 @endphp
 
 <main class="container-xl py-4">
@@ -48,7 +47,7 @@
               @foreach ($addresses as $a)
                 <label class="pay-option{{ $a->is_default ? ' selected' : '' }}"
                        data-name="{{ $a->full_name }}" data-phone="{{ $a->phone }}"
-                       data-city="{{ $a->city }}" data-address="{{ $a->address }}">
+                       data-city="{{ $a->city_id }}" data-quartier="{{ $a->quartier }}" data-precision="{{ $a->precision }}">
                   <input type="radio" name="saved_address" value="{{ $a->id }}" class="form-check-input m-0" @checked($a->is_default)>
                   <span class="flex-grow-1">
                     <span class="d-block fw-semibold">{{ $a->label ?: $a->full_name }}</span>
@@ -77,18 +76,23 @@
               @error('phone')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-6">
-              <label class="form-label">Préfecture / région</label>
-              <select name="city" id="ck-city" class="form-select @error('city') is-invalid @enderror">
+              <label class="form-label">Ville</label>
+              <select name="city_id" id="ck-city" class="form-select @error('city_id') is-invalid @enderror">
                 @foreach ($cities as $ville)
-                  <option value="{{ $ville }}" @selected($city === $ville)>{{ $ville }}</option>
+                  <option value="{{ $ville->id }}" @selected($cityId === $ville->id)>{{ $ville->name }}</option>
                 @endforeach
               </select>
-              @error('city')<div class="invalid-feedback">{{ $message }}</div>@enderror
+              @error('city_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Quartier</label>
+              <input name="quartier" id="ck-quartier" value="{{ $quartier }}" class="form-control @error('quartier') is-invalid @enderror" placeholder="Ex. Almamya">
+              @error('quartier')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-12">
-              <label class="form-label">Quartier / repère</label>
-              <input name="address" id="ck-address" value="{{ $addr }}" class="form-control @error('address') is-invalid @enderror" placeholder="Ex. Almamya, rue KA 020, en face de la pharmacie">
-              @error('address')<div class="invalid-feedback">{{ $message }}</div>@enderror
+              <label class="form-label">Précision <span class="text-muted" style="font-size:12px">(facultatif)</span></label>
+              <input name="precision" id="ck-precision" value="{{ $precision }}" class="form-control @error('precision') is-invalid @enderror" placeholder="Ex. rue KA 020, en face de la pharmacie">
+              @error('precision')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
           </div>
 
@@ -271,7 +275,8 @@
       set('ck-first', name[0] || '');
       set('ck-last', name.slice(1).join(' '));
       set('ck-phone', card.dataset.phone || '');
-      set('ck-address', card.dataset.address || '');
+      set('ck-quartier', card.dataset.quartier || '');
+      set('ck-precision', card.dataset.precision || '');
       set('ck-city', card.dataset.city || '');
     });
   });

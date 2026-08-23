@@ -11,7 +11,7 @@ use App\Services\Admin\ProductService;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
-use Illuminate\Support\Facades\Storage;
+use App\Support\Media;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -79,6 +79,10 @@ class ProductController extends Controller implements HasMiddleware
     public function show(Product $product): View
     {
         $product->load(['variants', 'images']);
+        // Avis clients : compteurs pour la carte de modération du panneau latéral.
+        $product->loadAvg('approvedReviews as rating_avg', 'rating')
+                ->loadCount(['reviews', 'approvedReviews as rating_count']);
+
         return view('admin.products.show', compact('product'));
     }
 
@@ -113,7 +117,7 @@ class ProductController extends Controller implements HasMiddleware
     public function destroyImage(Product $product, ProductImage $image): RedirectResponse
     {
         abort_unless($image->product_id === $product->id, 404);
-        Storage::delete($image->path);
+        Media::delete($image->path);
         $wasPrimary = $image->is_primary;
         $image->delete();
 
@@ -140,7 +144,7 @@ class ProductController extends Controller implements HasMiddleware
         $sort = (int) $product->images()->max('sort_order') + 1;
 
         foreach ($request->file('images') as $i => $file) {
-            $path = $file->store("products/{$product->id}", 'public');
+            $path = $file->store(Media::productImages($product->id), Media::diskName());
             $isPrimary = !$hasExisting && $i === 0;
 
             $product->images()->create([

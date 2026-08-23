@@ -74,7 +74,28 @@ class Product extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(ProductReview::class);
+    }
+
+    /** Avis visibles publiquement (base des étoiles et du compteur). */
+    public function approvedReviews()
+    {
+        return $this->hasMany(ProductReview::class)->where('is_approved', true);
+    }
+
     // Scopes
+    /**
+     * Charge la note moyenne et le nombre d'avis en deux sous-requêtes :
+     * évite un COUNT/AVG par produit dans les grilles et les cartes.
+     */
+    public function scopeWithRatings($query)
+    {
+        return $query->withAvg('approvedReviews as rating_avg', 'rating')
+                     ->withCount('approvedReviews as rating_count');
+    }
+
     public function scopePublished($query)
     {
         return $query->where('is_published', true)->where('is_active', true);
@@ -208,5 +229,28 @@ class Product extends Model
             ?? $this->images->first();
 
         return $primary?->url;
+    }
+
+    /**
+     * Note moyenne sur 5 (0 si aucun avis).
+     * Utilise la valeur préchargée par scopeWithRatings() quand elle existe.
+     */
+    public function ratingAverage(): float
+    {
+        // array_key_exists : scopeWithRatings() renvoie null quand il n'y a
+        // aucun avis, on ne doit pas repartir en base pour autant.
+        $avg = array_key_exists('rating_avg', $this->attributes)
+            ? $this->attributes['rating_avg']
+            : $this->approvedReviews()->avg('rating');
+
+        return round((float) $avg, 1);
+    }
+
+    /** Nombre d'avis publiés. */
+    public function ratingCount(): int
+    {
+        return (int) (array_key_exists('rating_count', $this->attributes)
+            ? $this->attributes['rating_count']
+            : $this->approvedReviews()->count());
     }
 }

@@ -279,6 +279,42 @@
                 </div>
             </div>
 
+            {{-- Avis clients --}}
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
+                    <h3 class="card-title">Avis clients ({{ $product->reviews_count }})</h3>
+                    <a href="{{ route('admin.products.reviews.index', $product) }}" class="btn btn-outline btn-sm">
+                        <i class="fas fa-comments"></i> Modérer
+                    </a>
+                </div>
+                <div class="card-body">
+                    @if($product->reviews_count === 0)
+                    <div style="text-align:center;padding:1rem;color:var(--gray);font-size:0.85rem;">
+                        <i class="fas fa-comment-slash" style="display:block;font-size:1.5rem;margin-bottom:.4rem;opacity:.3;"></i>
+                        Aucun avis pour ce produit
+                    </div>
+                    @else
+                    @php $avg = round((float) $product->rating_avg, 1); @endphp
+                    <div style="display:flex;align-items:center;gap:.75rem;">
+                        <div style="font-size:1.75rem;font-weight:700;line-height:1;">{{ number_format($avg, 1, ',', ' ') }}<span style="font-size:.9rem;color:var(--gray);">/5</span></div>
+                        <div>
+                            <div style="color:#F59E0B;">
+                                @for($i = 1; $i <= 5; $i++)
+                                <i class="fa{{ $i <= round($avg) ? 's' : 'r' }} fa-star" style="font-size:.8rem;"></i>
+                                @endfor
+                            </div>
+                            <div style="font-size:.8rem;color:var(--gray);">
+                                {{ $product->rating_count }} publié{{ $product->rating_count > 1 ? 's' : '' }}
+                                @if($product->reviews_count > $product->rating_count)
+                                · {{ $product->reviews_count - $product->rating_count }} masqué{{ ($product->reviews_count - $product->rating_count) > 1 ? 's' : '' }}
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+            </div>
+
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Statut</h3>

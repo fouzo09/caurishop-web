@@ -10,6 +10,7 @@ use App\Scrapers\ClaudeScraper;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Support\Media;
 
 class ScraperService
 {
@@ -354,9 +355,9 @@ class ScraperService
 
             $ext  = $this->guessExtension($imageUrl, $response->header('Content-Type') ?? '');
             $slug = $index > 0 ? "scraped_{$product->id}_{$index}" : "scraped_{$product->id}";
-            $path = "products/{$product->id}/{$slug}.{$ext}";
+            $path = Media::productImages($product->id) . "/{$slug}.{$ext}";
 
-            Storage::disk('public')->put($path, $response->body());
+            Storage::disk(Media::diskName())->put($path, $response->body());
 
             $isPrimary = $product->images()->count() === 0;
             $product->images()->create([

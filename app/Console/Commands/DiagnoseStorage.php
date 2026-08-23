@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\ProductImage;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Storage;
+use App\Support\Media;
 
 /**
  * Diagnostic du stockage des images produit.
@@ -19,35 +19,58 @@ class DiagnoseStorage extends Command
     {
         $ok = true;
 
+        $disk     = Media::diskName();
+        $isRemote = config("filesystems.disks.{$disk}.driver") === 's3';
+
         $this->line('');
         $this->info('── Configuration ──');
-        $this->line('  Disque par défaut  : ' . config('filesystems.default'));
-        $this->line('  Racine « public »  : ' . config('filesystems.disks.public.root'));
-        $this->line('  URL « public »     : ' . config('filesystems.disks.public.url'));
-        $this->line('  APP_URL            : ' . config('app.url'));
+        $this->line('  Disque média : ' . $disk);
+        $this->line('  APP_URL      : ' . config('app.url'));
 
-        $this->line('');
-        $this->info('── Lien symbolique ──');
-        $link = public_path('storage');
-        $target = storage_path('app/public');
+        if ($isRemote) {
+            $this->line('  Bucket       : ' . config("filesystems.disks.{$disk}.bucket"));
+            $this->line('  Endpoint     : ' . config("filesystems.disks.{$disk}.endpoint"));
+            $this->line('  URL publique : ' . config("filesystems.disks.{$disk}.url"));
 
-        if (! file_exists($link)) {
-            $this->error("  ABSENT : {$link} n'existe pas.");
-            $this->warn('  → Lancez : php artisan storage:link');
-            $ok = false;
-        } elseif (is_link($link)) {
-            $resolved = readlink($link);
-            $this->line("  Lien présent : {$link}");
-            $this->line("  Pointe vers  : {$resolved}");
-
-            if (realpath($resolved) !== realpath($target)) {
-                $this->error('  Il ne pointe PAS vers ' . $target);
-                $this->warn('  → Supprimez-le puis relancez : php artisan storage:link');
+            $this->line('');
+            $this->info('── Accès distant ──');
+            try {
+                $probe = 'healthcheck/diagnose-' . uniqid() . '.txt';
+                Media::disk()->put($probe, 'ok');
+                $this->line('  Écriture : OK');
+                $this->line('  Lecture  : ' . (Media::disk()->get($probe) === 'ok' ? 'OK' : 'contenu inattendu'));
+                Media::disk()->delete($probe);
+            } catch (\Throwable $e) {
                 $ok = false;
+                $this->error('  Échec : ' . $e->getMessage());
+                $this->warn('  → Vérifiez DO_SPACES_KEY / DO_SPACES_SECRET / DO_SPACES_ENDPOINT.');
             }
         } else {
-            $this->warn("  {$link} existe mais n'est pas un lien symbolique (dossier réel).");
-            $this->warn('  Acceptable si votre hébergeur interdit les liens, à condition que le contenu y soit copié.');
+            $this->line('  Racine       : ' . config("filesystems.disks.{$disk}.root"));
+
+            $this->line('');
+            $this->info('── Lien symbolique ──');
+            $link = public_path('storage');
+            $target = storage_path('app/public');
+
+            if (! file_exists($link)) {
+                $this->error("  ABSENT : {$link} n'existe pas.");
+                $this->warn('  → Lancez : php artisan storage:link');
+                $ok = false;
+            } elseif (is_link($link)) {
+                $resolved = readlink($link);
+                $this->line("  Lien présent : {$link}");
+                $this->line("  Pointe vers  : {$resolved}");
+
+                if (realpath($resolved) !== realpath($target)) {
+                    $this->error('  Il ne pointe PAS vers ' . $target);
+                    $this->warn('  → Supprimez-le puis relancez : php artisan storage:link');
+                    $ok = false;
+                }
+            } else {
+                $this->warn("  {$link} existe mais n'est pas un lien symbolique (dossier réel).");
+                $this->warn('  Acceptable si votre hébergeur interdit les liens, à condition que le contenu y soit copié.');
+            }
         }
 
         $this->line('');
@@ -57,7 +80,7 @@ class DiagnoseStorage extends Command
 
         $missing = [];
         foreach (ProductImage::cursor() as $image) {
-            if (! Storage::disk('public')->exists($image->path)) {
+            if (! Media::disk()->exists($image->path)) {
                 $missing[] = $image->path;
             }
         }
@@ -81,8 +104,8 @@ class DiagnoseStorage extends Command
             $this->info('── Exemple ──');
             $this->line('  Chemin stocké : ' . $sample->path);
             $this->line('  URL générée   : ' . $sample->url);
-            $this->line('  Fichier réel  : ' . Storage::disk('public')->path($sample->path));
-            $this->line('  Testez cette URL dans un navigateur : ' . rtrim(config('app.url'), '/') . $sample->url);
+            $this->line('  Testez cette URL dans un navigateur : '
+                . (str_starts_with($sample->url, 'http') ? $sample->url : rtrim(config('app.url'), '/') . $sample->url));
         }
 
         $this->line('');

@@ -279,7 +279,7 @@
                 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.75rem;">
                     @foreach($docs as $field => $meta)
                         @if($company->$field)
-                        <a href="{{ Storage::disk('public')->url($company->$field) }}" target="_blank"
+                        <a href="{{ \App\Support\Media::url($company->$field) }}" target="_blank"
                            style="display:flex;align-items:center;gap:.75rem;padding:.875rem 1rem;border:1.5px solid var(--border);border-radius:8px;background:var(--light);text-decoration:none;color:var(--dark);transition:border-color .15s;"
                            onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
                             <i class="fas {{ $meta['icon'] }}" style="color:var(--primary);font-size:1.25rem;flex-shrink:0;"></i>

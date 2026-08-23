@@ -11,6 +11,8 @@
     $soldOut = ! $product->isService() && $product->stock_status === 'rupture';
     $customer = auth()->check() ? auth()->user()->customer : null;
     $isFavorite = $customer ? $customer->favorites()->where('product_id', $product->id)->exists() : false;
+    $ratingAvg   = $product->ratingAverage();
+    $ratingCount = $product->ratingCount();
 @endphp
 
 <div class="breadcrumb-bar">
@@ -56,9 +58,11 @@
       <h1 class="fw-bolder m-0" style="font-size:30px;letter-spacing:-.02em">{{ $product->name }}</h1>
 
       <div class="d-flex align-items-center gap-2 text-muted" style="font-size:13.5px">
-        <span style="color:#f5a623" aria-hidden="true">
-          <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i>
-        </span>
+        @include('shop.partials.stars', ['rating' => $ratingAvg])
+        <a href="#avis" class="text-muted">
+          {{ $ratingCount > 0 ? $ratingAvg . '/5 · ' . $ratingCount . ' avis' : 'Aucun avis' }}
+        </a>
+        <span class="text-muted">·</span>
         @if ($soldOut)
           <span class="fw-semibold" style="color:var(--danger)">Rupture de stock</span>
         @else
@@ -156,6 +160,123 @@
       </div>
     </div>
   @endif
+
+  {{-- AVIS CLIENTS --}}
+  <section class="mt-5" id="avis">
+    <div class="d-flex align-items-baseline justify-content-between mb-3 flex-wrap gap-2">
+      <span class="section-title">Avis et commentaires</span>
+      <span class="text-muted" style="font-size:13px">{{ $ratingCount }} avis publié{{ $ratingCount > 1 ? 's' : '' }}</span>
+    </div>
+
+    <div class="row g-4 align-items-start">
+
+      {{-- Note moyenne + répartition --}}
+      <div class="col-lg-4">
+        <div class="review-summary">
+          <div class="review-summary__score">{{ $ratingCount ? number_format($ratingAvg, 1, ',', ' ') : '—' }}<small>/5</small></div>
+          @include('shop.partials.stars', ['rating' => $ratingAvg])
+          <div class="text-muted mt-1" style="font-size:12.5px">
+            {{ $ratingCount ? 'Sur ' . $ratingCount . ' avis client' . ($ratingCount > 1 ? 's' : '') : 'Aucun avis pour le moment' }}
+          </div>
+
+          <div class="review-bars mt-3">
+            @for ($note = 5; $note >= 1; $note--)
+              @php
+                  $nb  = (int) ($breakdown[$note] ?? 0);
+                  $pct = $ratingCount ? round($nb * 100 / $ratingCount) : 0;
+              @endphp
+              <div class="review-bar">
+                <span class="review-bar__k">{{ $note }} <i class="bi bi-star-fill"></i></span>
+                <span class="review-bar__track"><span class="review-bar__fill" style="width:{{ $pct }}%"></span></span>
+                <span class="review-bar__n">{{ $nb }}</span>
+              </div>
+            @endfor
+          </div>
+        </div>
+      </div>
+
+      {{-- Formulaire + liste --}}
+      <div class="col-lg-8 d-flex flex-column gap-3">
+
+        @auth
+          <form method="POST" action="{{ route('shop.products.reviews.store', $product->id) }}" class="review-form">
+            @csrf
+            <div class="fw-bolder" style="font-size:15px">
+              {{ $myReview ? 'Modifier mon avis' : 'Donner mon avis' }}
+            </div>
+            <div class="text-muted mb-3" style="font-size:12.5px">
+              @if ($myReview && ! $myReview->is_approved)
+                <i class="bi bi-eye-slash"></i> Votre avis a été retiré du site par la modération.
+              @elseif ($myReview)
+                Publié le {{ $myReview->created_at?->translatedFormat('j F Y') }}
+                @if ($myReview->is_verified)<span class="review-badge ms-1"><i class="bi bi-patch-check-fill"></i> Achat vérifié</span>@endif
+              @else
+                Votre avis aide les autres clients à se décider.
+              @endif
+            </div>
+
+            <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+              <span class="text-muted" style="font-size:13.5px">Votre note</span>
+              {{-- row-reverse : les étoiles se remplissent de gauche à droite au survol. --}}
+              <span class="rate-input">
+                @for ($note = 5; $note >= 1; $note--)
+                  <input type="radio" id="rate-{{ $note }}" name="rating" value="{{ $note }}"
+                         @checked((int) old('rating', $myReview->rating ?? 0) === $note) required>
+                  <label for="rate-{{ $note }}" title="{{ $note }} sur 5"><i class="bi bi-star-fill"></i></label>
+                @endfor
+              </span>
+            </div>
+            @error('rating')<div class="text-danger mb-2" style="font-size:12.5px">{{ $message }}</div>@enderror
+
+            <input name="title" value="{{ old('title', $myReview->title ?? '') }}" maxlength="120"
+                   class="form-control mb-2 @error('title') is-invalid @enderror" placeholder="Titre de votre avis (facultatif)">
+            @error('title')<div class="invalid-feedback d-block mb-2">{{ $message }}</div>@enderror
+
+            <textarea name="comment" rows="4" maxlength="2000"
+                      class="form-control @error('comment') is-invalid @enderror"
+                      placeholder="Qu'avez-vous pensé de ce produit ? Qualité, livraison, rapport qualité-prix…">{{ old('comment', $myReview->comment ?? '') }}</textarea>
+            @error('comment')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+
+            <div class="d-flex align-items-center gap-3 mt-3 flex-wrap">
+              <button type="submit" class="btn-brand btn-sm">{{ $myReview ? 'Mettre à jour mon avis' : 'Publier mon avis' }}</button>
+              @if ($myReview)
+                <button type="submit" form="reviewDelete" class="btn p-0 fw-semibold" style="font-size:13px;color:var(--danger)">
+                  <i class="bi bi-trash me-1"></i>Supprimer mon avis
+                </button>
+              @endif
+            </div>
+          </form>
+
+          @if ($myReview)
+            <form method="POST" action="{{ route('shop.products.reviews.destroy', $myReview->id) }}" id="reviewDelete" class="d-none">
+              @csrf @method('DELETE')
+            </form>
+          @endif
+        @else
+          <div class="review-cta">
+            <i class="bi bi-chat-quote"></i>
+            <span>Connectez-vous pour laisser un avis et un commentaire sur ce produit.</span>
+            <a href="{{ route('shop.login') }}" class="btn-brand btn-sm">Se connecter</a>
+          </div>
+        @endauth
+
+        @forelse ($reviews as $review)
+          @include('shop.partials.review-item', ['review' => $review])
+        @empty
+          @if (! $myReview)
+            <div class="empty-state">
+              <i class="bi bi-chat-square-text"></i>
+              Aucun avis sur ce produit pour l'instant. Soyez le premier à en laisser un.
+            </div>
+          @endif
+        @endforelse
+
+        @if ($reviews->hasPages())
+          <nav aria-label="Pagination des avis">{{ $reviews->links('pagination::bootstrap-5') }}</nav>
+        @endif
+      </div>
+    </div>
+  </section>
 
   {{-- SUGGESTIONS --}}
   @if ($suggestions->isNotEmpty())

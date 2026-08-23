@@ -9,6 +9,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Support\Media;
 
 class ServicesSeeder extends Seeder
 {
@@ -362,8 +363,8 @@ class ServicesSeeder extends Seeder
         try {
             $response = Http::timeout(20)->withOptions(['allow_redirects' => true])->get($url);
             if (!$response->successful()) return null;
-            $path = "products/{$productId}/img_{$index}.jpg";
-            Storage::disk('public')->put($path, $response->body());
+            $path = Media::productImages($productId) . "/img_{$index}.jpg";
+            Media::disk()->put($path, $response->body());
             return $path;
         } catch (\Throwable) {
             return null;

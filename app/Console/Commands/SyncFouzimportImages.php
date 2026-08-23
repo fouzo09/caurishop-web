@@ -7,6 +7,7 @@ use App\Models\ProductImage;
 use App\Models\Supplier;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
+use App\Support\Media;
 
 /**
  * Réassocie les photos de database/seeders/fouzimport-images aux produits
@@ -71,13 +72,13 @@ class SyncFouzimportImages extends Command
 
             // On efface les visuels actuels du produit, fichiers compris.
             foreach ($product->images as $image) {
-                Storage::disk('public')->delete($image->path);
+                Media::delete($image->path);
                 $image->delete();
             }
 
             foreach ($available as $position => $file) {
-                $path = "products/{$product->id}/{$product->sku}-{$position}.jpg";
-                Storage::disk('public')->put($path, file_get_contents($file));
+                $path = Media::productImages($product->id) . "/{$product->sku}-{$position}.jpg";
+                Media::disk()->put($path, file_get_contents($file));
 
                 ProductImage::create([
                     'product_id' => $product->id,

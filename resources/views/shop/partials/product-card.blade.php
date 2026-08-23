@@ -67,9 +67,7 @@
     <span class="cat">{{ $product->category->name ?? '' }}</span>
     <a href="{{ $url }}" class="title">{{ $product->name }}</a>
 
-    <span class="stars" aria-hidden="true">
-      <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i>
-    </span>
+    @include('shop.partials.stars', ['rating' => $product->ratingAverage(), 'count' => $product->ratingCount()])
 
     <div class="foot d-flex align-items-end justify-content-between gap-2">
       <span class="price">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Shop;
 
 use App\Http\Controllers\Controller;
+use App\Models\City;
 use App\Models\Customer;
 use App\Models\DjomyTransaction;
 use App\Models\Order;
@@ -47,6 +48,7 @@ class CheckoutController extends Controller
         return view('shop.checkout', [
             'summary'    => $summary,
             'customer'   => $customer,
+            'cities'     => AddressController::cities(),
             'deliveries' => self::DELIVERY,
             // Crédit entreprise : proposé au client rattaché à une entreprise
             // dont le plafond disponible couvre le panier.
@@ -96,8 +98,9 @@ class CheckoutController extends Controller
             'first_name'      => ['required', 'string', 'max:100'],
             'last_name'       => ['required', 'string', 'max:100'],
             'phone'           => ['required', 'string', 'max:30'],
-            'address'         => ['required', 'string', 'max:255'],
-            'city'            => ['required', 'string', 'max:100'],
+            'city_id'         => ['required', 'integer', 'exists:cities,id'],
+            'quartier'        => ['required', 'string', 'max:120'],
+            'precision'       => ['nullable', 'string', 'max:255'],
             'delivery_method' => ['required', 'string', 'in:' . implode(',', array_keys(self::DELIVERY))],
             'payment_mode'    => ['nullable', 'string', 'in:cash,credit'],
             'installments'    => ['nullable', 'integer', 'in:' . implode(',', self::CREDIT_PLANS)],
@@ -124,14 +127,21 @@ class CheckoutController extends Controller
             'credit_installments_count' => $onCredit ? (int) ($data['installments'] ?? self::CREDIT_PLANS[0]) : null,
         ]);
 
+        // La ville est figée sur la commande (nom au moment de l'achat), le
+        // quartier et la précision restent séparés ; `shipping_address` garde la
+        // ligne complète pour les récapitulatifs existants.
+        $addressLine = trim($data['quartier'] . (! empty($data['precision']) ? ' — ' . $data['precision'] : ''));
+
         $shipping = [
-            'shipping_name'    => trim($data['first_name'] . ' ' . $data['last_name']),
-            'shipping_phone'   => $data['phone'],
-            'shipping_address' => $data['address'],
-            'shipping_city'    => $data['city'],
-            'delivery_method'  => $data['delivery_method'],
-            'delivery_fee'     => $deliveryFee,
-            'discount_amount'  => $summary['discount'],
+            'shipping_name'      => trim($data['first_name'] . ' ' . $data['last_name']),
+            'shipping_phone'     => $data['phone'],
+            'shipping_address'   => $addressLine,
+            'shipping_quartier'  => $data['quartier'],
+            'shipping_precision' => $data['precision'] ?? null,
+            'shipping_city'      => City::find($data['city_id'])?->name,
+            'delivery_method'    => $data['delivery_method'],
+            'delivery_fee'       => $deliveryFee,
+            'discount_amount'    => $summary['discount'],
         ];
 
         // 1 bis) Crédit : pas de passage par Djomy, la commande attend son approbation.

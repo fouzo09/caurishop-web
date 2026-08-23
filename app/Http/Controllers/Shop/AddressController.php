@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Shop;
 
 use App\Http\Controllers\Controller;
+use App\Models\City;
 use App\Models\Customer;
 use App\Models\CustomerAddress;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,11 +14,15 @@ use Illuminate\View\View;
 
 /**
  * Carnet d'adresses de livraison de l'espace client.
+ * Une adresse = ville (référentiel `cities`) + quartier + précision.
  */
 class AddressController extends Controller
 {
-    /** Villes / préfectures proposées, alignées sur le checkout. */
-    public const CITIES = ['Conakry', 'Kindia', 'Boké', 'Labé', 'Mamou', 'Faranah', 'Kankan', "N'Zérékoré"];
+    /** Villes proposées au client, partagées avec le checkout. */
+    public static function cities(): Collection
+    {
+        return City::active()->ordered()->get();
+    }
 
     public function index(): View
     {
@@ -24,8 +30,8 @@ class AddressController extends Controller
 
         return view('shop.account.addresses', [
             'customer'  => $customer,
-            'addresses' => $customer ? $customer->addresses()->get() : collect(),
-            'cities'    => self::CITIES,
+            'addresses' => $customer ? $customer->addresses()->with('city')->get() : collect(),
+            'cities'    => self::cities(),
         ]);
     }
 
@@ -39,7 +45,11 @@ class AddressController extends Controller
         // Première adresse du carnet : elle devient l'adresse par défaut.
         $isFirst = $customer->addresses()->count() === 0;
 
-        $address = $customer->addresses()->create($data + ['is_default' => $isFirst || $data['is_default']]);
+        // array_merge et non `+` : `$data` porte déjà la clé is_default, l'union
+        // l'aurait gardée et la première adresse ne serait jamais par défaut.
+        $address = $customer->addresses()->create(array_merge($data, [
+            'is_default' => $isFirst || $data['is_default'],
+        ]));
 
         if ($address->is_default) {
             $this->clearOtherDefaults($customer, $address->id);
@@ -95,9 +105,14 @@ class AddressController extends Controller
             'label'      => ['nullable', 'string', 'max:60'],
             'full_name'  => ['required', 'string', 'max:120'],
             'phone'      => ['required', 'string', 'max:30'],
-            'city'       => ['required', 'string', 'max:100'],
-            'address'    => ['required', 'string', 'max:255'],
+            'city_id'    => ['required', 'integer', 'exists:cities,id'],
+            'quartier'   => ['required', 'string', 'max:120'],
+            'precision'  => ['nullable', 'string', 'max:255'],
             'is_default' => ['nullable', 'boolean'],
+        ], [], [
+            'city_id'   => 'ville',
+            'quartier'  => 'quartier',
+            'precision' => 'précision',
         ]);
 
         $data['is_default'] = (bool) ($data['is_default'] ?? false);

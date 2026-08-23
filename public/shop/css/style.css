@@ -415,6 +415,43 @@ a:hover{color:var(--brand)}
 .swal-cauri-toast.swal-cauri-toast--error{border-left-color:#e0403a}
 .swal-cauri-toast.swal-cauri-toast--error .swal2-timer-progress-bar{background:#e0403a!important}
 
+/* ============================ AVIS CLIENTS ============================ */
+/* Étoiles génériques (fiche produit, avis) ; .pcard .stars garde ses réglages. */
+.stars{display:inline-flex;align-items:center;gap:2px;color:#f5a623;font-size:13px;line-height:1}
+.stars .stars__off{color:#dcdcdc}
+.stars .count{color:var(--muted);margin-left:4px;font-size:12px}
+
+.review-summary{border:1px solid var(--line);border-radius:10px;padding:20px;text-align:center}
+.review-summary__score{font-size:38px;font-weight:800;line-height:1;color:var(--ink);margin-bottom:8px}
+.review-summary__score small{font-size:15px;font-weight:600;color:var(--muted)}
+.review-bars{display:flex;flex-direction:column;gap:6px}
+.review-bar{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.review-bar__k{display:inline-flex;align-items:center;gap:3px;width:32px;flex:none;color:var(--ink);font-weight:600}
+.review-bar__k i{color:#f5a623;font-size:10px}
+.review-bar__track{flex:1;height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.review-bar__fill{display:block;height:100%;background:#f5a623;border-radius:99px}
+.review-bar__n{width:22px;text-align:right;flex:none}
+
+.review-form{border:1px solid var(--line);border-radius:10px;padding:20px}
+/* row-reverse + sélecteur ~ : le survol remplit les étoiles jusqu'à la note visée. */
+.rate-input{display:inline-flex;flex-direction:row-reverse;gap:3px}
+.rate-input input{position:absolute;width:1px;height:1px;opacity:0}
+.rate-input label{cursor:pointer;color:#dcdcdc;font-size:19px;line-height:1;margin:0;transition:color .12s}
+.rate-input input:checked ~ label,
+.rate-input label:hover,
+.rate-input label:hover ~ label{color:#f5a623}
+.rate-input input:focus-visible + label{outline:2px solid var(--brand);outline-offset:2px;border-radius:3px}
+
+.review-cta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px dashed var(--line-input);border-radius:10px;padding:16px 18px;font-size:13.5px;color:#555}
+.review-cta > i{color:var(--brand);font-size:19px}
+.review-cta .btn-brand{margin-left:auto}
+
+.review-item{border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.review-item__author{font-weight:700;font-size:13.5px}
+.review-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--green);background:#eaf6ef;border-radius:99px;padding:1px 8px}
+.review-item__title{font-weight:700;font-size:14px;margin-top:6px}
+.review-item__body{margin:6px 0 0;font-size:13.5px;color:#555;line-height:1.65;white-space:pre-line}
+
 /* ============================ RESPONSIVE ============================ */
 @media (max-width:991.98px){
   .shop-aside{border-right:0;border-bottom:1px solid var(--line)}

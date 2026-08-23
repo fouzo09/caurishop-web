@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
+use App\Support\Media;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 class ProductImage extends Model
 {
@@ -19,13 +19,9 @@ class ProductImage extends Model
         return $this->belongsTo(Product::class);
     }
 
-    /**
-     * Les fichiers sont écrits sur le disque « public » (storage/app/public).
-     * On nomme ce disque explicitement : Storage::url() viserait le disque par
-     * défaut (local, racine storage/app/private), où le fichier n'existe pas.
-     */
+    /** URL publique de l'image, servie depuis le disque média (DigitalOcean Spaces). */
     public function getUrlAttribute(): string
     {
-        return Storage::disk('public')->url($this->path);
+        return (string) Media::url($this->path);
     }
 }

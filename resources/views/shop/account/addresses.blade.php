@@ -35,8 +35,8 @@
 
                 <div class="addr-card__body">
                   {{ $a->full_name }}<br>
-                  {{ $a->address }}<br>
-                  {{ $a->city }} — Guinée<br>
+                  {{ $a->quartier }}@if ($a->precision)<br><span class="text-muted">{{ $a->precision }}</span>@endif<br>
+                  {{ $a->cityName() }} — Guinée<br>
                   {{ $a->phone }}
                 </div>
 

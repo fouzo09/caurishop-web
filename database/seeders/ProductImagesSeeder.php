@@ -7,6 +7,7 @@ use App\Models\ProductImage;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use App\Support\Media;
 
 class ProductImagesSeeder extends Seeder
 {
@@ -47,7 +48,7 @@ class ProductImagesSeeder extends Seeder
 
             // Supprimer les anciennes images
             $product->images()->get()->each(function ($img) {
-                Storage::disk('public')->delete($img->path);
+                Media::delete($img->path);
                 $img->delete();
             });
 
@@ -83,8 +84,8 @@ class ProductImagesSeeder extends Seeder
             $contentType = $response->header('Content-Type');
             $ext = str_contains($contentType, 'png') ? 'png' : 'jpg';
 
-            $path = "products/{$productId}/img_{$index}.{$ext}";
-            Storage::disk('public')->put($path, $response->body());
+            $path = Media::productImages($productId) . "/img_{$index}.{$ext}";
+            Media::disk()->put($path, $response->body());
 
             return $path;
         } catch (\Throwable $e) {

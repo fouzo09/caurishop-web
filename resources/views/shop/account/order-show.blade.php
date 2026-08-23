@@ -84,7 +84,7 @@
         <div class="fw-bolder mb-3" style="font-size:15px"><i class="bi bi-geo-alt text-brand me-1"></i> Adresse de livraison</div>
         <div style="font-size:13.5px;color:#555;line-height:1.7">
           {{ $order->shipping_name }}<br>
-          {{ $order->shipping_address }}<br>
+          {{ $order->shippingLine() }}<br>
           {{ $order->shipping_city }} — Guinée<br>
           {{ $order->shipping_phone }}
         </div>

@@ -35,6 +35,8 @@ class Order extends Model
         'shipping_name',
         'shipping_phone',
         'shipping_address',
+        'shipping_quartier',
+        'shipping_precision',
         'shipping_city',
         'delivery_method',
         'payment_method',
@@ -77,6 +79,18 @@ class Order extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * Ligne d'adresse de livraison : quartier + précision.
+     * Retombe sur `shipping_address` pour les commandes passées avant la
+     * séparation ville / quartier / précision.
+     */
+    public function shippingLine(): string
+    {
+        $line = trim((string) $this->shipping_quartier . ($this->shipping_precision ? ' — ' . $this->shipping_precision : ''));
+
+        return $line !== '' ? $line : (string) $this->shipping_address;
     }
 
     public function isCredit(): bool

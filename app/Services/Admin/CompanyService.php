@@ -4,10 +4,10 @@ namespace App\Services\Admin;
 
 use App\Models\Company;
 use App\Repositories\Admin\CompanyRepository;
+use App\Support\Media;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class CompanyService
 {
@@ -61,10 +61,13 @@ class CompanyService
             $company = $this->companyRepository->create($data);
 
             // Stockage des fichiers
+            // Chaque type de document a son dossier racine : rccm/, nif/, statuts/…
             $docs = [];
             foreach ($files as $field => $file) {
-                if ($file) {
-                    $docs[$field] = $file->store("companies/{$company->id}", 'public');
+                $folder = $file ? Media::companyDoc($field, $company->id) : null;
+
+                if ($folder) {
+                    $docs[$field] = $file->store($folder, Media::diskName());
                 }
             }
             if (!empty($docs)) {
@@ -124,10 +127,8 @@ class CompanyService
         }
 
         // Supprimer les fichiers si présents
-        foreach (['doc_rccm','doc_nif','doc_statuts','doc_cni','doc_patente','doc_domicile'] as $doc) {
-            if ($company->$doc) {
-                Storage::disk('public')->delete($company->$doc);
-            }
+        foreach (array_keys(Media::COMPANY_DOCS) as $doc) {
+            Media::delete($company->$doc);
         }
 
         return $this->companyRepository->delete($company);

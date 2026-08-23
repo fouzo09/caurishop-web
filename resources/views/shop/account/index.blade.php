@@ -76,8 +76,8 @@
             @if ($defaultAddress)
               <div style="font-size:13.5px;color:#555;line-height:1.7">
                 {{ $defaultAddress->full_name }}<br>
-                {{ $defaultAddress->address }}<br>
-                {{ $defaultAddress->city }} — Guinée<br>
+                {{ $defaultAddress->street() }}<br>
+                {{ $defaultAddress->cityName() }} — Guinée<br>
                 {{ $defaultAddress->phone }}
               </div>
             @else
