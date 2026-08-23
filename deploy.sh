@@ -15,6 +15,9 @@ docker compose -f docker-compose.prod.yml pull app
 docker compose -f docker-compose.prod.yml up -d --no-deps app
 
 docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force
+# Bascule des fichiers encore stockés en local vers DigitalOcean Spaces.
+# Sans effet une fois la reprise faite : les chemins déjà à jour sont ignorés.
+docker compose -f docker-compose.prod.yml exec -T app php artisan media:migrate
 docker compose -f docker-compose.prod.yml exec -T app php artisan optimize
 docker compose -f docker-compose.prod.yml exec -T app php artisan storage:link
 

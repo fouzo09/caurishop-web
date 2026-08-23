@@ -47,3 +47,6 @@ jobs:
             docker compose pull
             docker compose up -d
             docker compose exec -T app php artisan migrate --force
+            # Reprise des fichiers encore stockés en local vers DigitalOcean Spaces.
+            # Sans effet une fois faite : les chemins déjà à jour sont ignorés.
+            docker compose exec -T app php artisan media:migrate

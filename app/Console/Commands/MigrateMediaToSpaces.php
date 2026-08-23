@@ -31,10 +31,12 @@ class MigrateMediaToSpaces extends Command
         $source    = Storage::disk($this->option('from'));
         $target    = Media::diskName();
 
+        // Rien à reprendre quand le disque média est déjà le disque source :
+        // on sort proprement pour ne pas interrompre un script de déploiement.
         if ($this->option('from') === $target) {
-            $this->error("Le disque source et le disque média sont identiques ({$target}).");
+            $this->warn("Disque média identique au disque source ({$target}) — rien à transférer.");
 
-            return self::FAILURE;
+            return self::SUCCESS;
         }
 
         $this->line('');
