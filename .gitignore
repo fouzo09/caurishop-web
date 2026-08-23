@@ -25,3 +25,4 @@ Thumbs.db
 
 # Comptes de test locaux — contient des mots de passe
 /test-accounts.html
+.vault_pass
